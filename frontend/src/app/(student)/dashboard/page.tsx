@@ -5,7 +5,14 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { api, getActiveDemoUserId } from "@/lib/api/client";
 import { ConceptGraphView } from "@/components/graph/ConceptGraphView";
-import { ArrowRight, RefreshCw, AlertCircle, RotateCcw } from "lucide-react";
+import {
+  ArrowRight,
+  RefreshCw,
+  AlertCircle,
+  RotateCcw,
+  Sparkles,
+  CheckCircle,
+} from "lucide-react";
 
 export default function StudentDashboardPage() {
   const [userId, setUserId] = useState<number | null>(null);
@@ -36,6 +43,13 @@ export default function StudentDashboardPage() {
     retry: 1,
   });
 
+  // Query assigned interventions for student
+  const { data: interventions, refetch: refetchInterventions } = useQuery({
+    queryKey: ["my-interventions", userId],
+    queryFn: () => api.getMyInterventions(),
+    enabled: userId !== null,
+  });
+
   return (
     <div className="space-y-6">
       {/* Top Banner / Welcome Card */}
@@ -52,22 +66,84 @@ export default function StudentDashboardPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2.5">
           <Link
             href="/diagnostic"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-ink-primary text-canvas text-xs font-semibold hover:bg-ink-primary/90 transition shadow-subtle"
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-ink-primary text-canvas text-xs font-semibold hover:bg-ink-primary/90 transition shadow-subtle"
           >
             <span>Start Diagnostic</span>
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
           <Link
             href="/practice"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border-subtle bg-surface text-ink-primary text-xs font-semibold hover:bg-subtle transition"
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-border-subtle bg-surface text-ink-primary text-xs font-semibold hover:bg-subtle transition"
           >
             <span>Targeted Practice</span>
           </Link>
         </div>
       </div>
+
+      {/* Assigned Teacher Interventions Notification Banner */}
+      {interventions && interventions.length > 0 && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-amber-700" />
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-amber-900 font-mono">
+                Assigned Teacher Intervention ({interventions.length})
+              </h2>
+            </div>
+            <span className="text-[11px] text-amber-800 font-medium">Action Required</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {interventions.map((it) => (
+              <div
+                key={it.assignment_id}
+                className="p-3 bg-surface rounded-lg border border-amber-200 shadow-xs flex flex-col justify-between gap-2"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-semibold text-xs text-ink-primary">{it.title}</span>
+                    <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 font-medium">
+                      {it.activity_type.replace("_", " ")}
+                    </span>
+                  </div>
+                  <p className="text-xs text-ink-secondary mt-1">{it.learning_gap}</p>
+                </div>
+
+                <div className="pt-2 border-t border-border-subtle flex items-center justify-between gap-2">
+                  <span className="text-[11px] text-ink-muted">Concept: {it.concept_name}</span>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={async () => {
+                        await api.completeMyIntervention(it.assignment_id);
+                        refetchInterventions();
+                      }}
+                      className="px-2 py-1 rounded text-[11px] font-medium text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 flex items-center gap-1"
+                    >
+                      <CheckCircle className="w-3 h-3 text-emerald-600" />
+                      <span>Mark Done</span>
+                    </button>
+                    <Link
+                      href={
+                        it.activity_type === "diagram_lab"
+                          ? "/lab"
+                          : it.activity_type === "teachback"
+                          ? `/teach-back/${it.concept_id}`
+                          : `/practice?concept=${it.concept_id}`
+                      }
+                      className="px-2.5 py-1 rounded text-[11px] font-medium text-white bg-amber-700 hover:bg-amber-800"
+                    >
+                      Start Task →
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Hero Interactive Concept Graph */}
       <div className="space-y-2">

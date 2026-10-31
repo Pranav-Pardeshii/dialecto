@@ -4,7 +4,9 @@ from pydantic import BaseModel, ConfigDict, Field
 class ConceptMasterySummary(BaseModel):
     model_config = ConfigDict(extra="forbid")
     p_effective: float = Field(ge=0.0, le=1.0)
-    status: str  # locked, unlocked, learning, mastered
+    status: str  # locked, ready, learning, mastered
+    lock_reason: str | None = None
+    unmet_prerequisites: list[str] = Field(default_factory=list)
 
 
 class ConceptNode(BaseModel):
@@ -37,3 +39,4 @@ class ConceptDetailResponse(BaseModel):
     lesson_md: str
     prerequisites: list[str]
     misconception_count: int
+    lock_reason: str | None = None

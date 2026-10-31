@@ -108,6 +108,16 @@ export function Navbar() {
                 >
                   Review
                 </Link>
+                <Link
+                  href="/lab"
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${
+                    pathname.startsWith("/lab")
+                      ? "bg-subtle text-ink-primary font-semibold"
+                      : "text-ink-secondary hover:text-ink-primary hover:bg-subtle/50"
+                  }`}
+                >
+                  Biology Lab
+                </Link>
               </>
             ) : (
               <>
@@ -120,6 +130,16 @@ export function Navbar() {
                   }`}
                 >
                   Class Heatmap & Insights
+                </Link>
+                <Link
+                  href="/authoring"
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${
+                    pathname.startsWith("/authoring")
+                      ? "bg-subtle text-ink-primary font-semibold"
+                      : "text-ink-secondary hover:text-ink-primary hover:bg-subtle/50"
+                  }`}
+                >
+                  Question Authoring
                 </Link>
                 <Link
                   href="/ops"

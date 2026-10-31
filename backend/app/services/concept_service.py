@@ -5,7 +5,10 @@ from typing import Any
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.errors import NotFoundError
-from app.domain.graph import calculate_concept_status
+from app.domain.graph import (
+    PrerequisiteInfo,
+    determine_concept_status,
+)
 from app.domain.sm2 import compute_effective_mastery
 from app.repositories.concept_repo import concept_repo
 from app.schemas.concept import (
@@ -30,6 +33,7 @@ class ConceptService:
     ) -> ConceptGraphResponse:
         concepts = await concept_repo.list_all(session)
         prereqs = await concept_repo.list_all_prerequisites(session)
+        concept_lookup = {c.id: c for c in concepts}
 
         # Map: concept_id -> list of prerequisite_ids
         prereq_map: dict[str, list[str]] = defaultdict(list)
@@ -42,34 +46,56 @@ class ConceptService:
         if current_user and current_user.role == UserRole.STUDENT:
             user_mastery_map = await concept_repo.get_user_masteries(session, current_user.id)
 
-        # Pre-compute effective masteries for status calculation
-        effective_masteries: dict[str, float] = {}
-        for c in concepts:
-            m_data = user_mastery_map.get(c.id)
-            if m_data:
-                eff = compute_effective_mastery(m_data["p_mastery"], m_data["next_due_at"])
-            else:
-                eff = c.p_l0
-            effective_masteries[c.id] = eff
-
+        now = datetime.datetime.now(datetime.UTC)
         nodes: list[ConceptNode] = []
+
         for c in concepts:
             mastery_summary: ConceptMasterySummary | None = None
             if current_user and current_user.role == UserRole.STUDENT:
                 m_data = user_mastery_map.get(c.id)
                 attempts = m_data["attempts"] if m_data else 0
-                eff = effective_masteries[c.id]
 
-                # List of base masteries of prerequisites to prevent decay relock
-                prereq_masteries = [
-                    user_mastery_map.get(p_id, {}).get("p_mastery", 0.3)
-                    for p_id in prereq_map[c.id]
-                ]
-                status = calculate_concept_status(eff, attempts, prereq_masteries)
+                if m_data and attempts > 0:
+                    eff = compute_effective_mastery(
+                        m_data["p_mastery"], m_data["next_due_at"], now=now
+                    )
+                else:
+                    # Untested concepts do not carry arbitrary low-mastery percentages
+                    eff = 0.0
+
+                # Build prerequisite infos using base masteries to prevent decay relock
+                prereq_infos: list[PrerequisiteInfo] = []
+                for p_id in prereq_map[c.id]:
+                    p_concept = concept_lookup.get(p_id)
+                    p_name = p_concept.name if p_concept else p_id
+                    p_m = user_mastery_map.get(p_id)
+                    # If prerequisite has attempts, use its base mastery; if not attempted, 0.0
+                    p_base = (
+                        float(p_m["p_mastery"])
+                        if (p_m and p_m.get("attempts", 0) > 0)
+                        else 0.0
+                    )
+                    prereq_infos.append(
+                        PrerequisiteInfo(
+                            prerequisite_id=p_id,
+                            prerequisite_name=p_name,
+                            base_mastery=p_base,
+                        )
+                    )
+
+                status_details = determine_concept_status(
+                    effective_mastery=eff,
+                    attempts=attempts,
+                    prerequisites=prereq_infos,
+                )
 
                 mastery_summary = ConceptMasterySummary(
                     p_effective=eff,
-                    status=status,
+                    status=status_details.status,
+                    lock_reason=status_details.lock_reason,
+                    unmet_prerequisites=[
+                        u["name"] for u in status_details.unmet_prerequisites
+                    ],
                 )
 
             nodes.append(
@@ -103,6 +129,7 @@ class ConceptService:
             lesson_md=concept.lesson_md,
             prerequisites=prereqs,
             misconception_count=misconception_count,
+            lock_reason=None,
         )
 
 
