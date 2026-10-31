@@ -1,6 +1,7 @@
 import datetime
 import math
 from collections import defaultdict
+from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -49,7 +50,7 @@ class ConceptService:
             prereq_map[dependent_id].append(prereq_id)
             edges.append(ConceptEdge.model_validate({"from": prereq_id, "to": dependent_id}))
 
-        user_mastery_map = {}
+        user_mastery_map: dict[str, dict[str, Any]] = {}
         if current_user and current_user.role == UserRole.STUDENT:
             user_mastery_map = await concept_repo.get_user_masteries(session, current_user.id)
 
