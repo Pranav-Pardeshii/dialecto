@@ -218,9 +218,9 @@ async def seed_database(reset_demo: bool = False) -> None:
 
             # Known misconception IDs for targeted classroom hotspots
             hotspot_misconceptions = [
-                "mis-lp-photo-01",  # Oxygen comes from CO2
-                "mis-cr-reflex-01",  # Reflex arc goes to brain
-                "mis-hr-mendel-01",  # Blending inheritance
+                "m-o2-from-co2",  # Oxygen comes from CO2
+                "m-reflex-brain",  # Reflex arc goes to brain
+                "m-recessive-lost",  # Blending inheritance / lost traits
             ]
 
             for idx, name in enumerate(student_names, start=3):
