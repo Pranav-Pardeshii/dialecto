@@ -42,7 +42,7 @@ class Settings(BaseSettings):
     TOKEN_BUDGET_PER_MINUTE: int = 20000
 
     # Security & CORS
-    ALLOW_DEMO_AUTH: bool = False
+    ALLOW_DEMO_AUTH: bool = True
     CORS_ORIGINS: str = "http://localhost:3000"
     BACKEND_URL: str = "http://localhost:8000"
 
