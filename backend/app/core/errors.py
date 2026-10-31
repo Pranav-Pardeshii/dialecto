@@ -29,6 +29,11 @@ class NotFoundError(AppError):
         super().__init__(code="not_found", message=message, status_code=404, details=details)
 
 
+class BadRequestError(AppError):
+    def __init__(self, message: str = "Invalid request", details: dict[str, Any] | None = None):
+        super().__init__(code="validation_error", message=message, status_code=422, details=details)
+
+
 class UnknownUserError(AppError):
     def __init__(self, message: str = "Unknown or missing demo user id"):
         super().__init__(code="unknown_user", message=message, status_code=401)

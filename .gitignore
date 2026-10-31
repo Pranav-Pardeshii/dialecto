@@ -24,6 +24,9 @@ out/
 # Taste skill
 .taste-skill/
 
+# Scratch files
+scratch/
+
 # OS
 .DS_Store
 Thumbs.db
