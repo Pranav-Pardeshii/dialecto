@@ -5,53 +5,57 @@ Handoff memory across agent sessions.
 ---
 
 ## Done
-- Read and internalized all authoritative documents (`MASTER_PROMPT.md`, `AGENTS.md`, `README.md`, `architecture.md`, `database.md`, `api.md`, `curriculum.md`, `plan.md`).
-- Installed Taste Skill (`design-taste-frontend` v2) into `.agents/skills/design-taste-frontend`.
-- Completed Phase 0 documentation:
-  - `docs/design.md` (Taste Skill design system, tokens, signature moments, dial settings).
-  - `docs/prd.md` (Problem statement, personas, user stories, rubric alignment, demo script).
-  - `docs/features.md` (P0/P1/P2 feature matrix mapping brief items 1–7 + Teach-Back + Wispr Flow).
-  - `docs/testing.md` (Test pyramid, commands, judge eval harness, debugging playbook).
-  - `docs/setup.md` (Prerequisites, environment vars, local first-run, deployment, Wispr Flow setup).
-  - `docs/DECISIONS.md` (Documented initial findings, missing docs/agents.md, Taste skill variant).
-- Initialized git repository.
+- **Phase 0 Documentation:**
+  - Read all authoritative docs (`AGENTS.md`, `README.md`, `architecture.md`, `database.md`, `api.md`, `curriculum.md`, `plan.md`).
+  - Installed Taste Skill (`design-taste-frontend` v2) in `.agents/skills/design-taste-frontend`.
+  - Created Phase 0 docs: `design.md`, `prd.md`, `features.md`, `testing.md`, `setup.md`, `DECISIONS.md`.
+  - Enforced strict rule: **Zero mentions of backend frameworks or third-party tools in UI code or copy.**
+- **Milestone M0 Complete (Setup, Monorepo Skeleton, Design Foundation):**
+  - Scaffolded `backend/`: FastAPI async modular monolith, Python 3.12 with `uv`, `app/core/` (settings, logging, error envelope, tracing middleware, rate limits), `app/api/v1/` (`/health`, `/ready`, `/users`, `/me`), `app/db/` (asyncpg session).
+  - Scaffolded `frontend/`: Next.js 15 App Router, TypeScript strict, Tailwind themed per Taste Skill tokens (`Fraunces` + `Plus Jakarta Sans` + `JetBrains Mono`), TanStack Query, generated typed API client (`pnpm gen:api`).
+  - Built App Shell with demo identity role switcher (`Aarav` Class 10 student / `Ms. Rao` Biology instructor).
+  - Root configuration: `Makefile`, `docker-compose.yml`, `.env.example`, `.github/workflows/ci.yml`, `backend/Dockerfile`, `frontend/Dockerfile`.
+  - Verified: `ruff` (clean), `mypy` (clean), `pytest` (5 passed), `pnpm lint` (clean), `pnpm typecheck` (clean), `pnpm build` (clean).
 
 ---
 
 ## In Progress
-- Waiting for developer approval on `docs/design.md` before starting M0 frontend implementation.
+- Transitioning to **Milestone M1: Data & Concept Graph**.
 
 ---
 
 ## Next
-- **Milestone M0 Completion:**
-  - Create monorepo skeleton matching README tree (`backend/` and `frontend/`).
-  - Create root `Makefile`, `docker-compose.yml`, `.env.example`, `.github/workflows/ci.yml`.
-  - Scaffold FastAPI backend with `uv`.
-  - Scaffold Next.js App Router frontend with `pnpm`.
-  - Build app shell with demo role switcher (`Aarav` student / `Ms. Rao` teacher) implementing the approved design.
-  - Verify `docker compose up db` and `make check`.
+- **Milestone M1 Plan:**
+  1. Define SQLAlchemy 2.0 ORM models in `backend/app/models/` matching `docs/database.md` (`Classroom`, `User`, `Concept`, `ConceptPrerequisite`, `Misconception`, `Question`, `Mastery`, `Session`, `Attempt`, `DetectedMisconception`, `TeachbackSession`, `TeachbackTurn`, `LLMCall`).
+  2. Setup Alembic async migrations (`alembic init -t async migrations`) and generate initial migration.
+  3. Convert `docs/curriculum.md` into `app/content/concepts.json` and `app/content/misconceptions.json`.
+  4. Write idempotent seeder `python -m app.db.seed` (loads content JSON, creates classroom and demo users Aarav and Ms. Rao).
+  5. Implement `GET /api/v1/concepts` and `GET /api/v1/concepts/{concept_id}` endpoints.
+  6. Build interactive Concept Graph in frontend (`src/components/graph/` using `@xyflow/react`) with custom nodes showing chapter, mastery ring, and locked/unlocked state.
+  7. Regenerate API types (`pnpm gen:api`), run checks, update `progress.md`, and commit.
 
 ---
 
-## Known Bugs / Blockers
-- `docs/agents.md` is referenced as authoritative doc #6 in `MASTER_PROMPT.md` and `README.md`, but was missing from the initial file bundle. Standing prompt schemas and evidence rules are tracked in `architecture.md` / `api.md`.
-- Upstream `taste-skill` repository does not provide a separate `full-output-enforcement` skill package; its enforcement rules are embedded within `design-taste-frontend`.
+## Known Bugs / Notes
+- Local service `postgresql-x64-18` is running on host port 5432. When using Docker Compose, port 5432 should be used after stopping the local service or configuring credentials, or using a cloud database (Neon) for live deployment.
+- Strict UI framework secrecy is active and enforced across all screens.
 
 ---
 
 ## Useful Commands
 ```bash
 # Quality checks
-make check
-uv run ruff check backend
-uv run mypy backend/app
-pnpm --dir frontend typecheck
-pnpm --dir frontend lint
+cd backend && uv run ruff check app tests
+cd backend && uv run mypy app
+cd backend && uv run pytest tests -v
+cd frontend && pnpm lint
+cd frontend && pnpm typecheck
+cd frontend && pnpm build
 
-# Local services
-docker compose up -d db
+# Type generation
+cd frontend && pnpm gen:api
+
+# Run dev servers
 cd backend && uv run uvicorn app.main:app --reload --port 8000
 cd frontend && pnpm dev
 ```
-
