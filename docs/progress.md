@@ -114,6 +114,7 @@ All Milestones (M0 through M6) are completely implemented, verified, and committ
 - **Cloud Deployment:**
   - Live Render Backend: `https://dialecto-backend-55qp.onrender.com` (Python 3.12, Alembic migrations, PostgreSQL seeded, health & readiness verified).
   - Vercel Frontend: Connected via `BACKEND_URL` environment variable through Next.js reverse proxy rewrites.
+  - Brand Assets: Custom transparent biology-graph emblem generated with anti-aliasing and integrated into Navbar, Landing page, app icons, and favicon.ico.
 
 
 
