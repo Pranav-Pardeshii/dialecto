@@ -83,6 +83,8 @@ export type DiagnosticResultResponse = paths["/api/v1/diagnostic/sessions/{sessi
 export type LearnerMasteryItem = paths["/api/v1/learner/mastery"]["get"]["responses"][200]["content"]["application/json"][number];
 export type LearnerSummary = paths["/api/v1/learner/summary"]["get"]["responses"][200]["content"]["application/json"];
 
+export type LLMStatsResponse = paths["/api/v1/ops/llm-stats"]["get"]["responses"][200]["content"]["application/json"];
+
 export const api = {
   getUsers: (includeSimulated = false) =>
     apiFetch<User[]>(`/api/v1/users?include_simulated=${includeSimulated}`),
@@ -121,5 +123,8 @@ export const api = {
   // Learner
   getLearnerMastery: () => apiFetch<LearnerMasteryItem[]>("/api/v1/learner/mastery"),
   getLearnerSummary: () => apiFetch<LearnerSummary>("/api/v1/learner/summary"),
+
+  // Ops & Telemetry
+  getLLMStats: () => apiFetch<LLMStatsResponse>("/api/v1/ops/llm-stats"),
 };
 

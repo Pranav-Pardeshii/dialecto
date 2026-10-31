@@ -264,6 +264,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/ops/llm-stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Llm Stats
+         * @description Returns telemetry on language models: latency percentiles, error rates, circuit breakers, and budgets.
+         */
+        get: operations["get_llm_stats_api_v1_ops_llm_stats_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -419,6 +439,27 @@ export interface components {
              */
             status: string;
         };
+        /** LLMStatsResponse */
+        LLMStatsResponse: {
+            /** Primary Model */
+            primary_model: string;
+            /** Fallback Models */
+            fallback_models: string[];
+            /** Total Calls */
+            total_calls: number;
+            /** Fallback Rate */
+            fallback_rate: number;
+            /** Error Rate */
+            error_rate: number;
+            /** P50 Latency Ms */
+            p50_latency_ms: number;
+            /** P95 Latency Ms */
+            p95_latency_ms: number;
+            /** Models */
+            models: components["schemas"]["ModelStatusOut"][];
+            /** Recent Calls */
+            recent_calls: components["schemas"]["RecentCallOut"][];
+        };
         /** LearnerMasteryItem */
         LearnerMasteryItem: {
             /** Concept Id */
@@ -474,6 +515,55 @@ export interface components {
             source: string;
             /** Confidence */
             confidence: number;
+        };
+        /** ModelBreakerStatus */
+        ModelBreakerStatus: {
+            /** Model */
+            model: string;
+            /** State */
+            state: string;
+            /** Failure Count */
+            failure_count: number;
+            /** Seconds Until Reset */
+            seconds_until_reset: number;
+        };
+        /** ModelStatusOut */
+        ModelStatusOut: {
+            /** Model */
+            model: string;
+            /** Is Primary */
+            is_primary: boolean;
+            circuit_breaker: components["schemas"]["ModelBreakerStatus"];
+            token_budget: components["schemas"]["ModelTokenBudgetStatus"];
+            /**
+             * Calls
+             * @default 0
+             */
+            calls: number;
+            /**
+             * Errors
+             * @default 0
+             */
+            errors: number;
+            /**
+             * Avg Latency Ms
+             * @default 0
+             */
+            avg_latency_ms: number;
+            /**
+             * Tokens Consumed
+             * @default 0
+             */
+            tokens_consumed: number;
+        };
+        /** ModelTokenBudgetStatus */
+        ModelTokenBudgetStatus: {
+            /** Capacity */
+            capacity: number;
+            /** Available */
+            available: number;
+            /** Pct Remaining */
+            pct_remaining: number;
         };
         /** PracticeAnswerRequest */
         PracticeAnswerRequest: {
@@ -571,6 +661,23 @@ export interface components {
             primary_model: string;
             /** Available Fallback Models */
             available_fallback_models: string[];
+        };
+        /** RecentCallOut */
+        RecentCallOut: {
+            /** Purpose */
+            purpose: string;
+            /** Model */
+            model: string;
+            /** Latency Ms */
+            latency_ms: number;
+            /** Status */
+            status: string;
+            /** Fallback Used */
+            fallback_used: boolean;
+            /** Tokens */
+            tokens: number;
+            /** Created At */
+            created_at: string;
         };
         /** UserOut */
         UserOut: {
@@ -1008,6 +1115,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_llm_stats_api_v1_ops_llm_stats_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LLMStatsResponse"];
                 };
             };
         };

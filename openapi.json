@@ -1,4 +1,4 @@
-﻿{
+{
   "openapi": "3.1.0",
   "info": {
     "title": "Dialecto API",
@@ -643,6 +643,28 @@
           }
         }
       }
+    },
+    "/api/v1/ops/llm-stats": {
+      "get": {
+        "tags": [
+          "Operations & Observability"
+        ],
+        "summary": "Get Llm Stats",
+        "description": "Returns telemetry on language models: latency percentiles, error rates, circuit breakers, and budgets.",
+        "operationId": "get_llm_stats_api_v1_ops_llm_stats_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LLMStatsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1056,6 +1078,75 @@
         "type": "object",
         "title": "HealthResponse"
       },
+      "LLMStatsResponse": {
+        "properties": {
+          "primary_model": {
+            "type": "string",
+            "title": "Primary Model"
+          },
+          "fallback_models": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Fallback Models"
+          },
+          "total_calls": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Total Calls"
+          },
+          "fallback_rate": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Fallback Rate"
+          },
+          "error_rate": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Error Rate"
+          },
+          "p50_latency_ms": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "P50 Latency Ms"
+          },
+          "p95_latency_ms": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "P95 Latency Ms"
+          },
+          "models": {
+            "items": {
+              "$ref": "#/components/schemas/ModelStatusOut"
+            },
+            "type": "array",
+            "title": "Models"
+          },
+          "recent_calls": {
+            "items": {
+              "$ref": "#/components/schemas/RecentCallOut"
+            },
+            "type": "array",
+            "title": "Recent Calls"
+          }
+        },
+        "type": "object",
+        "required": [
+          "primary_model",
+          "fallback_models",
+          "total_calls",
+          "fallback_rate",
+          "error_rate",
+          "p50_latency_ms",
+          "p95_latency_ms",
+          "models",
+          "recent_calls"
+        ],
+        "title": "LLMStatsResponse"
+      },
       "LearnerMasteryItem": {
         "properties": {
           "concept_id": {
@@ -1221,6 +1312,103 @@
           "confidence"
         ],
         "title": "MisconceptionFeedback"
+      },
+      "ModelBreakerStatus": {
+        "properties": {
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "state": {
+            "type": "string",
+            "title": "State"
+          },
+          "failure_count": {
+            "type": "integer",
+            "title": "Failure Count"
+          },
+          "seconds_until_reset": {
+            "type": "number",
+            "title": "Seconds Until Reset"
+          }
+        },
+        "type": "object",
+        "required": [
+          "model",
+          "state",
+          "failure_count",
+          "seconds_until_reset"
+        ],
+        "title": "ModelBreakerStatus"
+      },
+      "ModelStatusOut": {
+        "properties": {
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "is_primary": {
+            "type": "boolean",
+            "title": "Is Primary"
+          },
+          "circuit_breaker": {
+            "$ref": "#/components/schemas/ModelBreakerStatus"
+          },
+          "token_budget": {
+            "$ref": "#/components/schemas/ModelTokenBudgetStatus"
+          },
+          "calls": {
+            "type": "integer",
+            "title": "Calls",
+            "default": 0
+          },
+          "errors": {
+            "type": "integer",
+            "title": "Errors",
+            "default": 0
+          },
+          "avg_latency_ms": {
+            "type": "integer",
+            "title": "Avg Latency Ms",
+            "default": 0
+          },
+          "tokens_consumed": {
+            "type": "integer",
+            "title": "Tokens Consumed",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "model",
+          "is_primary",
+          "circuit_breaker",
+          "token_budget"
+        ],
+        "title": "ModelStatusOut"
+      },
+      "ModelTokenBudgetStatus": {
+        "properties": {
+          "capacity": {
+            "type": "integer",
+            "title": "Capacity"
+          },
+          "available": {
+            "type": "integer",
+            "title": "Available"
+          },
+          "pct_remaining": {
+            "type": "number",
+            "title": "Pct Remaining"
+          }
+        },
+        "type": "object",
+        "required": [
+          "capacity",
+          "available",
+          "pct_remaining"
+        ],
+        "title": "ModelTokenBudgetStatus"
       },
       "PracticeAnswerRequest": {
         "properties": {
@@ -1471,6 +1659,49 @@
           "available_fallback_models"
         ],
         "title": "ReadyResponse"
+      },
+      "RecentCallOut": {
+        "properties": {
+          "purpose": {
+            "type": "string",
+            "title": "Purpose"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "latency_ms": {
+            "type": "integer",
+            "title": "Latency Ms"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "fallback_used": {
+            "type": "boolean",
+            "title": "Fallback Used"
+          },
+          "tokens": {
+            "type": "integer",
+            "title": "Tokens"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "purpose",
+          "model",
+          "latency_ms",
+          "status",
+          "fallback_used",
+          "tokens",
+          "created_at"
+        ],
+        "title": "RecentCallOut"
       },
       "UserOut": {
         "properties": {

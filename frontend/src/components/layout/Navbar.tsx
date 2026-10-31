@@ -92,18 +92,40 @@ export function Navbar() {
                 >
                   Review
                 </Link>
+                <Link
+                  href="/ops"
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${
+                    pathname.startsWith("/ops")
+                      ? "bg-subtle text-ink-primary font-semibold"
+                      : "text-ink-secondary hover:text-ink-primary hover:bg-subtle/50"
+                  }`}
+                >
+                  System Health
+                </Link>
               </>
             ) : (
-              <Link
-                href="/class"
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${
-                  pathname.startsWith("/class")
-                    ? "bg-subtle text-ink-primary font-semibold"
-                    : "text-ink-secondary hover:text-ink-primary hover:bg-subtle/50"
-                }`}
-              >
-                Class Heatmap & Insights
-              </Link>
+              <>
+                <Link
+                  href="/class"
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${
+                    pathname.startsWith("/class")
+                      ? "bg-subtle text-ink-primary font-semibold"
+                      : "text-ink-secondary hover:text-ink-primary hover:bg-subtle/50"
+                  }`}
+                >
+                  Class Heatmap & Insights
+                </Link>
+                <Link
+                  href="/ops"
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${
+                    pathname.startsWith("/ops")
+                      ? "bg-subtle text-ink-primary font-semibold"
+                      : "text-ink-secondary hover:text-ink-primary hover:bg-subtle/50"
+                  }`}
+                >
+                  System Health
+                </Link>
+              </>
             )}
           </nav>
         </div>

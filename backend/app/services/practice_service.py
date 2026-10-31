@@ -1,9 +1,11 @@
 import datetime
 from typing import Any
 
+import structlog
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.ai.agents.misconception_classifier import classify_misconception
 from app.core.errors import NotFoundError
 from app.domain.bkt import bkt_update
 from app.domain.elo import calibrate_item_difficulty
@@ -33,6 +35,8 @@ from app.schemas.practice import (
     QuestionOptionOut,
     QuestionOut,
 )
+
+logger = structlog.get_logger(__name__)
 
 
 def to_question_out(q: Question) -> QuestionOut:
@@ -198,7 +202,7 @@ class PracticeService:
                 newly_unlocked=[],
             )
 
-        # 2. Load question
+        # 2. Load question and concept
         question = await question_repo.get_by_id(session, req.question_id)
         if not question:
             raise NotFoundError(f"Question '{req.question_id}' not found")
@@ -207,7 +211,43 @@ class PracticeService:
         if not concept:
             raise NotFoundError(f"Concept '{question.concept_id}' not found")
 
-        # 3. Lock mastery row with FOR UPDATE
+        # Evaluate correctness
+        is_correct = req.selected_key.strip().upper() == question.correct_key.strip().upper()
+
+        # Check for distractor-based misconception
+        chosen_opt = next(
+            (opt for opt in question.options if opt.get("key") == req.selected_key), None
+        )
+        distractor_misc_id = chosen_opt.get("misconception_id") if chosen_opt else None
+
+        # Misconception diagnosis via LLM Router if student provided reasoning and was wrong
+        # Rule: Call LLM before opening row lock transaction
+        classification_result = None
+        ai_meta = AIFallbackMeta(used=False, model=None, fallback=False)
+
+        if not is_correct and req.reasoning and len(req.reasoning.strip()) >= 5:
+            # Load known misconceptions for this concept
+            misc_stmt = select(Misconception).where(Misconception.concept_id == concept.id)
+            concept_miscs = (await session.execute(misc_stmt)).scalars().all()
+            misc_dicts = [
+                {"id": m.id, "statement": m.statement, "correction": m.correction}
+                for m in concept_miscs
+            ]
+
+            try:
+                classification_result, ai_meta = await classify_misconception(
+                    stem=question.stem,
+                    options=question.options,
+                    selected_key=req.selected_key,
+                    correct_key=question.correct_key,
+                    student_reasoning=req.reasoning,
+                    possible_misconceptions=misc_dicts,
+                    deterministic_misconception_id=distractor_misc_id,
+                )
+            except Exception as exc:
+                logger.warning("misconception_classification_error", error=str(exc))
+
+        # 3. Lock mastery row with FOR UPDATE and persist learner updates
         mastery_stmt = (
             select(Mastery)
             .where(Mastery.user_id == user_id, Mastery.concept_id == question.concept_id)
@@ -222,9 +262,6 @@ class PracticeService:
         reps = mastery.repetitions if mastery else 0
         attempts_count = mastery.attempts if mastery else 0
         correct_count = mastery.correct if mastery else 0
-
-        # Evaluate correctness
-        is_correct = req.selected_key.strip().upper() == question.correct_key.strip().upper()
 
         # BKT Update
         _, p_next = bkt_update(
@@ -300,34 +337,57 @@ class PracticeService:
         session.add(attempt)
         await session.flush()
 
-        # Check for distractor misconception
+        # Misconception resolution / recording
         misconception_feedback: MisconceptionFeedback | None = None
         if not is_correct:
-            chosen_opt = next(
-                (opt for opt in question.options if opt.get("key") == req.selected_key), None
-            )
-            if chosen_opt and chosen_opt.get("misconception_id"):
-                misc_id = chosen_opt["misconception_id"]
-                misc_stmt = select(Misconception).where(Misconception.id == misc_id)
+            active_misc_id = None
+            misc_source = MisconceptionSourceEnum.DISTRACTOR
+            confidence = 1.0
+
+            if classification_result and classification_result.misconception_detected:
+                active_misc_id = classification_result.misconception_id or distractor_misc_id
+                misc_source = MisconceptionSourceEnum.LLM_REASONING
+                confidence = classification_result.confidence
+            elif distractor_misc_id:
+                active_misc_id = distractor_misc_id
+                misc_source = MisconceptionSourceEnum.DISTRACTOR
+                confidence = 1.0
+
+            if active_misc_id:
+                misc_stmt = select(Misconception).where(Misconception.id == active_misc_id)
                 misc_obj = (await session.execute(misc_stmt)).scalars().first()
                 if misc_obj:
-                    # Insert detected misconception
                     detected = DetectedMisconception(
                         user_id=user_id,
-                        misconception_id=misc_id,
+                        misconception_id=active_misc_id,
                         attempt_id=attempt.id,
-                        source=MisconceptionSourceEnum.DISTRACTOR,
-                        confidence=1.0,
+                        source=misc_source,
+                        confidence=confidence,
                         created_at=now,
                     )
                     session.add(detected)
                     misconception_feedback = MisconceptionFeedback(
                         id=misc_obj.id,
                         statement=misc_obj.statement,
-                        correction=misc_obj.correction,
-                        source="distractor",
-                        confidence=1.0,
+                        correction=(
+                            classification_result.remedial_nudge
+                            if classification_result and classification_result.remedial_nudge
+                            else misc_obj.correction
+                        ),
+                        source="reasoning"
+                        if misc_source == MisconceptionSourceEnum.LLM_REASONING
+                        else "distractor",
+                        confidence=confidence,
                     )
+            elif classification_result and classification_result.student_gap_summary:
+                # Custom detected misconception from reasoning
+                misconception_feedback = MisconceptionFeedback(
+                    id="reasoning-gap",
+                    statement=classification_result.student_gap_summary,
+                    correction=classification_result.remedial_nudge,
+                    source="reasoning",
+                    confidence=classification_result.confidence,
+                )
 
         # Status & unlocks
         status = "mastered" if p_next >= 0.80 else "learning"
@@ -344,7 +404,7 @@ class PracticeService:
             ),
             next_due_at=next_due,
             misconception=misconception_feedback,
-            ai=AIFallbackMeta(used=False),
+            ai=ai_meta,
             newly_unlocked=[],
         )
 

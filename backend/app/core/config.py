@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     LLM_FALLBACK_MODELS: str = "llama-3.3-70b-versatile,llama-3.1-8b-instant"
     WHISPER_MODEL: str = "whisper-large-v3-turbo"
     LLM_TIMEOUT_S: float = 15.0
+    CIRCUIT_BREAKER_MAX_FAILURES: int = 3
+    CIRCUIT_BREAKER_RESET_SECS: float = 60.0
+    TOKEN_BUDGET_PER_MINUTE: int = 20000
 
     # Security & CORS
     CORS_ORIGINS: str = "http://localhost:3000"

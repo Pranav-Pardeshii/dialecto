@@ -5,6 +5,8 @@ import structlog
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.ai.llm.client import verify_available_models
+from app.ai.llm.recorder import recorder
 from app.api.v1.endpoints import health
 from app.api.v1.router import api_v1_router
 from app.core.config import get_settings
@@ -19,14 +21,25 @@ logger = structlog.get_logger(__name__)
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     setup_logging()
     settings = get_settings()
+    recorder.start()
     logger.info(
         "app_startup",
         env=settings.ENV,
         primary_model=settings.LLM_PRIMARY_MODEL,
         fallbacks=settings.fallback_models_list,
     )
+    # Check model availability non-blockingly
+    try:
+        import asyncio
+
+        asyncio.create_task(verify_available_models())
+    except Exception as exc:
+        logger.warning("model_verification_schedule_failed", error=str(exc))
+
     yield
+
     logger.info("app_shutdown")
+    await recorder.stop()
 
 
 def create_app() -> FastAPI:

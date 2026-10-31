@@ -43,22 +43,45 @@ Handoff memory across agent sessions.
 
 ---
 
+- **Milestone M3 Complete (AI Layer - Groq Router, Circuit Breaker, Token Budget, Misconception Classification, Ops Telemetry):**
+  - Groq async client wrapper with startup model verification in `app/ai/llm/client.py`.
+  - In-process Circuit Breaker in `app/ai/llm/breaker.py` with states `closed`, `half_open`, and `open`, cooldown timers, and immediate tripping on RateLimitError (429).
+  - In-process Token Budget rate limiter in `app/ai/llm/budget.py` with continuous refill and capacity checks.
+  - Non-blocking async telemetry recorder in `app/ai/llm/recorder.py` using `asyncio.Queue` draining to `llm_calls` table with in-memory ring buffer for low-latency ops lookups.
+  - Resilient `LLMRouter` in `app/ai/llm/router.py`:
+    - Chain traversal: primary model (`openai/gpt-oss-120b`) with fallbacks (`llama-3.3-70b-versatile,llama-3.1-8b-instant`).
+    - One repair retry on schema validation failures.
+    - One jittered retry on transient timeouts or connection errors.
+  - Prompt templates in `app/ai/prompts/`: `misconception_classifier.md`, `judge.md`, `student_persona.md`.
+  - Misconception classification agent in `app/ai/agents/misconception_classifier.py` wired to practice submissions without holding open DB transactions across LLM calls.
+  - Telemetry endpoint `GET /api/v1/ops/llm-stats` reporting latency percentiles (p50, p95), fallback rates, error rates, circuit breaker statuses, and token budgets.
+  - Frontend `/ops` telemetry screen displaying system health with zero backend framework leak.
+  - All 40 unit and integration backend tests passing.
+
+---
+
 ## In Progress
-- Transitioning to **Milestone M3: AI Layer (Groq Router, Circuit Breaker, Token Budget, Misconception Classification, Ops Telemetry)**.
+- Transitioning to **Milestone M4: Teach-Back Mode with Pip (Student Persona, Rubric Judge, Interactive Arena)**.
 
 ---
 
 ## Next
-- **Milestone M3 Plan:**
-  1. Groq async SDK client wrapper in `app/ai/llm/client.py` with startup model check.
-  2. In-process Circuit Breaker in `app/ai/llm/breaker.py` tripping on 429 rate limits.
-  3. Token budget manager in `app/ai/llm/budget.py`.
-  4. Async call telemetry recorder in `app/ai/llm/recorder.py` logging to `llm_calls` table.
-  5. `LLMRouter` in `app/ai/llm/router.py` with primary model `openai/gpt-oss-120b`, fallback chain (`llama-3.3-70b-versatile,llama-3.1-8b-instant`), exponential backoff, and JSON repair retry.
-  6. Prompt templates in `app/ai/prompts/*.md` (`misconception_classifier.md`, `judge.md`, `student_persona.md`).
-  7. Misconception classifier agent in `app/ai/agents/misconception_classifier.py` wired to practice submissions when reasoning is provided.
-  8. Telemetry endpoint `GET /api/v1/ops/llm-stats` and frontend ops status display.
-  9. Run checks, commit, and push.
+- **Milestone M4 Plan:**
+  1. Build rubric judge agent in `backend/app/ai/agents/judge.py`:
+     - Compares student free-text explanation against verified NCERT `key_points`.
+     - Returns `{comprehension_level: 0..3, accuracy_score: 0.0..1.0, confidence, covered_points, missing_points, misconceptions_found, feedback_summary}`.
+  2. Build student persona agent in `backend/app/ai/agents/student_persona.py`:
+     - Pip the naive peer student with persona behavior calibrated to levels 0..3.
+  3. Build Teach-Back service in `backend/app/services/teachback_service.py`:
+     - Atomic session creation `POST /api/v1/teachback/sessions`.
+     - Turn-based exchange `POST /api/v1/teachback/sessions/{id}/turns` with per-session lock (preventing double clicks/concurrent turns).
+     - Session termination when Pip reaches Level 3 or turn count reaches 4.
+     - Soft-evidence Bayesian Knowledge Tracing update ($P_{\text{new}} = P_{\text{prior}} + w(P_{\text{bkt}} - P_{\text{prior}})$ with $w = \min(0.7, \text{confidence})$).
+     - Full transcript retrieval `GET /api/v1/teachback/sessions/{id}`.
+  4. Write unit and integration tests for Teach-Back mode.
+  5. Build Teach-Back Arena UI at `frontend/src/app/(student)/teach-back/[conceptId]/page.tsx`:
+     - Split screen: Left side shows Pip avatar, comprehension level pill, rubric progress badge; Right side shows transcript chat and `VoiceFriendlyTextarea`.
+  6. Regenerate API types (`pnpm gen:api`), run checks, commit, and push.
 
 ---
 
