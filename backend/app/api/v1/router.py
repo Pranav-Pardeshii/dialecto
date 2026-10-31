@@ -1,8 +1,10 @@
 from fastapi import APIRouter
 
 from app.api.v1.endpoints import (
+    authoring,
     concepts,
     diagnostic,
+    diagrams,
     learner,
     ops,
     practice,
@@ -24,3 +26,5 @@ api_v1_router.include_router(review.router)
 api_v1_router.include_router(teacher.router)
 api_v1_router.include_router(speech.router)
 api_v1_router.include_router(ops.router_api)
+api_v1_router.include_router(authoring.router)
+api_v1_router.include_router(diagrams.router)

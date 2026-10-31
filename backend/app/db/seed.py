@@ -228,6 +228,11 @@ async def seed_database(reset_demo: bool = False) -> None:
             all_concepts_list = (
                 (await session.execute(select(Concept).order_by(Concept.position))).scalars().all()
             )
+            concept_by_id = {c.id: c for c in all_concepts_list}
+            prereqs_by_concept: dict[str, list[str]] = {
+                c["id"]: c.get("prerequisites", []) for c in concepts_data
+            }
+
             all_questions_list = (await session.execute(select(Question))).scalars().all()
             q_by_concept: dict[str, list[Question]] = {}
             for q in all_questions_list:
@@ -241,6 +246,9 @@ async def seed_database(reset_demo: bool = False) -> None:
                 "m-reflex-brain",  # Reflex arc goes to brain
                 "m-recessive-lost",  # Blending inheritance / lost traits
             ]
+
+            # Track in-memory base masteries per student during topological progression
+            student_simulated_masteries: dict[int, dict[str, float]] = {}
 
             for idx, name in enumerate(student_names, start=3):
                 existing_student = await session.get(User, idx)
@@ -256,6 +264,8 @@ async def seed_database(reset_demo: bool = False) -> None:
                     await session.flush()
                 else:
                     student = existing_student
+
+                student_simulated_masteries[student.id] = {}
 
                 # Determine ability profile: 5 high (88%), 18 average (65%), 7 struggling (38%)
                 if idx in (3, 4, 5, 6, 7):
@@ -283,8 +293,20 @@ async def seed_database(reset_demo: bool = False) -> None:
                     session.add(student_session)
                     await session.flush()
 
-                # Seed attempts & mastery across concepts using real domain math
-                for concept in all_concepts_list:
+                # Seed attempts & mastery across concepts following valid topological prerequisite progression
+                for concept_id in sorted_order:
+                    concept = concept_by_id[concept_id]
+                    prereqs = prereqs_by_concept.get(concept_id, [])
+
+                    # Prerequisites gate: all prerequisites must be attempted and have mastery >= 0.60
+                    prereqs_met = all(
+                        student_simulated_masteries[student.id].get(p, 0.0) >= 0.60
+                        for p in prereqs
+                    )
+                    if not prereqs_met:
+                        # Student has genuinely not unlocked this concept; leaves it untested
+                        continue
+
                     existing_mastery = (
                         (
                             await session.execute(
@@ -297,6 +319,7 @@ async def seed_database(reset_demo: bool = False) -> None:
                         .first()
                     )
                     if existing_mastery:
+                        student_simulated_masteries[student.id][concept.id] = existing_mastery.p_mastery
                         continue
 
                     # Simulate 1 to 4 attempts on this concept over the past 14 days
@@ -392,6 +415,7 @@ async def seed_database(reset_demo: bool = False) -> None:
                         version=1,
                     )
                     session.add(mastery_row)
+                    student_simulated_masteries[student.id][concept.id] = p_prior
 
                 # Add active misconceptions for struggling/average students
                 if target_accuracy < 0.70 and rng.random() < 0.60:

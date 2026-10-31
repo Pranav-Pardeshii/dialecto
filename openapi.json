@@ -105,7 +105,7 @@
           "Identity"
         ],
         "summary": "Get Me",
-        "description": "Return the currently authenticated demo identity from X-Demo-User-Id.",
+        "description": "Return the currently authenticated identity.",
         "operationId": "get_me_api_v1_me_get",
         "parameters": [
           {
@@ -630,6 +630,168 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/learner/concepts/{concept_id}/explainable": {
+      "get": {
+        "tags": [
+          "Learner"
+        ],
+        "summary": "Retrieve explainable concept mastery and evidence breakdown",
+        "operationId": "get_explainable_mastery_api_v1_learner_concepts__concept_id__explainable_get",
+        "parameters": [
+          {
+            "name": "concept_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Concept Id"
+            }
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExplainableConceptMasteryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/learner/interventions": {
+      "get": {
+        "tags": [
+          "Learner"
+        ],
+        "summary": "List active assigned interventions for the current student",
+        "operationId": "get_my_interventions_api_v1_learner_interventions_get",
+        "parameters": [
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StudentInterventionItemOut"
+                  },
+                  "title": "Response Get My Interventions Api V1 Learner Interventions Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/learner/interventions/{assignment_id}/complete": {
+      "post": {
+        "tags": [
+          "Learner"
+        ],
+        "summary": "Record student completion of an assigned intervention",
+        "operationId": "complete_my_intervention_api_v1_learner_interventions__assignment_id__complete_post",
+        "parameters": [
+          {
+            "name": "assignment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Assignment Id"
+            }
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
           },
           "422": {
             "description": "Validation Error",
@@ -1202,6 +1364,499 @@
         }
       }
     },
+    "/api/v1/teacher/classrooms/{classroom_id}/students/{student_id}/concepts/{concept_id}/explainable": {
+      "get": {
+        "tags": [
+          "Teacher Analytics"
+        ],
+        "summary": "Retrieve explainable concept mastery and evidence timeline for a student",
+        "operationId": "get_student_concept_explainable_mastery_api_v1_teacher_classrooms__classroom_id__students__student_id__concepts__concept_id__explainable_get",
+        "parameters": [
+          {
+            "name": "classroom_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Classroom Id"
+            }
+          },
+          {
+            "name": "student_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Student Id"
+            }
+          },
+          {
+            "name": "concept_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Concept Id"
+            }
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExplainableConceptMasteryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/teacher/classrooms/{classroom_id}/interventions/recommendations": {
+      "get": {
+        "tags": [
+          "Teacher Analytics"
+        ],
+        "summary": "Get data-driven intervention recommendations based on real classroom learning gaps",
+        "operationId": "get_intervention_recommendations_api_v1_teacher_classrooms__classroom_id__interventions_recommendations_get",
+        "parameters": [
+          {
+            "name": "classroom_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Classroom Id"
+            }
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InterventionRecommendationOut"
+                  },
+                  "title": "Response Get Intervention Recommendations Api V1 Teacher Classrooms  Classroom Id  Interventions Recommendations Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/teacher/classrooms/{classroom_id}/interventions": {
+      "get": {
+        "tags": [
+          "Teacher Analytics"
+        ],
+        "summary": "List all interventions for a classroom",
+        "operationId": "list_interventions_api_v1_teacher_classrooms__classroom_id__interventions_get",
+        "parameters": [
+          {
+            "name": "classroom_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Classroom Id"
+            }
+          },
+          {
+            "name": "status_filter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status Filter"
+            }
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InterventionDetailOut"
+                  },
+                  "title": "Response List Interventions Api V1 Teacher Classrooms  Classroom Id  Interventions Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Teacher Analytics"
+        ],
+        "summary": "Create a new teacher intervention plan",
+        "operationId": "create_intervention_api_v1_teacher_classrooms__classroom_id__interventions_post",
+        "parameters": [
+          {
+            "name": "classroom_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Classroom Id"
+            }
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InterventionCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterventionDetailOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/teacher/classrooms/{classroom_id}/interventions/{intervention_id}": {
+      "get": {
+        "tags": [
+          "Teacher Analytics"
+        ],
+        "summary": "Get intervention detail including student assignments and baseline masteries",
+        "operationId": "get_intervention_api_v1_teacher_classrooms__classroom_id__interventions__intervention_id__get",
+        "parameters": [
+          {
+            "name": "classroom_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Classroom Id"
+            }
+          },
+          {
+            "name": "intervention_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Intervention Id"
+            }
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterventionDetailOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/teacher/classrooms/{classroom_id}/interventions/{intervention_id}/assign": {
+      "post": {
+        "tags": [
+          "Teacher Analytics"
+        ],
+        "summary": "Assign selected students to an intervention",
+        "operationId": "assign_intervention_api_v1_teacher_classrooms__classroom_id__interventions__intervention_id__assign_post",
+        "parameters": [
+          {
+            "name": "classroom_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Classroom Id"
+            }
+          },
+          {
+            "name": "intervention_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Intervention Id"
+            }
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InterventionAssignRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterventionDetailOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/teacher/classrooms/{classroom_id}/interventions/{intervention_id}/outcomes": {
+      "get": {
+        "tags": [
+          "Teacher Analytics"
+        ],
+        "summary": "Measure pre/post intervention outcomes and misconception resolution",
+        "operationId": "get_intervention_outcomes_api_v1_teacher_classrooms__classroom_id__interventions__intervention_id__outcomes_get",
+        "parameters": [
+          {
+            "name": "classroom_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Classroom Id"
+            }
+          },
+          {
+            "name": "intervention_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Intervention Id"
+            }
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterventionOutcomesResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/speech/transcriptions": {
       "post": {
         "tags": [
@@ -1210,15 +1865,33 @@
         "summary": "Transcribe Audio",
         "description": "Transcribe spoken learner audio using Whisper speech-to-text model.",
         "operationId": "transcribe_audio_api_v1_speech_transcriptions_post",
+        "parameters": [
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "multipart/form-data": {
               "schema": {
                 "$ref": "#/components/schemas/Body_transcribe_audio_api_v1_speech_transcriptions_post"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -1252,6 +1925,24 @@
         "summary": "Get Llm Stats",
         "description": "Returns telemetry on language models: latency percentiles, error rates, circuit breakers, and budgets.",
         "operationId": "get_llm_stats_api_v1_ops_llm_stats_get",
+        "parameters": [
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -1259,6 +1950,743 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/LLMStatsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/authoring/questions/generate": {
+      "post": {
+        "tags": [
+          "Question Authoring"
+        ],
+        "summary": "Generate CBSE Class 10 Biology questions with deterministic validation",
+        "operationId": "generate_questions_api_v1_authoring_questions_generate_post",
+        "parameters": [
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionGenerateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneratedQuestionBatchResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/authoring/questions": {
+      "get": {
+        "tags": [
+          "Question Authoring"
+        ],
+        "summary": "List questions in the authoring repository with status/concept filters",
+        "operationId": "list_questions_api_v1_authoring_questions_get",
+        "parameters": [
+          {
+            "name": "concept_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Concept Id"
+            }
+          },
+          {
+            "name": "review_status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Review Status"
+            }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionAuthoringListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Question Authoring"
+        ],
+        "summary": "Manually author a new question draft",
+        "operationId": "create_question_draft_api_v1_authoring_questions_post",
+        "parameters": [
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionAuthoringOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/authoring/questions/{question_id}": {
+      "get": {
+        "tags": [
+          "Question Authoring"
+        ],
+        "summary": "Get question detail with version and authoring metadata",
+        "operationId": "get_question_api_v1_authoring_questions__question_id__get",
+        "parameters": [
+          {
+            "name": "question_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Question Id"
+            }
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionAuthoringOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Question Authoring"
+        ],
+        "summary": "Update or branch a new question version",
+        "operationId": "update_question_api_v1_authoring_questions__question_id__put",
+        "parameters": [
+          {
+            "name": "question_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Question Id"
+            }
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionAuthoringOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Question Authoring"
+        ],
+        "summary": "Delete an unattempted question draft",
+        "operationId": "delete_question_api_v1_authoring_questions__question_id__delete",
+        "parameters": [
+          {
+            "name": "question_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Question Id"
+            }
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/authoring/questions/{question_id}/review": {
+      "post": {
+        "tags": [
+          "Question Authoring"
+        ],
+        "summary": "Approve or reject a question draft",
+        "operationId": "review_question_api_v1_authoring_questions__question_id__review_post",
+        "parameters": [
+          {
+            "name": "question_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Question Id"
+            }
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionReviewActionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionAuthoringOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/diagrams": {
+      "get": {
+        "tags": [
+          "Interactive Biology Lab"
+        ],
+        "summary": "List all loaded interactive biological diagrams",
+        "operationId": "list_diagrams_api_v1_diagrams_get",
+        "parameters": [
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  "title": "Response List Diagrams Api V1 Diagrams Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/diagrams/{diagram_id}": {
+      "get": {
+        "tags": [
+          "Interactive Biology Lab"
+        ],
+        "summary": "Get detailed diagram manifest with structures, pathways, and licence",
+        "operationId": "get_diagram_manifest_api_v1_diagrams__diagram_id__get",
+        "parameters": [
+          {
+            "name": "diagram_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Diagram Id"
+            }
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Get Diagram Manifest Api V1 Diagrams  Diagram Id  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/diagrams/{diagram_id}/commands": {
+      "post": {
+        "tags": [
+          "Interactive Biology Lab"
+        ],
+        "summary": "Interpret natural-language Wispr Flow voice or text command",
+        "operationId": "interpret_voice_command_api_v1_diagrams__diagram_id__commands_post",
+        "parameters": [
+          {
+            "name": "diagram_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Diagram Id"
+            }
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VoiceCommandRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoiceCommandResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/diagrams/{diagram_id}/assessments": {
+      "post": {
+        "tags": [
+          "Interactive Biology Lab"
+        ],
+        "summary": "Submit diagram assessment answer with atomic BKT learner model update",
+        "operationId": "submit_diagram_assessment_api_v1_diagrams__diagram_id__assessments_post",
+        "parameters": [
+          {
+            "name": "diagram_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Diagram Id"
+            }
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DiagramAssessmentSubmitRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiagramAssessmentResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -1320,6 +2748,60 @@
           "concept_id"
         ],
         "title": "ActiveMisconceptionItem"
+      },
+      "AffectedStudentOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "baseline_mastery": {
+            "type": "number",
+            "title": "Baseline Mastery"
+          },
+          "evidence_strength": {
+            "type": "string",
+            "title": "Evidence Strength"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "display_name",
+          "baseline_mastery",
+          "evidence_strength"
+        ],
+        "title": "AffectedStudentOut"
+      },
+      "AssessmentBreakdownOut": {
+        "properties": {
+          "practice_count": {
+            "type": "integer",
+            "title": "Practice Count",
+            "default": 0
+          },
+          "diagnostic_count": {
+            "type": "integer",
+            "title": "Diagnostic Count",
+            "default": 0
+          },
+          "teachback_count": {
+            "type": "integer",
+            "title": "Teachback Count",
+            "default": 0
+          },
+          "diagram_count": {
+            "type": "integer",
+            "title": "Diagram Count",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "AssessmentBreakdownOut"
       },
       "AtRiskStudentItem": {
         "properties": {
@@ -1405,6 +2887,17 @@
           "misconception_count": {
             "type": "integer",
             "title": "Misconception Count"
+          },
+          "lock_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lock Reason"
           }
         },
         "additionalProperties": false,
@@ -1475,6 +2968,24 @@
           "status": {
             "type": "string",
             "title": "Status"
+          },
+          "lock_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lock Reason"
+          },
+          "unmet_prerequisites": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Unmet Prerequisites"
           }
         },
         "additionalProperties": false,
@@ -1749,6 +3260,325 @@
         ],
         "title": "DiagnosticStartResponse"
       },
+      "DiagramAssessmentResponse": {
+        "properties": {
+          "is_correct": {
+            "type": "boolean",
+            "title": "Is Correct"
+          },
+          "score": {
+            "type": "number",
+            "title": "Score"
+          },
+          "feedback": {
+            "type": "string",
+            "title": "Feedback"
+          },
+          "target_structure_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Structure Id"
+          },
+          "target_sequence": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Sequence"
+          },
+          "mastery": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Mastery"
+          },
+          "detected_misconception": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detected Misconception"
+          },
+          "is_idempotent_replay": {
+            "type": "boolean",
+            "title": "Is Idempotent Replay",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "is_correct",
+          "score",
+          "feedback",
+          "mastery"
+        ],
+        "title": "DiagramAssessmentResponse"
+      },
+      "DiagramAssessmentSubmitRequest": {
+        "properties": {
+          "client_attempt_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Client Attempt Id"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          },
+          "diagram_id": {
+            "type": "string",
+            "title": "Diagram Id"
+          },
+          "question_id": {
+            "type": "string",
+            "title": "Question Id"
+          },
+          "assessment_type": {
+            "type": "string",
+            "title": "Assessment Type"
+          },
+          "selected_structure_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Selected Structure Id"
+          },
+          "selected_sequence": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Selected Sequence"
+          },
+          "explanation_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation Text"
+          }
+        },
+        "type": "object",
+        "required": [
+          "client_attempt_id",
+          "diagram_id",
+          "question_id",
+          "assessment_type"
+        ],
+        "title": "DiagramAssessmentSubmitRequest"
+      },
+      "ExplainableConceptMasteryResponse": {
+        "properties": {
+          "concept_id": {
+            "type": "string",
+            "title": "Concept Id"
+          },
+          "concept_name": {
+            "type": "string",
+            "title": "Concept Name"
+          },
+          "chapter": {
+            "type": "string",
+            "title": "Chapter"
+          },
+          "p_mastery": {
+            "type": "number",
+            "title": "P Mastery"
+          },
+          "p_effective": {
+            "type": "number",
+            "title": "P Effective"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "evidence_strength": {
+            "type": "string",
+            "title": "Evidence Strength"
+          },
+          "evidence_score": {
+            "type": "number",
+            "title": "Evidence Score"
+          },
+          "total_attempts": {
+            "type": "integer",
+            "title": "Total Attempts"
+          },
+          "correct_attempts": {
+            "type": "integer",
+            "title": "Correct Attempts"
+          },
+          "accuracy_rate": {
+            "type": "number",
+            "title": "Accuracy Rate"
+          },
+          "recent_trend": {
+            "type": "string",
+            "title": "Recent Trend"
+          },
+          "last_seen_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Seen At"
+          },
+          "next_due_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Due At"
+          },
+          "is_overdue": {
+            "type": "boolean",
+            "title": "Is Overdue",
+            "default": false
+          },
+          "days_overdue": {
+            "type": "integer",
+            "title": "Days Overdue",
+            "default": 0
+          },
+          "assessment_breakdown": {
+            "$ref": "#/components/schemas/AssessmentBreakdownOut"
+          },
+          "active_misconceptions": {
+            "items": {
+              "$ref": "#/components/schemas/MisconceptionStateOut"
+            },
+            "type": "array",
+            "title": "Active Misconceptions"
+          },
+          "resolved_misconceptions": {
+            "items": {
+              "$ref": "#/components/schemas/MisconceptionStateOut"
+            },
+            "type": "array",
+            "title": "Resolved Misconceptions"
+          },
+          "unmet_prerequisites": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Unmet Prerequisites"
+          },
+          "narrative": {
+            "type": "string",
+            "title": "Narrative"
+          },
+          "timeline": {
+            "items": {
+              "$ref": "#/components/schemas/TimelineEventOut"
+            },
+            "type": "array",
+            "title": "Timeline"
+          }
+        },
+        "type": "object",
+        "required": [
+          "concept_id",
+          "concept_name",
+          "chapter",
+          "p_mastery",
+          "p_effective",
+          "status",
+          "evidence_strength",
+          "evidence_score",
+          "total_attempts",
+          "correct_attempts",
+          "accuracy_rate",
+          "recent_trend",
+          "assessment_breakdown",
+          "narrative"
+        ],
+        "title": "ExplainableConceptMasteryResponse"
+      },
+      "GeneratedQuestionBatchResponse": {
+        "properties": {
+          "generated": {
+            "items": {
+              "$ref": "#/components/schemas/QuestionAuthoringOut"
+            },
+            "type": "array",
+            "title": "Generated"
+          },
+          "validation_passed": {
+            "type": "integer",
+            "title": "Validation Passed"
+          },
+          "validation_failed": {
+            "type": "integer",
+            "title": "Validation Failed"
+          },
+          "errors": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Errors"
+          }
+        },
+        "type": "object",
+        "required": [
+          "generated",
+          "validation_passed",
+          "validation_failed"
+        ],
+        "title": "GeneratedQuestionBatchResponse"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -1842,6 +3672,436 @@
           "display_name"
         ],
         "title": "HeatmapStudentOut"
+      },
+      "InterventionAssignRequest": {
+        "properties": {
+          "student_ids": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Student Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "student_ids"
+        ],
+        "title": "InterventionAssignRequest"
+      },
+      "InterventionAssignmentOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "intervention_id": {
+            "type": "integer",
+            "title": "Intervention Id"
+          },
+          "user_id": {
+            "type": "integer",
+            "title": "User Id"
+          },
+          "student_name": {
+            "type": "string",
+            "title": "Student Name"
+          },
+          "baseline_mastery": {
+            "type": "number",
+            "title": "Baseline Mastery"
+          },
+          "post_mastery": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Post Mastery"
+          },
+          "baseline_evidence_strength": {
+            "type": "string",
+            "title": "Baseline Evidence Strength"
+          },
+          "post_evidence_strength": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Post Evidence Strength"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "assigned_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Assigned At"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "intervention_id",
+          "user_id",
+          "student_name",
+          "baseline_mastery",
+          "baseline_evidence_strength",
+          "status",
+          "assigned_at"
+        ],
+        "title": "InterventionAssignmentOut"
+      },
+      "InterventionCreateRequest": {
+        "properties": {
+          "concept_id": {
+            "type": "string",
+            "title": "Concept Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "learning_gap": {
+            "type": "string",
+            "title": "Learning Gap"
+          },
+          "target_misconception_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Misconception Id"
+          },
+          "activity_type": {
+            "type": "string",
+            "title": "Activity Type",
+            "default": "practice"
+          },
+          "recommended_remediation": {
+            "type": "string",
+            "title": "Recommended Remediation"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "default": "draft"
+          }
+        },
+        "type": "object",
+        "required": [
+          "concept_id",
+          "title",
+          "learning_gap",
+          "recommended_remediation"
+        ],
+        "title": "InterventionCreateRequest"
+      },
+      "InterventionDetailOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "teacher_id": {
+            "type": "integer",
+            "title": "Teacher Id"
+          },
+          "classroom_id": {
+            "type": "integer",
+            "title": "Classroom Id"
+          },
+          "concept_id": {
+            "type": "string",
+            "title": "Concept Id"
+          },
+          "concept_name": {
+            "type": "string",
+            "title": "Concept Name"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "learning_gap": {
+            "type": "string",
+            "title": "Learning Gap"
+          },
+          "target_misconception_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Misconception Id"
+          },
+          "activity_type": {
+            "type": "string",
+            "title": "Activity Type"
+          },
+          "recommended_remediation": {
+            "type": "string",
+            "title": "Recommended Remediation"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "total_assigned": {
+            "type": "integer",
+            "title": "Total Assigned"
+          },
+          "completed_count": {
+            "type": "integer",
+            "title": "Completed Count"
+          },
+          "assignments": {
+            "items": {
+              "$ref": "#/components/schemas/InterventionAssignmentOut"
+            },
+            "type": "array",
+            "title": "Assignments"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "teacher_id",
+          "classroom_id",
+          "concept_id",
+          "concept_name",
+          "title",
+          "learning_gap",
+          "activity_type",
+          "recommended_remediation",
+          "status",
+          "created_at",
+          "updated_at",
+          "total_assigned",
+          "completed_count"
+        ],
+        "title": "InterventionDetailOut"
+      },
+      "InterventionOutcomesResponse": {
+        "properties": {
+          "intervention_id": {
+            "type": "integer",
+            "title": "Intervention Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "concept_id": {
+            "type": "string",
+            "title": "Concept Id"
+          },
+          "concept_name": {
+            "type": "string",
+            "title": "Concept Name"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "total_assigned": {
+            "type": "integer",
+            "title": "Total Assigned"
+          },
+          "completed_count": {
+            "type": "integer",
+            "title": "Completed Count"
+          },
+          "completion_rate": {
+            "type": "number",
+            "title": "Completion Rate"
+          },
+          "mean_baseline_mastery": {
+            "type": "number",
+            "title": "Mean Baseline Mastery"
+          },
+          "mean_post_mastery": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Post Mastery"
+          },
+          "mean_mastery_gain": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Mastery Gain"
+          },
+          "misconceptions_resolved_count": {
+            "type": "integer",
+            "title": "Misconceptions Resolved Count",
+            "default": 0
+          },
+          "sample_size_sufficient": {
+            "type": "boolean",
+            "title": "Sample Size Sufficient",
+            "default": false
+          },
+          "outcome_summary": {
+            "type": "string",
+            "title": "Outcome Summary"
+          },
+          "assignments": {
+            "items": {
+              "$ref": "#/components/schemas/InterventionAssignmentOut"
+            },
+            "type": "array",
+            "title": "Assignments"
+          }
+        },
+        "type": "object",
+        "required": [
+          "intervention_id",
+          "title",
+          "concept_id",
+          "concept_name",
+          "status",
+          "total_assigned",
+          "completed_count",
+          "completion_rate",
+          "mean_baseline_mastery",
+          "outcome_summary"
+        ],
+        "title": "InterventionOutcomesResponse"
+      },
+      "InterventionRecommendationOut": {
+        "properties": {
+          "concept_id": {
+            "type": "string",
+            "title": "Concept Id"
+          },
+          "concept_name": {
+            "type": "string",
+            "title": "Concept Name"
+          },
+          "chapter": {
+            "type": "string",
+            "title": "Chapter"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "learning_gap": {
+            "type": "string",
+            "title": "Learning Gap"
+          },
+          "target_misconception_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Misconception Id"
+          },
+          "target_misconception_statement": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Misconception Statement"
+          },
+          "affected_student_count": {
+            "type": "integer",
+            "title": "Affected Student Count"
+          },
+          "affected_students": {
+            "items": {
+              "$ref": "#/components/schemas/AffectedStudentOut"
+            },
+            "type": "array",
+            "title": "Affected Students"
+          },
+          "activity_type": {
+            "type": "string",
+            "title": "Activity Type",
+            "default": "practice"
+          },
+          "recommended_remediation": {
+            "type": "string",
+            "title": "Recommended Remediation"
+          },
+          "suggested_duration_mins": {
+            "type": "integer",
+            "title": "Suggested Duration Mins",
+            "default": 15
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "concept_id",
+          "concept_name",
+          "chapter",
+          "title",
+          "learning_gap",
+          "affected_student_count",
+          "recommended_remediation",
+          "reason"
+        ],
+        "title": "InterventionRecommendationOut"
       },
       "LLMStatsResponse": {
         "properties": {
@@ -2112,6 +4372,47 @@
           "n_students"
         ],
         "title": "MisconceptionPrevalenceItem"
+      },
+      "MisconceptionStateOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "statement": {
+            "type": "string",
+            "title": "Statement"
+          },
+          "correction": {
+            "type": "string",
+            "title": "Correction"
+          },
+          "detected_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Detected At"
+          },
+          "resolved_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "statement",
+          "correction",
+          "detected_at"
+        ],
+        "title": "MisconceptionStateOut"
       },
       "ModelBreakerStatus": {
         "properties": {
@@ -2388,6 +4689,379 @@
         ],
         "title": "PracticeNextResponse"
       },
+      "QuestionAuthoringListResponse": {
+        "properties": {
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/QuestionAuthoringOut"
+            },
+            "type": "array",
+            "title": "Questions"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "questions",
+          "total"
+        ],
+        "title": "QuestionAuthoringListResponse"
+      },
+      "QuestionAuthoringOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "concept_id": {
+            "type": "string",
+            "title": "Concept Id"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "stem": {
+            "type": "string",
+            "title": "Stem"
+          },
+          "options": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Options"
+          },
+          "correct_key": {
+            "type": "string",
+            "title": "Correct Key"
+          },
+          "explanation": {
+            "type": "string",
+            "title": "Explanation"
+          },
+          "difficulty_bucket": {
+            "type": "integer",
+            "title": "Difficulty Bucket"
+          },
+          "difficulty_rating": {
+            "type": "number",
+            "title": "Difficulty Rating"
+          },
+          "n_attempts": {
+            "type": "integer",
+            "title": "N Attempts"
+          },
+          "verified": {
+            "type": "boolean",
+            "title": "Verified"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "review_status": {
+            "type": "string",
+            "title": "Review Status"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Id"
+          },
+          "author_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Author Id"
+          },
+          "learning_objective": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Learning Objective"
+          },
+          "cognitive_skill": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cognitive Skill"
+          },
+          "curriculum_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Curriculum Ref"
+          },
+          "generation_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Generation Model"
+          },
+          "distractor_explanations": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distractor Explanations"
+          },
+          "rejection_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rejection Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "concept_id",
+          "kind",
+          "stem",
+          "options",
+          "correct_key",
+          "explanation",
+          "difficulty_bucket",
+          "difficulty_rating",
+          "n_attempts",
+          "verified",
+          "source",
+          "review_status",
+          "version"
+        ],
+        "title": "QuestionAuthoringOut"
+      },
+      "QuestionCreateRequest": {
+        "properties": {
+          "concept_id": {
+            "type": "string",
+            "title": "Concept Id"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind",
+            "default": "mcq"
+          },
+          "stem": {
+            "type": "string",
+            "title": "Stem"
+          },
+          "options": {
+            "items": {
+              "$ref": "#/components/schemas/QuestionOptionSchema"
+            },
+            "type": "array",
+            "title": "Options"
+          },
+          "correct_key": {
+            "type": "string",
+            "title": "Correct Key"
+          },
+          "explanation": {
+            "type": "string",
+            "title": "Explanation"
+          },
+          "difficulty_bucket": {
+            "type": "integer",
+            "maximum": 3.0,
+            "minimum": 1.0,
+            "title": "Difficulty Bucket",
+            "default": 2
+          },
+          "learning_objective": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Learning Objective"
+          },
+          "cognitive_skill": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cognitive Skill"
+          },
+          "curriculum_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Curriculum Ref"
+          },
+          "distractor_explanations": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distractor Explanations"
+          }
+        },
+        "type": "object",
+        "required": [
+          "concept_id",
+          "stem",
+          "correct_key",
+          "explanation"
+        ],
+        "title": "QuestionCreateRequest"
+      },
+      "QuestionGenerateRequest": {
+        "properties": {
+          "concept_id": {
+            "type": "string",
+            "title": "Concept Id"
+          },
+          "chapter_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chapter Id"
+          },
+          "subconcept": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subconcept"
+          },
+          "difficulty_bucket": {
+            "type": "integer",
+            "maximum": 3.0,
+            "minimum": 1.0,
+            "title": "Difficulty Bucket",
+            "default": 2
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind",
+            "default": "mcq"
+          },
+          "count": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 1.0,
+            "title": "Count",
+            "default": 3
+          },
+          "target_misconception_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Misconception Id"
+          },
+          "cognitive_skill": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cognitive Skill"
+          },
+          "learning_objective": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Learning Objective"
+          }
+        },
+        "type": "object",
+        "required": [
+          "concept_id"
+        ],
+        "title": "QuestionGenerateRequest"
+      },
       "QuestionOptionOut": {
         "properties": {
           "key": {
@@ -2406,6 +5080,35 @@
           "text"
         ],
         "title": "QuestionOptionOut"
+      },
+      "QuestionOptionSchema": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "misconception_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Misconception Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "text"
+        ],
+        "title": "QuestionOptionSchema"
       },
       "QuestionOut": {
         "properties": {
@@ -2443,6 +5146,155 @@
           "difficulty_bucket"
         ],
         "title": "QuestionOut"
+      },
+      "QuestionReviewActionRequest": {
+        "properties": {
+          "action": {
+            "type": "string",
+            "title": "Action",
+            "description": "'approve' or 'reject'"
+          },
+          "rejection_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rejection Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "action"
+        ],
+        "title": "QuestionReviewActionRequest"
+      },
+      "QuestionUpdateRequest": {
+        "properties": {
+          "stem": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stem"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind"
+          },
+          "options": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/QuestionOptionSchema"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Options"
+          },
+          "correct_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Correct Key"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          },
+          "difficulty_bucket": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 3.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Difficulty Bucket"
+          },
+          "learning_objective": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Learning Objective"
+          },
+          "cognitive_skill": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cognitive Skill"
+          },
+          "curriculum_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Curriculum Ref"
+          },
+          "distractor_explanations": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distractor Explanations"
+          }
+        },
+        "type": "object",
+        "title": "QuestionUpdateRequest"
       },
       "ReadyResponse": {
         "properties": {
@@ -2672,6 +5524,65 @@
           "recent_attempts"
         ],
         "title": "StudentDetailResponse"
+      },
+      "StudentInterventionItemOut": {
+        "properties": {
+          "assignment_id": {
+            "type": "integer",
+            "title": "Assignment Id"
+          },
+          "intervention_id": {
+            "type": "integer",
+            "title": "Intervention Id"
+          },
+          "concept_id": {
+            "type": "string",
+            "title": "Concept Id"
+          },
+          "concept_name": {
+            "type": "string",
+            "title": "Concept Name"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "learning_gap": {
+            "type": "string",
+            "title": "Learning Gap"
+          },
+          "activity_type": {
+            "type": "string",
+            "title": "Activity Type"
+          },
+          "recommended_remediation": {
+            "type": "string",
+            "title": "Recommended Remediation"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "assigned_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Assigned At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "assignment_id",
+          "intervention_id",
+          "concept_id",
+          "concept_name",
+          "title",
+          "learning_gap",
+          "activity_type",
+          "recommended_remediation",
+          "status",
+          "assigned_at"
+        ],
+        "title": "StudentInterventionItemOut"
       },
       "StudentMasteryDetail": {
         "properties": {
@@ -3107,6 +6018,55 @@
         ],
         "title": "TeacherHeatmapResponse"
       },
+      "TimelineEventOut": {
+        "properties": {
+          "event_type": {
+            "type": "string",
+            "title": "Event Type"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "is_correct": {
+            "type": "boolean",
+            "title": "Is Correct"
+          },
+          "mastery_before": {
+            "type": "number",
+            "title": "Mastery Before"
+          },
+          "mastery_after": {
+            "type": "number",
+            "title": "Mastery After"
+          },
+          "mastery_delta": {
+            "type": "number",
+            "title": "Mastery Delta"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_type",
+          "timestamp",
+          "description",
+          "is_correct",
+          "mastery_before",
+          "mastery_after",
+          "mastery_delta"
+        ],
+        "title": "TimelineEventOut"
+      },
       "TranscriptionResponse": {
         "properties": {
           "text": {
@@ -3207,6 +6167,125 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "VoiceCommandRequest": {
+        "properties": {
+          "diagram_id": {
+            "type": "string",
+            "title": "Diagram Id"
+          },
+          "spoken_text": {
+            "type": "string",
+            "title": "Spoken Text"
+          },
+          "is_assessment_mode": {
+            "type": "boolean",
+            "title": "Is Assessment Mode",
+            "default": false
+          },
+          "active_question_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Question Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "diagram_id",
+          "spoken_text"
+        ],
+        "title": "VoiceCommandRequest"
+      },
+      "VoiceCommandResponse": {
+        "properties": {
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "target_structure_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Structure Id"
+          },
+          "target_structure_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Structure Name"
+          },
+          "pathway_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pathway Id"
+          },
+          "view_direction": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "View Direction"
+          },
+          "zoom_level": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Zoom Level"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "clarification_options": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Clarification Options"
+          },
+          "confidence": {
+            "type": "number",
+            "title": "Confidence",
+            "default": 1.0
+          }
+        },
+        "type": "object",
+        "required": [
+          "action",
+          "message"
+        ],
+        "title": "VoiceCommandResponse"
       }
     }
   }

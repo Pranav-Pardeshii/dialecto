@@ -3,7 +3,7 @@ import uuid
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.entities import Attempt, Question
+from app.models.entities import Attempt, Question, QuestionReviewStatusEnum
 
 
 class QuestionRepository:
@@ -16,12 +16,16 @@ class QuestionRepository:
         stmt = select(Question).where(
             Question.concept_id == concept_id,
             Question.verified.is_(True),
+            Question.review_status == QuestionReviewStatusEnum.APPROVED,
         )
         result = await session.execute(stmt)
         return list(result.scalars().all())
 
     async def list_all_verified(self, session: AsyncSession) -> list[Question]:
-        stmt = select(Question).where(Question.verified.is_(True))
+        stmt = select(Question).where(
+            Question.verified.is_(True),
+            Question.review_status == QuestionReviewStatusEnum.APPROVED,
+        )
         result = await session.execute(stmt)
         return list(result.scalars().all())
 

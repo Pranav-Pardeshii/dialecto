@@ -120,25 +120,31 @@ class PracticeService:
             )
 
         # Helper to check if concept is locked
-        def is_locked(concept_id: str) -> bool:
-            # If student has already practiced this concept, it is permanently unlocked
+        def check_lock(concept_id: str) -> str | None:
+            # If student has already practiced this concept, it is unlocked
             if concept_id in user_masteries and user_masteries[concept_id].get("attempts", 0) > 0:
-                return False
-            # Check prerequisites base mastery >= 0.60
+                return None
+            unmet = []
             for p_id in prereq_map.get(concept_id, []):
-                p_base = user_masteries.get(p_id, {}).get("p_mastery", 0.30)
+                p_m = user_masteries.get(p_id, {})
+                p_attempts = p_m.get("attempts", 0)
+                p_base = float(p_m.get("p_mastery", 0.0)) if p_attempts > 0 else 0.0
                 if p_base < 0.60:
-                    return True
-            return False
+                    p_name = concepts_by_id[p_id].name if p_id in concepts_by_id else p_id
+                    unmet.append((p_name, int(round(p_base * 100))))
+            if unmet:
+                p_name, curr_pct = unmet[0]
+                c_name = concepts_by_id[concept_id].name if concept_id in concepts_by_id else concept_id
+                return f"Concept '{c_name}' is locked. {p_name} requires 60% prerequisite mastery (current: {curr_pct}%)."
+            return None
 
         # Specific concept mode validation
         if req.mode == "concept":
             if not req.concept_id or req.concept_id not in concepts_by_id:
                 raise NotFoundError(f"Concept '{req.concept_id}' not found.")
-            if is_locked(req.concept_id):
-                raise ForbiddenError(
-                    f"Concept '{req.concept_id}' is locked. Please master prerequisites first."
-                )
+            lock_err = check_lock(req.concept_id)
+            if lock_err:
+                raise ForbiddenError(lock_err)
 
             c_questions = questions_by_concept.get(req.concept_id, [])
             if not c_questions:
@@ -166,7 +172,7 @@ class PracticeService:
         # Unlocked concepts pool for adaptive and review modes
         unlocked_pool: list[dict[str, Any]] = []
         for c in concepts:
-            if is_locked(c.id):
+            if check_lock(c.id):
                 continue
 
             m_data = user_masteries.get(c.id)
@@ -232,7 +238,13 @@ class PracticeService:
             prereqs = prereq_map.get(c.id, [])
             if not prereqs:
                 unlocked.add(c.id)
-            elif all(mastery_map.get(p, {}).get("p_mastery", 0.0) >= 0.60 for p in prereqs):
+            elif all(
+                (
+                    mastery_map.get(p, {}).get("attempts", 0) > 0
+                    and mastery_map.get(p, {}).get("p_mastery", 0.0) >= 0.60
+                )
+                for p in prereqs
+            ):
                 unlocked.add(c.id)
         return unlocked
 

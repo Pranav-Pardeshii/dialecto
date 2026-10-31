@@ -97,6 +97,79 @@ export type MisconceptionPrevalenceItem = paths["/api/v1/teacher/classrooms/{cla
 export type AtRiskStudentItem = paths["/api/v1/teacher/classrooms/{classroom_id}/at-risk"]["get"]["responses"][200]["content"]["application/json"][number];
 export type StudentDetailResponse = paths["/api/v1/teacher/classrooms/{classroom_id}/students/{student_id}"]["get"]["responses"][200]["content"]["application/json"];
 
+// Authoring types
+export type QuestionAuthoringItem = paths["/api/v1/authoring/questions"]["get"]["responses"][200]["content"]["application/json"]["questions"][number];
+export type QuestionGenerateRequest = paths["/api/v1/authoring/questions/generate"]["post"]["requestBody"]["content"]["application/json"];
+export type QuestionGenerateResponse = paths["/api/v1/authoring/questions/generate"]["post"]["responses"][200]["content"]["application/json"];
+export type QuestionCreateRequest = paths["/api/v1/authoring/questions"]["post"]["requestBody"]["content"]["application/json"];
+export type QuestionUpdateRequest = paths["/api/v1/authoring/questions/{question_id}"]["put"]["requestBody"]["content"]["application/json"];
+
+// Explainable mastery types
+export type ExplainableMasteryResponse = paths["/api/v1/learner/concepts/{concept_id}/explainable"]["get"]["responses"][200]["content"]["application/json"];
+
+// Intervention types
+export type InterventionRecommendation = paths["/api/v1/teacher/classrooms/{classroom_id}/interventions/recommendations"]["get"]["responses"][200]["content"]["application/json"][number];
+export type InterventionDetail = paths["/api/v1/teacher/classrooms/{classroom_id}/interventions/{intervention_id}"]["get"]["responses"][200]["content"]["application/json"];
+export type InterventionCreateRequest = paths["/api/v1/teacher/classrooms/{classroom_id}/interventions"]["post"]["requestBody"]["content"]["application/json"];
+export type InterventionOutcomes = paths["/api/v1/teacher/classrooms/{classroom_id}/interventions/{intervention_id}/outcomes"]["get"]["responses"][200]["content"]["application/json"];
+export type StudentIntervention = paths["/api/v1/learner/interventions"]["get"]["responses"][200]["content"]["application/json"][number];
+
+// Diagram types
+export interface DiagramStructure {
+  id: string;
+  name: string;
+  aliases?: string[];
+  description?: string;
+  function?: string;
+  color?: string;
+  oxygenated?: boolean | null;
+  related_misconception_id?: string | null;
+}
+
+export interface DiagramAssessmentItem {
+  id: string;
+  type: string;
+  prompt: string;
+  target_structure_id?: string;
+  target_sequence?: string[];
+  hint?: string;
+  rubric?: string;
+  rubric_points?: string[];
+}
+
+export interface DiagramManifest {
+  id: string;
+  concept_id: string;
+  chapter: string;
+  display_name: string;
+  subtitle: string;
+  model_type: string;
+  structures: DiagramStructure[];
+  pathways?: Array<{ id: string; name: string; description: string; ordered_structure_ids: string[] }>;
+  assessments: DiagramAssessmentItem[];
+  licence?: {
+    source: string;
+    creator: string;
+    licence_type: string;
+    attribution: string;
+  };
+}
+
+export type VoiceCommandResponse = paths["/api/v1/diagrams/{diagram_id}/commands"]["post"]["responses"][200]["content"]["application/json"];
+
+export interface DiagramAssessmentResponse {
+  is_correct: boolean;
+  score: number;
+  feedback: string;
+  target_structure_id?: string | null;
+  target_sequence?: string[] | null;
+  mastery: { concept_id: string; before: number; after: number };
+  detected_misconception?: { id: string } | null;
+  is_idempotent_replay?: boolean;
+}
+
+export type DiagramAssessmentSubmitRequest = paths["/api/v1/diagrams/{diagram_id}/assessments"]["post"]["requestBody"]["content"]["application/json"];
+
 export const api = {
   getUsers: (includeSimulated = false) =>
     apiFetch<User[]>(`/api/v1/users?include_simulated=${includeSimulated}`),
@@ -165,7 +238,99 @@ export const api = {
   getLearnerMastery: () => apiFetch<LearnerMasteryItem[]>("/api/v1/learner/mastery"),
   getLearnerSummary: () => apiFetch<LearnerSummary>("/api/v1/learner/summary"),
 
+  // Explainable Mastery
+  getConceptExplainableMastery: (conceptId: string) =>
+    apiFetch<ExplainableMasteryResponse>(`/api/v1/learner/concepts/${conceptId}/explainable`),
+  getTeacherStudentExplainableMastery: (studentId: number, conceptId: string, classroomId = 1) =>
+    apiFetch<ExplainableMasteryResponse>(
+      `/api/v1/teacher/classrooms/${classroomId}/students/${studentId}/concepts/${conceptId}/explainable`
+    ),
+
+  // Question Authoring & Pipeline
+  getAuthoringQuestions: (params?: { concept_id?: string; review_status?: string; kind?: string }) => {
+    const q = new URLSearchParams();
+    if (params?.concept_id) q.set("concept_id", params.concept_id);
+    if (params?.review_status) q.set("review_status", params.review_status);
+    if (params?.kind) q.set("kind", params.kind);
+    return apiFetch<{ questions: QuestionAuthoringItem[]; total: number }>(`/api/v1/authoring/questions?${q.toString()}`);
+  },
+  generateQuestions: (req: QuestionGenerateRequest) =>
+    apiFetch<QuestionGenerateResponse>("/api/v1/authoring/questions/generate", {
+      method: "POST",
+      body: JSON.stringify(req),
+    }),
+  createQuestionDraft: (req: QuestionCreateRequest) =>
+    apiFetch<QuestionAuthoringItem>("/api/v1/authoring/questions", {
+      method: "POST",
+      body: JSON.stringify(req),
+    }),
+  updateQuestionDraft: (questionId: string, req: QuestionUpdateRequest) =>
+    apiFetch<QuestionAuthoringItem>(`/api/v1/authoring/questions/${questionId}`, {
+      method: "PUT",
+      body: JSON.stringify(req),
+    }),
+  reviewQuestion: (questionId: string, action: "approve" | "reject", rejectionReason?: string) =>
+    apiFetch<QuestionAuthoringItem>(`/api/v1/authoring/questions/${questionId}/review`, {
+      method: "POST",
+      body: JSON.stringify({ action, rejection_reason: rejectionReason || null }),
+    }),
+  deleteQuestionDraft: (questionId: string) =>
+    apiFetch<void>(`/api/v1/authoring/questions/${questionId}`, {
+      method: "DELETE",
+    }),
+
+  // Teacher Interventions
+  getInterventionRecommendations: (classroomId = 1) =>
+    apiFetch<InterventionRecommendation[]>(`/api/v1/teacher/classrooms/${classroomId}/interventions/recommendations`),
+  getInterventions: (classroomId = 1, statusFilter?: string) => {
+    const query = statusFilter ? `?status_filter=${statusFilter}` : "";
+    return apiFetch<InterventionDetail[]>(`/api/v1/teacher/classrooms/${classroomId}/interventions${query}`);
+  },
+  createIntervention: (req: InterventionCreateRequest, classroomId = 1) =>
+    apiFetch<InterventionDetail>(`/api/v1/teacher/classrooms/${classroomId}/interventions`, {
+      method: "POST",
+      body: JSON.stringify(req),
+    }),
+  assignIntervention: (interventionId: number, studentIds: number[], classroomId = 1) =>
+    apiFetch<InterventionDetail>(`/api/v1/teacher/classrooms/${classroomId}/interventions/${interventionId}/assign`, {
+      method: "POST",
+      body: JSON.stringify({ student_ids: studentIds }),
+    }),
+  getInterventionOutcomes: (interventionId: number, classroomId = 1) =>
+    apiFetch<InterventionOutcomes>(`/api/v1/teacher/classrooms/${classroomId}/interventions/${interventionId}/outcomes`),
+
+  // Student Interventions
+  getMyInterventions: () => apiFetch<StudentIntervention[]>("/api/v1/learner/interventions"),
+  completeMyIntervention: (assignmentId: number) =>
+    apiFetch<void>(`/api/v1/learner/interventions/${assignmentId}/complete`, {
+      method: "POST",
+    }),
+
+  // Interactive Biology Lab & Voice
+  getDiagrams: () => apiFetch<Record<string, unknown>[]>("/api/v1/diagrams"),
+  getDiagramManifest: (diagramId: string) =>
+    apiFetch<DiagramManifest>(`/api/v1/diagrams/${diagramId}`),
+  sendDiagramVoiceCommand: (
+    diagramId: string,
+    spokenText: string,
+    isAssessmentMode = false,
+    activeQuestionId?: string
+  ) =>
+    apiFetch<VoiceCommandResponse>(`/api/v1/diagrams/${diagramId}/commands`, {
+      method: "POST",
+      body: JSON.stringify({
+        diagram_id: diagramId,
+        spoken_text: spokenText,
+        is_assessment_mode: isAssessmentMode,
+        active_question_id: activeQuestionId || null,
+      }),
+    }),
+  submitDiagramAssessment: (diagramId: string, req: DiagramAssessmentSubmitRequest) =>
+    apiFetch<DiagramAssessmentResponse>(`/api/v1/diagrams/${diagramId}/assessments`, {
+      method: "POST",
+      body: JSON.stringify(req),
+    }),
+
   // Ops & Telemetry
   getLLMStats: () => apiFetch<LLMStatsResponse>("/api/v1/ops/llm-stats"),
 };
-

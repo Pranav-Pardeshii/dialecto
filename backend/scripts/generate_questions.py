@@ -3,12 +3,14 @@ import asyncio
 import json
 import sys
 from pathlib import Path
+from typing import Any
 
 import structlog
 from pydantic import BaseModel, Field
 
 from app.ai.llm.router import router
 from app.core.config import get_settings
+from app.domain.question_validator import QuestionValidator
 
 logger = structlog.get_logger(__name__)
 CONTENT_DIR = Path(__file__).parent.parent / "app" / "content"
@@ -39,7 +41,7 @@ class GenerationBatch(BaseModel):
     questions: list[GeneratedQuestion]
 
 
-async def generate_for_concept(concept: dict, count: int, misconceptions: list[dict]) -> list[dict]:
+async def generate_for_concept(concept: dict[str, Any], count: int, misconceptions: list[dict[str, Any]]) -> list[dict[str, Any]]:
     concept_miscs = [m for m in misconceptions if m.get("concept_id") == concept["id"]]
     prompt = f"""Generate {count} multiple choice questions for CBSE Class 10 Biology on the following concept:
 Concept: {concept['name']} ({concept['id']})
@@ -68,7 +70,25 @@ Requirements:
         temperature=0.3,
     )
     if isinstance(res, GenerationBatch):
-        return [q.model_dump() for q in res.questions]
+        valid_items: list[dict[str, Any]] = []
+        valid_misc_ids = {m["id"] for m in concept_miscs}
+        for q in res.questions:
+            q_dict = q.model_dump()
+            errors = QuestionValidator.validate_question(
+                stem=q.stem,
+                kind=q.kind,
+                options=[opt.model_dump() for opt in q.options],
+                correct_key=q.correct_key,
+                explanation=q.explanation,
+                difficulty_bucket=q.difficulty_bucket,
+                concept_id=concept["id"],
+                valid_concept_misconception_ids=valid_misc_ids,
+            )
+            if not errors:
+                valid_items.append(q_dict)
+            else:
+                logger.warning("generated_question_failed_validation", errors=errors, stem=q.stem[:40])
+        return valid_items
     return []
 
 
@@ -112,7 +132,7 @@ async def main() -> None:
         count_per_concept=args.count,
     )
 
-    generated_pool: list[dict] = []
+    generated_pool: list[dict[str, Any]] = []
     for c in target_concepts:
         try:
             questions = await generate_for_concept(c, args.count, misconceptions)

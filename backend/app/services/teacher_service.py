@@ -5,11 +5,13 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.errors import NotFoundError
+from app.domain.graph import PrerequisiteInfo, determine_concept_status
 from app.domain.sm2 import compute_effective_mastery
 from app.models.entities import (
     Attempt,
     Classroom,
     Concept,
+    ConceptPrerequisite,
     DetectedMisconception,
     Mastery,
     Misconception,
@@ -273,6 +275,13 @@ class TeacherService:
 
         concepts_stmt = select(Concept).order_by(Concept.position)
         concepts = (await session.execute(concepts_stmt)).scalars().all()
+        concept_lookup = {c.id: c for c in concepts}
+
+        prereqs_stmt = select(ConceptPrerequisite.concept_id, ConceptPrerequisite.prerequisite_id)
+        prereqs_res = (await session.execute(prereqs_stmt)).all()
+        prereq_map: dict[str, list[str]] = defaultdict(list)
+        for dep_id, pr_id in prereqs_res:
+            prereq_map[dep_id].append(pr_id)
 
         masteries_stmt = select(Mastery).where(Mastery.user_id == student_id)
         masteries = (await session.execute(masteries_stmt)).scalars().all()
@@ -283,17 +292,37 @@ class TeacherService:
 
         for c in concepts:
             m = m_map.get(c.id)
-            if m and m.attempts > 0:
+            c_attempts = m.attempts if m else 0
+
+            if m and c_attempts > 0:
                 p_eff = compute_effective_mastery(m.p_mastery, m.next_due_at, now=now)
                 p_mast = m.p_mastery
                 next_due = m.next_due_at
-                status = "mastered" if p_eff >= 0.80 else "learning"
                 attempted_scores.append(p_eff)
             else:
-                p_eff = c.p_l0
-                p_mast = c.p_l0
+                p_eff = 0.0
+                p_mast = 0.0
                 next_due = None
-                status = "untested"
+
+            prereq_infos: list[PrerequisiteInfo] = []
+            for pid in prereq_map.get(c.id, []):
+                p_c = concept_lookup.get(pid)
+                p_name = p_c.name if p_c else pid
+                p_m = m_map.get(pid)
+                p_base = float(p_m.p_mastery) if (p_m and p_m.attempts > 0) else 0.0
+                prereq_infos.append(
+                    PrerequisiteInfo(
+                        prerequisite_id=pid,
+                        prerequisite_name=p_name,
+                        base_mastery=p_base,
+                    )
+                )
+
+            status_details = determine_concept_status(
+                effective_mastery=p_eff,
+                attempts=c_attempts,
+                prerequisites=prereq_infos,
+            )
 
             mastery_details.append(
                 StudentMasteryDetail(
@@ -301,7 +330,7 @@ class TeacherService:
                     concept_name=c.name,
                     p_mastery=round(p_mast, 4),
                     p_effective=round(p_eff, 4),
-                    status=status,
+                    status=status_details.status,
                     next_due_at=next_due,
                 )
             )

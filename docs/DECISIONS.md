@@ -18,3 +18,6 @@ Record decisions in this file: Date, Decision, Reason.
 - **Decision:** Strictly ban mentions of backend frameworks, internal architecture, and third-party tools in any user-facing UI code or copy (e.g. no "FastAPI", "identity validation", "Wispr Flow", "Groq").
 - **Reason:** Preserves a clean, minimal, beautiful, and distraction-free user experience focused purely on learning without leaking implementation details.
 
+- **Decision:** Establish canonical concept status engine (`determine_concept_status`) in `domain/graph.py` and replace orthogonal tree edges with diagonal cubic Bézier curves (`CurvedTreeEdge`).
+- **Reason:** Eliminates ad-hoc, contradictory status calculations across endpoints, ensures prerequisite decay does not cause relocking, provides transparent, authentic lock explanations with actual prerequisite names and mastery percentages, and renders an elegant hierarchical learning tree.
+

@@ -35,8 +35,8 @@ def test_circuit_breaker_half_open_transition() -> None:
     breaker.record_failure()
     assert breaker.is_open()
 
-    # Sleep past the reset timeout
-    time.sleep(0.06)
+    # Sleep past the reset timeout (using 0.1s to exceed 0.05s reliably across OS timers)
+    time.sleep(0.1)
     # is_open() should transition to HALF_OPEN and return False to allow probe
     assert not breaker.is_open()
     assert str(breaker.state) == CircuitState.HALF_OPEN.value

@@ -73,7 +73,7 @@ export interface paths {
         };
         /**
          * Get Me
-         * @description Return the currently authenticated demo identity from X-Demo-User-Id.
+         * @description Return the currently authenticated identity.
          */
         get: operations["get_me_api_v1_me_get"];
         put?: never;
@@ -264,6 +264,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/learner/concepts/{concept_id}/explainable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Retrieve explainable concept mastery and evidence breakdown */
+        get: operations["get_explainable_mastery_api_v1_learner_concepts__concept_id__explainable_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/learner/interventions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List active assigned interventions for the current student */
+        get: operations["get_my_interventions_api_v1_learner_interventions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/learner/interventions/{assignment_id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record student completion of an assigned intervention */
+        post: operations["complete_my_intervention_api_v1_learner_interventions__assignment_id__complete_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/teachback/sessions": {
         parameters: {
             query?: never;
@@ -444,6 +495,109 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/teacher/classrooms/{classroom_id}/students/{student_id}/concepts/{concept_id}/explainable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Retrieve explainable concept mastery and evidence timeline for a student */
+        get: operations["get_student_concept_explainable_mastery_api_v1_teacher_classrooms__classroom_id__students__student_id__concepts__concept_id__explainable_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teacher/classrooms/{classroom_id}/interventions/recommendations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get data-driven intervention recommendations based on real classroom learning gaps */
+        get: operations["get_intervention_recommendations_api_v1_teacher_classrooms__classroom_id__interventions_recommendations_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teacher/classrooms/{classroom_id}/interventions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all interventions for a classroom */
+        get: operations["list_interventions_api_v1_teacher_classrooms__classroom_id__interventions_get"];
+        put?: never;
+        /** Create a new teacher intervention plan */
+        post: operations["create_intervention_api_v1_teacher_classrooms__classroom_id__interventions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teacher/classrooms/{classroom_id}/interventions/{intervention_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get intervention detail including student assignments and baseline masteries */
+        get: operations["get_intervention_api_v1_teacher_classrooms__classroom_id__interventions__intervention_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teacher/classrooms/{classroom_id}/interventions/{intervention_id}/assign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Assign selected students to an intervention */
+        post: operations["assign_intervention_api_v1_teacher_classrooms__classroom_id__interventions__intervention_id__assign_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teacher/classrooms/{classroom_id}/interventions/{intervention_id}/outcomes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Measure pre/post intervention outcomes and misconception resolution */
+        get: operations["get_intervention_outcomes_api_v1_teacher_classrooms__classroom_id__interventions__intervention_id__outcomes_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/speech/transcriptions": {
         parameters: {
             query?: never;
@@ -484,6 +638,145 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/authoring/questions/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Generate CBSE Class 10 Biology questions with deterministic validation */
+        post: operations["generate_questions_api_v1_authoring_questions_generate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/authoring/questions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List questions in the authoring repository with status/concept filters */
+        get: operations["list_questions_api_v1_authoring_questions_get"];
+        put?: never;
+        /** Manually author a new question draft */
+        post: operations["create_question_draft_api_v1_authoring_questions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/authoring/questions/{question_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get question detail with version and authoring metadata */
+        get: operations["get_question_api_v1_authoring_questions__question_id__get"];
+        /** Update or branch a new question version */
+        put: operations["update_question_api_v1_authoring_questions__question_id__put"];
+        post?: never;
+        /** Delete an unattempted question draft */
+        delete: operations["delete_question_api_v1_authoring_questions__question_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/authoring/questions/{question_id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve or reject a question draft */
+        post: operations["review_question_api_v1_authoring_questions__question_id__review_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/diagrams": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all loaded interactive biological diagrams */
+        get: operations["list_diagrams_api_v1_diagrams_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/diagrams/{diagram_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get detailed diagram manifest with structures, pathways, and licence */
+        get: operations["get_diagram_manifest_api_v1_diagrams__diagram_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/diagrams/{diagram_id}/commands": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Interpret natural-language Wispr Flow voice or text command */
+        post: operations["interpret_voice_command_api_v1_diagrams__diagram_id__commands_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/diagrams/{diagram_id}/assessments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Submit diagram assessment answer with atomic BKT learner model update */
+        post: operations["submit_diagram_assessment_api_v1_diagrams__diagram_id__assessments_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -511,6 +804,40 @@ export interface components {
             statement: string;
             /** Concept Id */
             concept_id: string;
+        };
+        /** AffectedStudentOut */
+        AffectedStudentOut: {
+            /** Id */
+            id: number;
+            /** Display Name */
+            display_name: string;
+            /** Baseline Mastery */
+            baseline_mastery: number;
+            /** Evidence Strength */
+            evidence_strength: string;
+        };
+        /** AssessmentBreakdownOut */
+        AssessmentBreakdownOut: {
+            /**
+             * Practice Count
+             * @default 0
+             */
+            practice_count: number;
+            /**
+             * Diagnostic Count
+             * @default 0
+             */
+            diagnostic_count: number;
+            /**
+             * Teachback Count
+             * @default 0
+             */
+            teachback_count: number;
+            /**
+             * Diagram Count
+             * @default 0
+             */
+            diagram_count: number;
         };
         /** AtRiskStudentItem */
         AtRiskStudentItem: {
@@ -546,6 +873,8 @@ export interface components {
             prerequisites: string[];
             /** Misconception Count */
             misconception_count: number;
+            /** Lock Reason */
+            lock_reason?: string | null;
         };
         /** ConceptEdge */
         ConceptEdge: {
@@ -567,6 +896,10 @@ export interface components {
             p_effective: number;
             /** Status */
             status: string;
+            /** Lock Reason */
+            lock_reason?: string | null;
+            /** Unmet Prerequisites */
+            unmet_prerequisites?: string[];
         };
         /** ConceptNode */
         ConceptNode: {
@@ -659,6 +992,117 @@ export interface components {
             question: components["schemas"]["QuestionOut"];
             progress: components["schemas"]["DiagnosticProgress"];
         };
+        /** DiagramAssessmentResponse */
+        DiagramAssessmentResponse: {
+            /** Is Correct */
+            is_correct: boolean;
+            /** Score */
+            score: number;
+            /** Feedback */
+            feedback: string;
+            /** Target Structure Id */
+            target_structure_id?: string | null;
+            /** Target Sequence */
+            target_sequence?: string[] | null;
+            /** Mastery */
+            mastery: {
+                [key: string]: unknown;
+            };
+            /** Detected Misconception */
+            detected_misconception?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Is Idempotent Replay
+             * @default false
+             */
+            is_idempotent_replay: boolean;
+        };
+        /** DiagramAssessmentSubmitRequest */
+        DiagramAssessmentSubmitRequest: {
+            /**
+             * Client Attempt Id
+             * Format: uuid
+             */
+            client_attempt_id: string;
+            /** Session Id */
+            session_id?: number | null;
+            /** Diagram Id */
+            diagram_id: string;
+            /** Question Id */
+            question_id: string;
+            /** Assessment Type */
+            assessment_type: string;
+            /** Selected Structure Id */
+            selected_structure_id?: string | null;
+            /** Selected Sequence */
+            selected_sequence?: string[] | null;
+            /** Explanation Text */
+            explanation_text?: string | null;
+        };
+        /** ExplainableConceptMasteryResponse */
+        ExplainableConceptMasteryResponse: {
+            /** Concept Id */
+            concept_id: string;
+            /** Concept Name */
+            concept_name: string;
+            /** Chapter */
+            chapter: string;
+            /** P Mastery */
+            p_mastery: number;
+            /** P Effective */
+            p_effective: number;
+            /** Status */
+            status: string;
+            /** Evidence Strength */
+            evidence_strength: string;
+            /** Evidence Score */
+            evidence_score: number;
+            /** Total Attempts */
+            total_attempts: number;
+            /** Correct Attempts */
+            correct_attempts: number;
+            /** Accuracy Rate */
+            accuracy_rate: number;
+            /** Recent Trend */
+            recent_trend: string;
+            /** Last Seen At */
+            last_seen_at?: string | null;
+            /** Next Due At */
+            next_due_at?: string | null;
+            /**
+             * Is Overdue
+             * @default false
+             */
+            is_overdue: boolean;
+            /**
+             * Days Overdue
+             * @default 0
+             */
+            days_overdue: number;
+            assessment_breakdown: components["schemas"]["AssessmentBreakdownOut"];
+            /** Active Misconceptions */
+            active_misconceptions?: components["schemas"]["MisconceptionStateOut"][];
+            /** Resolved Misconceptions */
+            resolved_misconceptions?: components["schemas"]["MisconceptionStateOut"][];
+            /** Unmet Prerequisites */
+            unmet_prerequisites?: string[];
+            /** Narrative */
+            narrative: string;
+            /** Timeline */
+            timeline?: components["schemas"]["TimelineEventOut"][];
+        };
+        /** GeneratedQuestionBatchResponse */
+        GeneratedQuestionBatchResponse: {
+            /** Generated */
+            generated: components["schemas"]["QuestionAuthoringOut"][];
+            /** Validation Passed */
+            validation_passed: number;
+            /** Validation Failed */
+            validation_failed: number;
+            /** Errors */
+            errors?: string[];
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -696,6 +1140,177 @@ export interface components {
             id: number;
             /** Display Name */
             display_name: string;
+        };
+        /** InterventionAssignRequest */
+        InterventionAssignRequest: {
+            /** Student Ids */
+            student_ids: number[];
+        };
+        /** InterventionAssignmentOut */
+        InterventionAssignmentOut: {
+            /** Id */
+            id: number;
+            /** Intervention Id */
+            intervention_id: number;
+            /** User Id */
+            user_id: number;
+            /** Student Name */
+            student_name: string;
+            /** Baseline Mastery */
+            baseline_mastery: number;
+            /** Post Mastery */
+            post_mastery?: number | null;
+            /** Baseline Evidence Strength */
+            baseline_evidence_strength: string;
+            /** Post Evidence Strength */
+            post_evidence_strength?: string | null;
+            /** Status */
+            status: string;
+            /**
+             * Assigned At
+             * Format: date-time
+             */
+            assigned_at: string;
+            /** Completed At */
+            completed_at?: string | null;
+        };
+        /** InterventionCreateRequest */
+        InterventionCreateRequest: {
+            /** Concept Id */
+            concept_id: string;
+            /** Title */
+            title: string;
+            /** Learning Gap */
+            learning_gap: string;
+            /** Target Misconception Id */
+            target_misconception_id?: string | null;
+            /**
+             * Activity Type
+             * @default practice
+             */
+            activity_type: string;
+            /** Recommended Remediation */
+            recommended_remediation: string;
+            /**
+             * Status
+             * @default draft
+             */
+            status: string;
+        };
+        /** InterventionDetailOut */
+        InterventionDetailOut: {
+            /** Id */
+            id: number;
+            /** Teacher Id */
+            teacher_id: number;
+            /** Classroom Id */
+            classroom_id: number;
+            /** Concept Id */
+            concept_id: string;
+            /** Concept Name */
+            concept_name: string;
+            /** Title */
+            title: string;
+            /** Learning Gap */
+            learning_gap: string;
+            /** Target Misconception Id */
+            target_misconception_id?: string | null;
+            /** Activity Type */
+            activity_type: string;
+            /** Recommended Remediation */
+            recommended_remediation: string;
+            /** Status */
+            status: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Total Assigned */
+            total_assigned: number;
+            /** Completed Count */
+            completed_count: number;
+            /** Assignments */
+            assignments?: components["schemas"]["InterventionAssignmentOut"][];
+        };
+        /** InterventionOutcomesResponse */
+        InterventionOutcomesResponse: {
+            /** Intervention Id */
+            intervention_id: number;
+            /** Title */
+            title: string;
+            /** Concept Id */
+            concept_id: string;
+            /** Concept Name */
+            concept_name: string;
+            /** Status */
+            status: string;
+            /** Total Assigned */
+            total_assigned: number;
+            /** Completed Count */
+            completed_count: number;
+            /** Completion Rate */
+            completion_rate: number;
+            /** Mean Baseline Mastery */
+            mean_baseline_mastery: number;
+            /** Mean Post Mastery */
+            mean_post_mastery?: number | null;
+            /** Mean Mastery Gain */
+            mean_mastery_gain?: number | null;
+            /**
+             * Misconceptions Resolved Count
+             * @default 0
+             */
+            misconceptions_resolved_count: number;
+            /**
+             * Sample Size Sufficient
+             * @default false
+             */
+            sample_size_sufficient: boolean;
+            /** Outcome Summary */
+            outcome_summary: string;
+            /** Assignments */
+            assignments?: components["schemas"]["InterventionAssignmentOut"][];
+        };
+        /** InterventionRecommendationOut */
+        InterventionRecommendationOut: {
+            /** Concept Id */
+            concept_id: string;
+            /** Concept Name */
+            concept_name: string;
+            /** Chapter */
+            chapter: string;
+            /** Title */
+            title: string;
+            /** Learning Gap */
+            learning_gap: string;
+            /** Target Misconception Id */
+            target_misconception_id?: string | null;
+            /** Target Misconception Statement */
+            target_misconception_statement?: string | null;
+            /** Affected Student Count */
+            affected_student_count: number;
+            /** Affected Students */
+            affected_students?: components["schemas"]["AffectedStudentOut"][];
+            /**
+             * Activity Type
+             * @default practice
+             */
+            activity_type: string;
+            /** Recommended Remediation */
+            recommended_remediation: string;
+            /**
+             * Suggested Duration Mins
+             * @default 15
+             */
+            suggested_duration_mins: number;
+            /** Reason */
+            reason: string;
         };
         /** LLMStatsResponse */
         LLMStatsResponse: {
@@ -786,6 +1401,22 @@ export interface components {
             concept_name: string;
             /** N Students */
             n_students: number;
+        };
+        /** MisconceptionStateOut */
+        MisconceptionStateOut: {
+            /** Id */
+            id: string;
+            /** Statement */
+            statement: string;
+            /** Correction */
+            correction: string;
+            /**
+             * Detected At
+             * Format: date-time
+             */
+            detected_at: string;
+            /** Resolved At */
+            resolved_at?: string | null;
         };
         /** ModelBreakerStatus */
         ModelBreakerStatus: {
@@ -901,12 +1532,142 @@ export interface components {
             /** Selection Reason */
             selection_reason: string;
         };
+        /** QuestionAuthoringListResponse */
+        QuestionAuthoringListResponse: {
+            /** Questions */
+            questions: components["schemas"]["QuestionAuthoringOut"][];
+            /** Total */
+            total: number;
+        };
+        /** QuestionAuthoringOut */
+        QuestionAuthoringOut: {
+            /** Id */
+            id: string;
+            /** Concept Id */
+            concept_id: string;
+            /** Kind */
+            kind: string;
+            /** Stem */
+            stem: string;
+            /** Options */
+            options: {
+                [key: string]: unknown;
+            }[];
+            /** Correct Key */
+            correct_key: string;
+            /** Explanation */
+            explanation: string;
+            /** Difficulty Bucket */
+            difficulty_bucket: number;
+            /** Difficulty Rating */
+            difficulty_rating: number;
+            /** N Attempts */
+            n_attempts: number;
+            /** Verified */
+            verified: boolean;
+            /** Source */
+            source: string;
+            /** Review Status */
+            review_status: string;
+            /** Version */
+            version: number;
+            /** Parent Id */
+            parent_id?: string | null;
+            /** Author Id */
+            author_id?: number | null;
+            /** Learning Objective */
+            learning_objective?: string | null;
+            /** Cognitive Skill */
+            cognitive_skill?: string | null;
+            /** Curriculum Ref */
+            curriculum_ref?: string | null;
+            /** Generation Model */
+            generation_model?: string | null;
+            /** Distractor Explanations */
+            distractor_explanations?: {
+                [key: string]: unknown;
+            } | null;
+            /** Rejection Reason */
+            rejection_reason?: string | null;
+        };
+        /** QuestionCreateRequest */
+        QuestionCreateRequest: {
+            /** Concept Id */
+            concept_id: string;
+            /**
+             * Kind
+             * @default mcq
+             */
+            kind: string;
+            /** Stem */
+            stem: string;
+            /** Options */
+            options?: components["schemas"]["QuestionOptionSchema"][];
+            /** Correct Key */
+            correct_key: string;
+            /** Explanation */
+            explanation: string;
+            /**
+             * Difficulty Bucket
+             * @default 2
+             */
+            difficulty_bucket: number;
+            /** Learning Objective */
+            learning_objective?: string | null;
+            /** Cognitive Skill */
+            cognitive_skill?: string | null;
+            /** Curriculum Ref */
+            curriculum_ref?: string | null;
+            /** Distractor Explanations */
+            distractor_explanations?: {
+                [key: string]: string;
+            } | null;
+        };
+        /** QuestionGenerateRequest */
+        QuestionGenerateRequest: {
+            /** Concept Id */
+            concept_id: string;
+            /** Chapter Id */
+            chapter_id?: string | null;
+            /** Subconcept */
+            subconcept?: string | null;
+            /**
+             * Difficulty Bucket
+             * @default 2
+             */
+            difficulty_bucket: number;
+            /**
+             * Kind
+             * @default mcq
+             */
+            kind: string;
+            /**
+             * Count
+             * @default 3
+             */
+            count: number;
+            /** Target Misconception Id */
+            target_misconception_id?: string | null;
+            /** Cognitive Skill */
+            cognitive_skill?: string | null;
+            /** Learning Objective */
+            learning_objective?: string | null;
+        };
         /** QuestionOptionOut */
         QuestionOptionOut: {
             /** Key */
             key: string;
             /** Text */
             text: string;
+        };
+        /** QuestionOptionSchema */
+        QuestionOptionSchema: {
+            /** Key */
+            key: string;
+            /** Text */
+            text: string;
+            /** Misconception Id */
+            misconception_id?: string | null;
         };
         /** QuestionOut */
         QuestionOut: {
@@ -920,6 +1681,41 @@ export interface components {
             options: components["schemas"]["QuestionOptionOut"][];
             /** Difficulty Bucket */
             difficulty_bucket: number;
+        };
+        /** QuestionReviewActionRequest */
+        QuestionReviewActionRequest: {
+            /**
+             * Action
+             * @description 'approve' or 'reject'
+             */
+            action: string;
+            /** Rejection Reason */
+            rejection_reason?: string | null;
+        };
+        /** QuestionUpdateRequest */
+        QuestionUpdateRequest: {
+            /** Stem */
+            stem?: string | null;
+            /** Kind */
+            kind?: string | null;
+            /** Options */
+            options?: components["schemas"]["QuestionOptionSchema"][] | null;
+            /** Correct Key */
+            correct_key?: string | null;
+            /** Explanation */
+            explanation?: string | null;
+            /** Difficulty Bucket */
+            difficulty_bucket?: number | null;
+            /** Learning Objective */
+            learning_objective?: string | null;
+            /** Cognitive Skill */
+            cognitive_skill?: string | null;
+            /** Curriculum Ref */
+            curriculum_ref?: string | null;
+            /** Distractor Explanations */
+            distractor_explanations?: {
+                [key: string]: string;
+            } | null;
         };
         /** ReadyResponse */
         ReadyResponse: {
@@ -1007,6 +1803,32 @@ export interface components {
             active_misconceptions: components["schemas"]["StudentMisconceptionDetail"][];
             /** Recent Attempts */
             recent_attempts: components["schemas"]["StudentAttemptBrief"][];
+        };
+        /** StudentInterventionItemOut */
+        StudentInterventionItemOut: {
+            /** Assignment Id */
+            assignment_id: number;
+            /** Intervention Id */
+            intervention_id: number;
+            /** Concept Id */
+            concept_id: string;
+            /** Concept Name */
+            concept_name: string;
+            /** Title */
+            title: string;
+            /** Learning Gap */
+            learning_gap: string;
+            /** Activity Type */
+            activity_type: string;
+            /** Recommended Remediation */
+            recommended_remediation: string;
+            /** Status */
+            status: string;
+            /**
+             * Assigned At
+             * Format: date-time
+             */
+            assigned_at: string;
         };
         /** StudentMasteryDetail */
         StudentMasteryDetail: {
@@ -1153,6 +1975,30 @@ export interface components {
             /** Cells */
             cells: components["schemas"]["HeatmapCellOut"][];
         };
+        /** TimelineEventOut */
+        TimelineEventOut: {
+            /** Event Type */
+            event_type: string;
+            /**
+             * Timestamp
+             * Format: date-time
+             */
+            timestamp: string;
+            /** Description */
+            description: string;
+            /** Is Correct */
+            is_correct: boolean;
+            /** Mastery Before */
+            mastery_before: number;
+            /** Mastery After */
+            mastery_after: number;
+            /** Mastery Delta */
+            mastery_delta: number;
+            /** Metadata */
+            metadata?: {
+                [key: string]: unknown;
+            };
+        };
         /** TranscriptionResponse */
         TranscriptionResponse: {
             /** Text */
@@ -1190,6 +2036,44 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /** VoiceCommandRequest */
+        VoiceCommandRequest: {
+            /** Diagram Id */
+            diagram_id: string;
+            /** Spoken Text */
+            spoken_text: string;
+            /**
+             * Is Assessment Mode
+             * @default false
+             */
+            is_assessment_mode: boolean;
+            /** Active Question Id */
+            active_question_id?: string | null;
+        };
+        /** VoiceCommandResponse */
+        VoiceCommandResponse: {
+            /** Action */
+            action: string;
+            /** Target Structure Id */
+            target_structure_id?: string | null;
+            /** Target Structure Name */
+            target_structure_name?: string | null;
+            /** Pathway Id */
+            pathway_id?: string | null;
+            /** View Direction */
+            view_direction?: string | null;
+            /** Zoom Level */
+            zoom_level?: number | null;
+            /** Message */
+            message: string;
+            /** Clarification Options */
+            clarification_options?: string[];
+            /**
+             * Confidence
+             * @default 1
+             */
+            confidence: number;
         };
     };
     responses: never;
@@ -1598,6 +2482,101 @@ export interface operations {
             };
         };
     };
+    get_explainable_mastery_api_v1_learner_concepts__concept_id__explainable_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path: {
+                concept_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExplainableConceptMasteryResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_my_interventions_api_v1_learner_interventions_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentInterventionItemOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    complete_my_intervention_api_v1_learner_interventions__assignment_id__complete_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path: {
+                assignment_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     start_teachback_session_api_v1_teachback_sessions_post: {
         parameters: {
             query?: never;
@@ -1900,10 +2879,258 @@ export interface operations {
             };
         };
     };
+    get_student_concept_explainable_mastery_api_v1_teacher_classrooms__classroom_id__students__student_id__concepts__concept_id__explainable_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path: {
+                classroom_id: number;
+                student_id: number;
+                concept_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExplainableConceptMasteryResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_intervention_recommendations_api_v1_teacher_classrooms__classroom_id__interventions_recommendations_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path: {
+                classroom_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterventionRecommendationOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_interventions_api_v1_teacher_classrooms__classroom_id__interventions_get: {
+        parameters: {
+            query?: {
+                status_filter?: string | null;
+            };
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path: {
+                classroom_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterventionDetailOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_intervention_api_v1_teacher_classrooms__classroom_id__interventions_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path: {
+                classroom_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InterventionCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterventionDetailOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_intervention_api_v1_teacher_classrooms__classroom_id__interventions__intervention_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path: {
+                classroom_id: number;
+                intervention_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterventionDetailOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    assign_intervention_api_v1_teacher_classrooms__classroom_id__interventions__intervention_id__assign_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path: {
+                classroom_id: number;
+                intervention_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InterventionAssignRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterventionDetailOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_intervention_outcomes_api_v1_teacher_classrooms__classroom_id__interventions__intervention_id__outcomes_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path: {
+                classroom_id: number;
+                intervention_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterventionOutcomesResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     transcribe_audio_api_v1_speech_transcriptions_post: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1936,7 +3163,9 @@ export interface operations {
     get_llm_stats_api_v1_ops_llm_stats_get: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1949,6 +3178,402 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["LLMStatsResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    generate_questions_api_v1_authoring_questions_generate_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuestionGenerateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GeneratedQuestionBatchResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_questions_api_v1_authoring_questions_get: {
+        parameters: {
+            query?: {
+                concept_id?: string | null;
+                review_status?: string | null;
+                kind?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionAuthoringListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_question_draft_api_v1_authoring_questions_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuestionCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionAuthoringOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_question_api_v1_authoring_questions__question_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path: {
+                question_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionAuthoringOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_question_api_v1_authoring_questions__question_id__put: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path: {
+                question_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuestionUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionAuthoringOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_question_api_v1_authoring_questions__question_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path: {
+                question_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    review_question_api_v1_authoring_questions__question_id__review_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path: {
+                question_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuestionReviewActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionAuthoringOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_diagrams_api_v1_diagrams_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_diagram_manifest_api_v1_diagrams__diagram_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path: {
+                diagram_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    interpret_voice_command_api_v1_diagrams__diagram_id__commands_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path: {
+                diagram_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VoiceCommandRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VoiceCommandResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    submit_diagram_assessment_api_v1_diagrams__diagram_id__assessments_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path: {
+                diagram_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DiagramAssessmentSubmitRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiagramAssessmentResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

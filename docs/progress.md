@@ -196,6 +196,33 @@ Handoff memory across agent sessions.
     - Added safe client-side DOM reconciliation patch for `Node.prototype.removeChild` to prevent third-party canvas overlay unmount collisions.
     - Verified all 13 Next.js routes, `pnpm typecheck` (0 errors), `pnpm lint` (0 errors), and all 74 backend tests passing.
 
+  - **Navbar & Dashboard UI Consistency Polish:**
+    - Aligned the Navbar "Biology Lab" button styling with other navigation items (`Study Map`, `Diagnostic`, `Practice`, `Review`), removing green color overrides and the animated pulse dot.
+    - Removed the redundant "Interactive Lab" button and icon from the student dashboard welcome card.
+    - Verified frontend typechecking (`pnpm typecheck`) and ESLint (`pnpm lint`) with 0 errors.
+
+  - **Study Map Tree Correction & Concept Locking Polish:**
+    - **Concept Locking & Status Logic Fixed:**
+      - Established canonical domain status engine in `backend/app/domain/graph.py` with authoritative thresholds (prerequisites: $\ge 0.60$, mastery: $\ge 0.80$).
+      - Implemented `determine_concept_status` returning exact statuses (`locked`, `ready`, `learning`, `mastered`), formatted `lock_reason`, and `unmet_prerequisites` with required vs. current mastery percentages.
+      - Fixed root concepts (`lp-nutrition`, `cc-neuron`, `cc-plant-hormones`, `cc-animal-hormones`, `he-variation`) without prerequisites so they are never locked and cleanly accessible as `ready`.
+      - Eliminated conflicting ad-hoc status calculations across all services: `concept_service.py`, `learner_service.py`, `explainable_mastery_service.py`, `teacher_service.py`, `practice_service.py`, and `diagnostic_service.py`.
+      - Prerequisite checks now evaluate base mastery `p_mastery` instead of decayed `p_effective` to prevent SM-2 decay relocking.
+      - Fixed simulated learner data in `backend/app/db/seed.py`: enforced topological prerequisite progression so students only attempt unlocked concepts; untested concepts remain cleanly at 0.0 with 0 attempts.
+      - Added SM-2 runaway interval guard `min(365, ...)` in `app/domain/sm2.py`.
+    - **Diagonal Curved Connectors & Tree Polish:**
+      - Completely replaced `smoothstep` right-angle orthogonal connectors with custom diagonal cubic Bézier edges (`CurvedTreeEdge.tsx`) using `@xyflow/react` `getBezierPath` with curvature 0.45.
+      - Symmetrically balanced node layout positions for all chapters (`lp-nutrition` centered at y=220, `cc-neuron` at y=660, `he-variation` at y=1090).
+      - Added directional arrowheads (`MarkerType.ArrowClosed`) and distinction between active (cool slate `#94A3B8`), locked (dashed `#D1D5DB`), and highlighted learning paths (forest emerald `#2E7D32`, 2.5px width).
+      - Zero unnecessary edge animations.
+      - Removed arbitrary 30% progress bar for untested concepts on `ConceptNodeComponent.tsx`; fresh concepts display clean "Ready" state.
+      - Added authentic prerequisite lock explanation banner with "Review Prerequisite" 1-click navigation in `ConceptDetailModal.tsx`.
+    - **Testing & Verification:**
+      - Added comprehensive unit and integration tests in `test_graph.py` and `test_concepts.py` covering root accessibility, prerequisite locks, lock reasons, and unlock progressions.
+      - All 83 backend tests passing (`pytest tests -v`).
+      - 0 errors in backend `ruff` and `mypy` across 81 files.
+      - 0 ESLint errors or warnings, `tsc --noEmit` 0 errors, Next.js production build (`pnpm build` across 12/12 routes) passing cleanly.
+
 ---
 
 ## Complete

@@ -44,7 +44,7 @@ def calculate_sm2_update(
         elif current_repetitions == 1:
             new_interval_days = 6
         else:
-            new_interval_days = max(1, round(current_interval_days * new_ease))
+            new_interval_days = min(365, max(1, round(current_interval_days * new_ease)))
         new_repetitions = current_repetitions + 1
 
     next_due_at = now + datetime.timedelta(days=new_interval_days)
