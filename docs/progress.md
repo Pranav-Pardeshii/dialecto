@@ -111,6 +111,10 @@ All Milestones (M0 through M6) are completely implemented, verified, and committ
 - **Teacher Classroom Analytics** featuring $30 \times 20$ interactive student-by-concept knowledge matrix, curriculum failure gap rankings, misconception hotspots, and at-risk student intervention drill-downs.
 - **Spaced Review Queue** with urgency ranking and one-click review launch.
 - **Observability Panel (`/ops`)** displaying live latency percentiles (P50/P95), circuit breaker states, token budgets, and invocation logs.
+- **Cloud Deployment:**
+  - Live Render Backend: `https://dialecto-backend-55qp.onrender.com` (Python 3.12, Alembic migrations, PostgreSQL seeded, health & readiness verified).
+  - Vercel Frontend: Connected via `BACKEND_URL` environment variable through Next.js reverse proxy rewrites.
+
 
 
 ---
