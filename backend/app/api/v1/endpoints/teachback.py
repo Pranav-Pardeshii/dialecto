@@ -45,3 +45,4 @@ async def get_teachback_session(
 ) -> TeachbackDetailResponse:
     """Retrieve full transcript and state of a Teach-Back dialogue session."""
     return await teachback_service.get_session_detail(session, current_user.id, session_id)
+

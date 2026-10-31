@@ -17,3 +17,4 @@ async def get_due_reviews(
 ) -> list[ReviewDueItem]:
     """Retrieve biological concepts due for spaced review, prioritized by SM-2 delay and decay."""
     return await review_service.get_due_reviews(session, current_user.id)
+

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { api, PracticeNextResponse, PracticeAnswerResponse } from "@/lib/api/client";
@@ -49,7 +49,7 @@ function PracticeContent() {
   const [feedback, setFeedback] = useState<PracticeAnswerResponse | null>(null);
   const [startTime, setStartTime] = useState<number>(Date.now());
 
-  const fetchNextQuestion = async () => {
+  const fetchNextQuestion = useCallback(async () => {
     setLoading(true);
     setFeedback(null);
     setSelectedKey(null);
@@ -81,11 +81,11 @@ function PracticeContent() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [conceptParam]);
 
   useEffect(() => {
     fetchNextQuestion();
-  }, [conceptParam]);
+  }, [fetchNextQuestion]);
 
   const handleSubmit = async () => {
     if (!selectedKey || !sessionData || submitting) return;

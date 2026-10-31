@@ -40,3 +40,4 @@ Return ONLY a valid JSON object matching this schema:
   "misconceptions_found": [],
   "feedback_summary": "Great explanation of photolysis, but you still need to explain how carbon dioxide is converted into sugars."
 }
+

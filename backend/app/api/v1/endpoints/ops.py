@@ -74,3 +74,4 @@ async def get_llm_stats() -> LLMStatsResponse:
         models=models_out,
         recent_calls=recent_calls,
     )
+

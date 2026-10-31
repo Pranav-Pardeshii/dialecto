@@ -45,3 +45,4 @@ class LLMStatsResponse(BaseModel):
     p95_latency_ms: int = Field(..., ge=0)
     models: list[ModelStatusOut]
     recent_calls: list[RecentCallOut]
+

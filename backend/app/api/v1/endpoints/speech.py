@@ -58,3 +58,4 @@ async def transcribe_audio(
             message="Failed to process audio recording",
             status_code=500,
         )
+

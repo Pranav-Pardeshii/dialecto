@@ -40,3 +40,4 @@ def calibrate_item_difficulty(
     new_b = current_difficulty + delta
     # Clamp difficulty to reasonable range [-3.0, 3.0]
     return round(max(-3.0, min(3.0, new_b)), 4)
+

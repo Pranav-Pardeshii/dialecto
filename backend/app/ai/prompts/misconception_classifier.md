@@ -35,3 +35,4 @@ Return ONLY a valid JSON object matching this schema:
   "student_gap_summary": "The student confuses the source of oxygen during photosynthesis with carbon dioxide instead of water photolysis.",
   "remedial_nudge": "Remember that light energy directly splits water molecules in the thylakoid to release O2 gas."
 }
+

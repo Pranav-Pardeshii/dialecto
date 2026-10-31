@@ -24,3 +24,4 @@ async def test_get_llm_stats(client: AsyncClient) -> None:
         assert "state" in m["circuit_breaker"]
         assert "token_budget" in m
         assert "capacity" in m["token_budget"]
+
