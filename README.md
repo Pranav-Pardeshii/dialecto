@@ -1,272 +1,353 @@
-# 💬 Dialecto: the AI tutor that learns what you know
+# 💬 Dialecto: The AI Tutor That Learns What You Know
 
-> An adaptive **CBSE Class 10 Biology** tutor with a real learner model. It tracks a Bayesian mastery estimate for every concept, detects misconceptions from your *reasoning* (not just your final answer), schedules spaced repetition, gives teachers a class-wide gap map, and lets you prove mastery by **teaching a deliberately naive AI student called Pip**.
+> An adaptive **CBSE Class 10 Biology** tutor built with a real learner model. It tracks Bayesian knowledge states per concept, uncovers misconceptions from student *reasoning* (not just final answers), schedules spaced repetition, empowers teachers with automated intervention clinics and a $30 \times 20$ class heatmap, lets learners inspect interactive **3D cellular specimens**, and lets them prove mastery by **teaching a deliberately naive AI student called Pip**.
 
 Built for the Agentic AI Hackathon (Product Space × Wispr Flow).
 
-<!-- Add demo GIF here: docs/assets/demo.gif -->
+[![Tests](https://img.shields.io/badge/pytest-83%20passed-22c55e?style=flat-square&logo=pytest)](docs/testing.md)
+[![Typecheck](https://img.shields.io/badge/mypy%20%7C%20tsc-strict%20clean-blue?style=flat-square)](docs/testing.md)
+[![Code Style](https://img.shields.io/badge/code%20style-ruff%20%7C%20prettier-000000?style=flat-square)](docs/design.md)
+[![Backend](https://img.shields.io/badge/backend-FastAPI%20%7C%20Python%203.12-009688?style=flat-square&logo=fastapi)](backend)
+[![Frontend](https://img.shields.io/badge/frontend-Next.js%2015%20%7C%20TypeScript-000000?style=flat-square&logo=next.js)](frontend)
+[![AI Engine](https://img.shields.io/badge/AI-Groq%20LLM%20Router-f55036?style=flat-square)](backend/app/ai)
+[![3D Graphics](https://img.shields.io/badge/3D-Three.js%20%7C%20R3F-black?style=flat-square&logo=threedotjs)](frontend/src/components/lab)
 
-## Why Dialecto
+---
 
-Generic AI tutors answer questions but never track what you actually understand. Dialecto keeps a **learner model**: a probability of mastery per concept, updated after every answer, that drives what you practise next, when you review, and what your teacher sees.
+## 🚀 Live Deployments
 
-## Features
+- **Live Backend API (Render):** [`https://dialecto-backend-55qp.onrender.com`](https://dialecto-backend-55qp.onrender.com) (Health, OpenAPI docs at `/docs`)
+- **Frontend App (Vercel):** Connected via reverse-proxy rewrites (`/api/*` → backend) with demo identity role switcher (`Aarav` Class 10 Student / `Ms. Rao` Biology Instructor).
 
-| Brief requirement | How Dialecto does it |
+---
+
+## 💡 Why Dialecto
+
+Generic AI tutors act as chatbots: they answer questions in isolation but maintain no persistent cognitive state. When a learner makes a mistake, chatbots give the answer away without diagnosing *why* or tracking whether the concept was truly acquired.
+
+Dialecto maintains an authoritative, mathematical **learner model**:
+1. **Bayesian Knowledge Tracing (BKT)** computes dynamic mastery probability $P(L)$ per curriculum concept.
+2. **Item Response Theory / Elo Calibration** dynamically rates question difficulty from student responses.
+3. **SM-2 Spaced Repetition** models memory retention and schedules reviews before concepts decay.
+4. **Explainable Mastery & Confidence** separates raw mastery from evidence volume and evaluation diversity.
+5. **Teach-Back Arena** challenges students to explain biology concepts to **Pip**, a naive peer AI learner.
+6. **Interactive 3D Diagram Lab** brings cellular biology to life with authentic 3D specimens and direct organelle teaching.
+7. **Teacher Intervention Planner** turns classroom analytics into targeted, one-click remedial clinics.
+
+---
+
+## ✨ Features
+
+| Capability | What Dialecto Delivers |
 |---|---|
-| Diagnostic test | 15-question adaptive diagnostic using uncertainty sampling and prerequisite inference |
-| Concept graph | 20 concepts across 3 chapters with prerequisites; nodes recolor live as mastery changes |
-| Learner model | Bayesian Knowledge Tracing per concept, updated after every answer |
-| Targeted questions + difficulty calibration | Selector targets weak, unlocked concepts at about 70% predicted success; item difficulty is calibrated with an Elo-style update |
-| Misconception detection | Tagged distractors plus an LLM classifier over the student's written or spoken reasoning |
-| Spaced repetition | SM-2 scheduling with mastery decay |
-| Teacher dashboard | Class heatmap, weakest concepts, top misconceptions, at-risk students |
-| **Teach-Back (our differentiator)** | Explain a concept to Pip, a naive student AI; a judge scores your explanation against a rubric and feeds the learner model |
-| **Voice-first input** | Built for Wispr Flow dictation; Groq Whisper mic button as fallback |
+| **Adaptive Diagnostic Exam** | 15-question adaptive assessment using uncertainty sampling ($P(L) \approx 0.5$) and topological prerequisite progression to establish an instant baseline. |
+| **Interactive Study Map** | Interactive curriculum graph with 20 concepts across 3 NCERT chapters, featuring custom diagonal cubic Bézier edges, topological prerequisite locking, and live status badges (`ready`, `learning`, `mastered`, `locked`). |
+| **Pure Learner Model** | Bayesian Knowledge Tracing with dynamic slip adjustment ($S_q = S + 0.05(d-2)$), continuous soft-evidence updates, and zero mathematical delegation to LLMs. |
+| **Item Calibration (Elo)** | Real-time question difficulty calibration ($b \leftarrow b + K(\text{expected} - y)$) based on student ability proxy $\theta = \text{logit}(P(L))$. |
+| **Misconception Detection** | Dual-channel classification: tagged distractor choices plus Groq LLM reasoning analysis comparing written/spoken explanations against 23 NCERT misconceptions. |
+| **Spaced Repetition & Decay** | SuperMemo SM-2 repetition queue with quality ratings ($q \in \{1, 3, 4, 5\}$) and exponential mastery decay ($p_{\text{eff}} = p \cdot \exp(-\text{days\_overdue}/14)$). |
+| **Teach-Back Mode with Pip** | Explain concepts out loud or in writing to Pip, a naive peer AI. A multi-rubric judge evaluates key points and misconceptions, updating BKT mastery via soft evidence while Pip advances through comprehension levels (Level 0: Confused $\rightarrow$ Level 3: Mastered). |
+| **Interactive 3D Biology Lab** | 7 whitelisted cellular specimens from Cell Architecture Studio and NIH 3D Print Exchange with precision 3D model-local raycasting, anatomical pins, cross-section views, accessible 2D SVG atlas, and contextual "Teach this to Pip" directly from 3D structures. |
+| **Explainable Mastery & Confidence** | Mathematical Evidence Confidence score $S \in [0.0, 1.0]$ based on sample size, difficulty variance, decay, and mode diversity (Practice, Diagnostic, Teach-Back, Lab), with deterministic state narratives and chronological evidence timelines. |
+| **Teacher Intervention Planner** | Automated triage identifying struggling cohorts ($\ge 35\%$ failure rate, $<0.50$ mastery, or shared active misconceptions), 1-click targeted clinic assignments with voice notes, live student progress, and before/after outcome gain measurement. |
+| **Teacher Classroom Heatmap** | $30 \times 20$ interactive student-by-concept knowledge matrix, failure-ranked curriculum gaps, class misconception hotspots, and at-risk student drill-down drawers. |
+| **AI Question Authoring Studio** | Curriculum-grounded question generator with pure pedagogical validation, multi-stage approval workflow (`draft`, `approved`, `rejected`), protecting the question bank from unreviewed drafts. |
+| **Voice-First Dictation** | Tailored for Wispr Flow system-wide dictation into native `<textarea>` elements, with Groq Whisper audio transcription as an in-app microphone fallback. |
+| **Observability Panel (`/ops`)** | Live operational telemetry dashboard reporting P50/P95 LLM latencies, circuit breaker states, continuous token budget refill rates, and execution audit logs. |
 
-## Architecture
+---
+
+## 🔬 Interactive 3D Biology Lab & Whitelisted Specimens
+
+Dialecto enforces strict biological fidelity. All 3D diagram models are sourced directly from verified educational repositories: [Cell Architecture Studio](https://github.com/cclank/cell-architecture-studio) and the National Institutes of Health (NIH 3D Print Exchange). Unverified or placeholder diagrams are strictly prohibited.
+
+| Specimen ID | Specimen Name | Visual Architecture | Curriculum Concept | Provenance / License |
+|---|---|---|---|---|
+| `plant` | **Plant Cell** | Production GLB (`/models/plant-cell-first001.glb`) | Photosynthesis (`lp-photosynthesis`) | Cell Architecture Studio / CC-BY-4.0 |
+| `whiteBlood` | **White Blood Cell** | Production GLB (`/models/white-blood-cell-user.glb`) | Circulation & Defense (`lp-circulation`) | Cell Architecture Studio / CC-BY-4.0 |
+| `animal` | **Animal Cell** | Production GLB (`/models/animal-cell-nih.glb`) | Respiration (`lp-respiration`) | NIH 3DPX-015797 / Public Domain CC0 |
+| `neuron` | **Neuron** | Production GLB (`/models/neuron-nih.glb`) | Nerve Transmission (`cc-neuron`) | NIH 3DPX-015796 / Public Domain CC0 |
+| `bacteria` | **Bacterial Cell Wall** | Production GLB (`/models/bacteria-wall-nih.glb`) | Nutrition (`lp-nutrition`) | NIH 3DPX-010752 / Public Domain CC0 |
+| `epithelial` | **Epithelial Cell** | Procedural 3D Brush Border (`EpithelialModel`) | Digestion (`lp-digestion`) | Cell Architecture Studio / MIT |
+| `muscle` | **Muscle Cell** | Procedural Sarcomere Bundles (`MuscleModel`) | Respiration (`lp-respiration`) | Cell Architecture Studio / MIT |
+
+*For complete provenance, mesh attributes, and citations, see [`docs/ASSETS_ATTRIBUTION.md`](docs/ASSETS_ATTRIBUTION.md).*
+
+---
+
+## 🏛️ System Architecture
+
+Dialecto is built as a resilient **modular monolith** adhering to strict dependency layering: `api` $\rightarrow$ `services` $\rightarrow$ `repositories`, `domain`, and `ai`. Routers contain zero business logic; `domain/` contains zero I/O; and **database transactions are never held open across LLM calls**.
 
 ```mermaid
 flowchart LR
-  subgraph Client["Browser"]
-    U["Learner or Teacher<br/>Wispr Flow dictation into textarea"]
+  subgraph Client["Browser (Desktop / Tablet / Mobile)"]
+    U["Learner or Teacher"]
+    W["Wispr Flow Dictation / In-App Mic"]
+    T3D["Three.js / React Three Fiber Lab"]
   end
 
-  subgraph FE["Next.js (Vercel)"]
-    UI["App Router UI<br/>Concept graph, Practice, Teach-Back, Teacher dashboard"]
-    RW["/api/* rewrite"]
+  subgraph FE["Frontend: Next.js 15 (Vercel)"]
+    UI["App Router UI<br/>Study Map, Diagnostic, Practice, Lab, Teach-Back, Teacher Studio"]
+    RW["/api/* Reverse Proxy Rewrite"]
   end
 
-  subgraph BE["FastAPI (async modular monolith)"]
-    MW["Middleware<br/>request id, logging, error envelope, CORS"]
-    API["API layer /api/v1"]
-    SVC["Services<br/>diagnostic, practice, teachback,<br/>review, teacher analytics"]
-    DOM["Domain (pure)<br/>BKT, Elo, SM-2, Selector, Graph"]
-    REPO["Repositories<br/>SQLAlchemy 2.0 async"]
-    AI["AI layer<br/>Agents and prompts<br/>LLM Router: fallback chain,<br/>circuit breaker, token budget"]
-    LOG["llm_calls writer<br/>asyncio queue"]
+  subgraph BE["Backend: FastAPI (Async Modular Monolith)"]
+    MW["Middleware<br/>Request ID, Structured JSON Logging, Error Envelope"]
+    API["API Layer (/api/v1)"]
+    SVC["Domain Services<br/>Diagnostic, Practice, TeachBack, Lab, Interventions, Authoring"]
+    DOM["Pure Domain Mathematics<br/>BKT, Elo, SM-2, Selector, Graph, Explainable Mastery, Validator"]
+    REPO["Repositories<br/>SQLAlchemy 2.0 Async"]
+    AI["AI Layer<br/>Groq LLM Router: Fallback Chain,<br/>Circuit Breaker, Token Budget Limiter"]
+    LOG["Telemetry Writer<br/>Non-blocking asyncio.Queue"]
   end
 
-  DB[("PostgreSQL<br/>Neon in prod")]
-  G1["Groq: gpt-oss-120b (primary)"]
-  G2["Groq: fallback models"]
-  WH["Groq Whisper (speech fallback)"]
+  DB[("PostgreSQL<br/>Neon in Prod")]
+  G1["Groq: gpt-oss-120b (Primary)"]
+  G2["Groq: Fallbacks (70b, 8b)"]
+  WH["Groq Whisper (Speech Fallback)"]
 
-  U --> UI --> RW --> MW --> API --> SVC
+  U --> W --> UI
+  U --> T3D --> UI
+  UI --> RW --> MW --> API --> SVC
   SVC --> DOM
   SVC --> REPO --> DB
   SVC --> AI
   AI --> G1
-  AI -. "429, timeout, bad JSON" .-> G2
+  AI -. "429, Timeout, Schema Fail" .-> G2
   API --> WH
   AI --> LOG --> DB
 ```
 
-### Teach-Back turn (the interesting flow)
+### Teach-Back Turn Lifecycle
 
 ```mermaid
 sequenceDiagram
-  participant L as Learner (dictating via Wispr Flow)
-  participant FE as Next.js
-  participant API as FastAPI
+  autonumber
+  actor Learner as Learner (Wispr Flow Dictation)
+  participant FE as Next.js 15 UI
+  participant API as FastAPI Router
   participant DB as PostgreSQL
-  participant R as LLM Router
-  participant G as Groq
-  L->>FE: speaks explanation into textarea
+  participant Router as Groq LLM Router
+  participant Domain as Pure Domain Math
+
+  Learner->>FE: Dictates explanation into textarea
   FE->>API: POST /teachback/sessions/{id}/turns
-  API->>DB: load context (txn 1, then released)
-  API->>R: judge(key points, misconception catalog, explanation)
-  R->>G: gpt-oss-120b (JSON)
-  G-->>R: judgement
-  API->>API: domain: level + soft evidence
-  API->>R: persona(level, hidden misconceptions, gap hint)
-  R->>G: Pip's reply
-  G-->>R: reply
-  API->>DB: persist turn, mastery, SM-2 (txn 2)
-  API-->>FE: Pip's reply, level, feedback
+  Note over API,DB: Transaction 1: Read & Release
+  API->>DB: Load session, concept rubric, and dialogue history
+  API-->>DB: Connection released immediately
+  
+  API->>Router: Judge prompt (cumulative transcript + NCERT rubric)
+  Router->>Router: Execute primary model (fallback on 429/timeout)
+  Router-->>API: Structured evaluation (key points covered, misconceptions)
+  
+  API->>Domain: Calculate Pip level (0-3) and soft-evidence BKT update
+  Domain-->>API: P_new = P_prior + w * (P_bkt - P_prior)
+  
+  API->>Router: Student Persona prompt (Pip level, reaction, inquiry)
+  Router-->>API: Pip character response
+  
+  Note over API,DB: Transaction 2: Atomic State Write
+  API->>DB: Lock mastery row (SELECT ... FOR UPDATE)
+  API->>DB: Commit turns, update BKT, calibrate SM-2
+  API-->>FE: Return Pip response, comprehension level, and rubric delta
 ```
 
-### Delivery topology
+---
 
-```mermaid
-flowchart TB
-  Dev["Developers"] -->|git push| GH["GitHub"]
-  GH --> CI["GitHub Actions<br/>ruff, mypy, pytest, lint, typecheck, build"]
-  CI --> V["Vercel: Next.js"]
-  CI --> C["Container host (Render, Railway or Fly):<br/>FastAPI image built with uv"]
-  C --> N[("Neon PostgreSQL")]
-  C --> GQ["Groq API"]
-```
+## 📐 Mathematical Formulation
 
-Design principles: a **modular monolith** with a strict dependency rule; **pure domain logic** (all learner math is unit-tested and never delegated to an LLM); **graceful degradation** (if every LLM is down, diagnostic and practice keep working); **observability built in** (structured logs plus an `llm_calls` table surfaced in an AI reliability panel). Details in [`docs/architecture.md`](docs/architecture.md).
+### 1. Bayesian Knowledge Tracing (BKT)
+- **Observation update:**
+  $$\begin{aligned}
+  P(L \mid \text{correct}) &= \frac{P(L)(1 - S_q)}{P(L)(1 - S_q) + (1 - P(L)) G} \\
+  P(L \mid \text{wrong}) &= \frac{P(L) S_q}{P(L) S_q + (1 - P(L))(1 - G)}
+  \end{aligned}$$
+- **Dynamic slip adjustment:** $S_q = \text{clamp}(S + 0.05(d - 2), 0.02, 0.30)$ for difficulty bucket $d \in \{1, 2, 3\}$.
+- **Transition update:**
+  $$P(L') = P(L \mid \text{obs}) + (1 - P(L \mid \text{obs})) T$$
+- **Soft evidence (Teach-Back & Lab):**
+  $$P_{\text{new}} = P_{\text{prior}} + w \cdot (P_{\text{bkt}} - P_{\text{prior}}), \quad w = \min(0.70, \text{confidence})$$
 
-## Repository structure
+### 2. Item Difficulty Calibration (Elo)
+- Student latent ability proxy: $\theta = \text{logit}(P(L))$.
+- Expected success probability: $\sigma(\theta - b) = \frac{1}{1 + e^{-(\theta - b)}}$.
+- Calibration update (active after $n \ge 5$ attempts):
+  $$b \leftarrow b + K \cdot (\sigma(\theta - b) - y), \quad K = 0.10, \; y \in \{0, 1\}$$
+
+### 3. Spaced Repetition (SM-2) & Exponential Decay
+- Interval and ease factor update based on quality rating $q \in \{1, 3, 4, 5\}$.
+- Effective mastery decay when reviews are overdue ($\Delta t > 0$):
+  $$p_{\text{eff}} = p \cdot \exp\left(-\frac{\Delta t}{14}\right)$$
+
+### 4. Explainable Mastery & Evidence Confidence
+- Evidence confidence score $S \in [0.0, 1.0]$:
+  $$S = \text{clamp}\left(0.40 \cdot \min\left(1.0, \frac{n}{6}\right) + 0.20 \cdot \min\left(1.0, \frac{m}{3}\right) + 0.25 \cdot e^{-\Delta t / 30} + 0.15 \cdot (1 - \text{var}_d), 0.0, 1.0\right)$$
+  *(where $n$ is sample count, $m$ is distinct modality count, $\Delta t$ is days since last attempt, and $\text{var}_d$ is question difficulty variance).*
+
+---
+
+## 📂 Repository Structure
 
 ```text
 dialecto/
-├── AGENTS.md                      # standing rules for AI agents
-├── MASTER_PROMPT.md               # bootstrap prompt (not shipped to prod)
-├── README.md
-├── Makefile                       # dev, check, test, seed, migrate, eval
-├── docker-compose.yml             # postgres, backend, frontend
-├── .env.example
-├── .github/
-│   └── workflows/ci.yml
+├── AGENTS.md                                # Standing protocol & operational rules
+├── README.md                                # Authoritative overview & system documentation
+├── Makefile                                 # Build, quality checks, test, and seed tasks
+├── docker-compose.yml                       # PostgreSQL local container
+├── .env.example                             # Environment template
 ├── docs/
-│   ├── prd.md
-│   ├── design.md                  # design language (Taste Skill), approved before UI work
-│   ├── architecture.md
-│   ├── database.md
-│   ├── api.md
-│   ├── agents.md
-│   ├── curriculum.md
-│   ├── features.md
-│   ├── plan.md
-│   ├── testing.md
-│   ├── setup.md
-│   ├── progress.md                # agent handoff memory
-│   ├── DECISIONS.md               # decision log
-│   └── assets/
+│   ├── architecture.md                      # Layering, modular monolith constraints, concurrency
+│   ├── ASSETS_ATTRIBUTION.md                # 3D specimen provenance & licensing records
+│   ├── prd.md / features.md                 # Product requirements and feature catalog
+│   ├── design.md                            # Taste Skill design tokens & typography
+│   ├── curriculum.md                        # CBSE Class 10 NCERT concepts & misconceptions
+│   ├── progress.md                          # Permanent handoff memory across agent sessions
+│   └── DECISIONS.md                         # Architecture Decision Records (ADRs)
 ├── backend/
-│   ├── pyproject.toml
-│   ├── uv.lock
-│   ├── Dockerfile                 # multi-stage, uv, non-root
-│   ├── alembic.ini
-│   ├── migrations/
-│   │   ├── env.py
-│   │   └── versions/
+│   ├── pyproject.toml / uv.lock             # Python 3.12 dependencies managed via uv
+│   ├── Dockerfile                           # Production multi-stage Docker build
+│   ├── alembic.ini / migrations/            # Async database schema migrations
 │   ├── app/
-│   │   ├── main.py                # app factory, lifespan (db, llm router, log writer)
-│   │   ├── core/
-│   │   │   ├── config.py          # pydantic-settings
-│   │   │   ├── logging.py         # structlog setup
-│   │   │   ├── errors.py          # AppError hierarchy and handlers
-│   │   │   ├── middleware.py      # request id, access log
-│   │   │   └── limits.py          # per-user in-process rate limit
-│   │   ├── api/
-│   │   │   ├── deps.py            # db session, current demo user
-│   │   │   └── v1/
-│   │   │       ├── router.py
-│   │   │       └── endpoints/
-│   │   │           ├── health.py
-│   │   │           ├── users.py
-│   │   │           ├── concepts.py
-│   │   │           ├── learner.py
-│   │   │           ├── diagnostic.py
-│   │   │           ├── practice.py
-│   │   │           ├── teachback.py
-│   │   │           ├── reviews.py
-│   │   │           ├── teacher.py
-│   │   │           ├── speech.py
-│   │   │           └── ops.py
-│   │   ├── schemas/               # Pydantic request/response models
-│   │   ├── models/                # SQLAlchemy ORM models
-│   │   ├── db/
-│   │   │   ├── base.py
-│   │   │   ├── session.py         # async engine and sessionmaker
-│   │   │   └── seed.py            # idempotent content and class simulation
-│   │   ├── repositories/          # data access only
-│   │   ├── services/              # use cases (orchestration, transactions)
-│   │   │   ├── diagnostic.py
-│   │   │   ├── practice.py
-│   │   │   ├── teachback.py
-│   │   │   ├── review.py
-│   │   │   ├── teacher_analytics.py
-│   │   │   └── misconceptions.py
-│   │   ├── domain/                # PURE logic, no I/O
-│   │   │   ├── bkt.py
-│   │   │   ├── elo.py
-│   │   │   ├── sm2.py
-│   │   │   ├── selector.py
-│   │   │   └── graph.py
+│   │   ├── main.py                          # Lifespan, CORS, rate limits, telemetry queue
+│   │   ├── core/                            # Config, logging, AppError hierarchy, middleware
+│   │   ├── api/v1/endpoints/
+│   │   │   ├── authoring.py                 # Teacher question generation & review endpoints
+│   │   │   ├── concepts.py                  # Concept graph & DAG details
+│   │   │   ├── diagnostic.py                # 15-question adaptive assessment
+│   │   │   ├── diagrams.py                  # 3D diagram manifests & assessment submissions
+│   │   │   ├── learner.py                   # Student mastery & explainable narratives
+│   │   │   ├── ops.py                       # Operational telemetry & circuit breaker stats
+│   │   │   ├── practice.py                  # Adaptive practice & distractor submissions
+│   │   │   ├── review.py                    # Spaced review queues
+│   │   │   ├── speech.py                    # Groq Whisper transcription fallback
+│   │   │   ├── teachback.py                 # Teach-Back session creation & turns
+│   │   │   ├── teacher.py                   # Heatmap, gaps, at-risk, and clinic endpoints
+│   │   │   └── users.py                     # Demo identity provider
+│   │   ├── services/                        # Business orchestration & transaction boundaries
+│   │   │   ├── concept_service.py
+│   │   │   ├── diagnostic_service.py
+│   │   │   ├── diagram_assessment_service.py
+│   │   │   ├── diagram_command_service.py
+│   │   │   ├── explainable_mastery_service.py
+│   │   │   ├── intervention_service.py
+│   │   │   ├── learner_service.py
+│   │   │   ├── practice_service.py
+│   │   │   ├── question_authoring_service.py
+│   │   │   ├── review_service.py
+│   │   │   ├── teachback_service.py
+│   │   │   └── teacher_service.py
+│   │   ├── domain/                          # PURE Python learner math (no I/O, 100% unit tested)
+│   │   │   ├── bkt.py                       # Bayesian Knowledge Tracing
+│   │   │   ├── elo.py                       # Elo difficulty rating calibration
+│   │   │   ├── explainable_mastery.py       # Evidence confidence & state narratives
+│   │   │   ├── graph.py                     # Topological DAG validation & prerequisite locking
+│   │   │   ├── question_validator.py        # Pedagogical question integrity rules
+│   │   │   ├── selector.py                  # Active next-question selection policy
+│   │   │   └── sm2.py                       # SuperMemo SM-2 & decay calculation
 │   │   ├── ai/
-│   │   │   ├── llm/
-│   │   │   │   ├── client.py      # Groq async wrapper
-│   │   │   │   ├── router.py      # fallback chain, repair retry
-│   │   │   │   ├── breaker.py     # circuit breaker
-│   │   │   │   ├── budget.py      # token budget per model
-│   │   │   │   └── recorder.py    # llm_calls queue writer
-│   │   │   ├── agents/
-│   │   │   │   ├── student_persona.py
-│   │   │   │   ├── judge.py
-│   │   │   │   ├── misconception_classifier.py
-│   │   │   │   └── lesson.py
-│   │   │   ├── prompts/           # *.md templates
-│   │   │   └── speech.py          # Groq Whisper
-│   │   └── content/               # concepts.json, misconceptions.json, questions.json
-│   ├── scripts/
-│   │   └── generate_questions.py
+│   │   │   ├── llm/                         # Groq client, router, breaker, budget, recorder
+│   │   │   ├── agents/                      # Judge, Student Persona, Misconception Classifier
+│   │   │   └── prompts/                     # Markdown prompt templates with typed placeholders
+│   │   ├── models/                          # SQLAlchemy 2.0 async ORM entities
+│   │   ├── repositories/                    # Isolated database access layer
+│   │   └── content/                         # concepts.json, misconceptions.json, questions.json
 │   └── tests/
-│       ├── unit/                  # domain
-│       ├── integration/           # endpoints with real Postgres, mocked Groq
-│       └── evals/                 # judge golden set (live, opt-in)
+│       ├── unit/                            # Pure domain mathematics tests
+│       └── integration/                     # Endpoint & concurrency tests (PostgreSQL + mocked Groq)
 └── frontend/
-    ├── package.json
-    ├── next.config.ts             # rewrites /api/* to the backend
-    ├── Dockerfile
+    ├── package.json / pnpm-lock.yaml        # Next.js 15, React 19, TypeScript dependencies
+    ├── next.config.ts                       # Reverse-proxy rewrite to backend
+    ├── public/models/                       # Authenticated 3D GLB specimens (NIH 3DPX / CAS)
     └── src/
         ├── app/
-        │   ├── layout.tsx
-        │   ├── page.tsx           # role switcher (demo identity)
         │   ├── (student)/
-        │   │   ├── dashboard/
-        │   │   ├── diagnostic/
-        │   │   ├── practice/
-        │   │   ├── teach-back/[conceptId]/
-        │   │   └── review/
+        │   │   ├── dashboard/               # Interactive Study Map & active alerts
+        │   │   ├── diagnostic/              # Adaptive 15-question baseline exam
+        │   │   ├── practice/                # Adaptive practice with voice-friendly textarea
+        │   │   ├── lab/                     # Interactive 3D Biology Lab & contextual Teach-Back
+        │   │   ├── teach-back/[conceptId]/  # Dedicated Teach-Back Arena with Pip
+        │   │   └── review/                  # Spaced Repetition queue
         │   ├── (teacher)/
-        │   │   └── class/
-        │   └── ops/               # AI reliability panel
-        ├── components/
-        │   ├── ui/                # shadcn/ui
-        │   ├── graph/             # concept graph (React Flow)
-        │   ├── practice/
-        │   ├── teachback/         # dictation-friendly textarea, Pip chat
-        │   └── teacher/           # heatmap, gap list
-        ├── lib/
-        │   ├── api/               # generated types and typed client
-        │   └── utils.ts
-        └── hooks/
+        │   │   ├── class/                   # Classroom Heatmap, Gaps, and Intervention Planner
+        │   │   └── authoring/               # AI Question Studio & Review Pipeline
+        │   └── ops/                         # AI System Health & Telemetry Dashboard
+        └── components/
+            ├── graph/                       # React Flow DAG with custom curved Bézier edges
+            ├── lab/                         # Three.js 3D Viewer, 2D SVG Atlas, Pip Slide-Over
+            ├── teacher/                     # Heatmap matrix, Clinic Drawer, Outcome Measurement
+            └── ui/                          # Dictation-friendly textarea, modals, badges, cards
 ```
 
-## Tech stack
+---
 
-| Layer | Technology |
-|---|---|
-| Backend | Python 3.12, FastAPI, asyncio, Pydantic v2 |
-| Data | PostgreSQL, SQLAlchemy 2.0 (async, asyncpg), Alembic |
-| Packaging | uv |
-| AI | Groq (`openai/gpt-oss-120b` primary, fallback chain in config), Groq Whisper |
-| Frontend | Next.js (App Router), TypeScript, Tailwind, shadcn/ui, TanStack Query, React Flow, Recharts, Motion; UI built with the Taste Skill |
-| Quality | ruff, mypy, pytest, respx, ESLint, GitHub Actions, Docker |
+## 🛠️ Tech Stack
 
-## How mastery works
+| Layer | Component | Technology Choice |
+|---|---|---|
+| **Backend** | API Framework | Python 3.12, FastAPI, AsyncIO, Pydantic v2, `pydantic-settings` |
+| **Database** | ORM & Migrations | PostgreSQL, SQLAlchemy 2.0 Async (`asyncpg`), Alembic |
+| **Packaging** | Package Manager | **uv** (Backend: strict lockfile), **pnpm** (Frontend) |
+| **AI Layer** | Inference & Routing | Groq Async SDK (`openai/gpt-oss-120b` primary with `llama-3.3-70b` & `llama-3.1-8b` fallbacks) |
+| **Speech** | Transcription | Wispr Flow native dictation, Groq Whisper API (`whisper-large-v3`) fallback |
+| **3D Graphics** | WebGL / 3D Canvas | Three.js, React Three Fiber (`@react-three/fiber`), `@react-three/drei` |
+| **Frontend** | Application Framework | Next.js 15 (App Router), TypeScript Strict, Tailwind CSS, shadcn/ui |
+| **Visualization**| Graphs & Charts | `@xyflow/react` (React Flow for Concept DAG), Recharts |
+| **Testing** | Verification Suites | `pytest`, `pytest-asyncio`, `respx` (Mocked Groq), `ruff`, `mypy`, ESLint |
 
-- **BKT update** with prior `P(L)`, slip `S`, guess `G`, learn rate `T`:
-  - correct: `P(L|c) = P(L)(1-S) / [P(L)(1-S) + (1-P(L))G]`
-  - wrong: `P(L|w) = P(L)S / [P(L)S + (1-P(L))(1-G)]`
-  - then `P(L') = P(L|obs) + (1 - P(L|obs)) T`
-- **Soft evidence** (Teach-Back): `P_new = P_prior + w·(P_bkt − P_prior)` where `w` is capped by the judge's confidence.
-- **Difficulty calibration:** `θ = logit(P(L))`; expected success `σ(θ − b)`; item difficulty `b ← b + K(σ(θ − b) − y)`.
-- **Spaced repetition:** SM-2 per concept; effective mastery decays when a review is overdue.
+---
 
-Full rules in [`docs/architecture.md`](docs/architecture.md) and [`docs/agents.md`](docs/agents.md).
+## 🏁 Quickstart
 
-## Quickstart
+### Prerequisites
+- Python 3.12+ and [`uv`](https://docs.astral.sh/uv/)
+- Node.js 20+ and [`pnpm`](https://pnpm.io/)
+- Docker & Docker Compose
+- Groq API Key
 
+### 1. Clone & Configure
 ```bash
-cp .env.example .env                 # set GROQ_API_KEY
+git clone https://github.com/your-org/dialecto.git
+cd dialecto
+
+# Create environment file
+cp .env.example .env
+# Edit .env and insert your GROQ_API_KEY
+```
+
+### 2. Start PostgreSQL
+```bash
 docker compose up -d db
+```
 
+### 3. Backend Setup & Database Seeding
+```bash
 cd backend
-uv sync
-uv run alembic upgrade head
-uv run python -m app.db.seed
-uv run uvicorn app.main:app --reload --port 8000
 
+# Sync dependencies with uv
+uv sync
+
+# Run database migrations
+uv run alembic upgrade head
+
+# Seed verified curriculum and 30 simulated students via pure domain math
+uv run python -m app.db.seed
+
+# Start FastAPI development server
+uv run uvicorn app.main:app --reload --port 8000
+```
+
+### 4. Frontend Setup
+```bash
 cd ../frontend
+
+# Install dependencies
 pnpm install
-pnpm gen:api                         # generate API types from the backend OpenAPI
+
+# Generate typed TypeScript client from backend OpenAPI specification
+pnpm gen:api
+
+# Start Next.js development server
 pnpm dev
 ```
 
