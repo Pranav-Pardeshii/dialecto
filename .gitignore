@@ -1,0 +1,29 @@
+# Environment
+.env
+.env.local
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+dist/
+build/
+
+# Node
+node_modules/
+.next/
+out/
+.pnpm-debug.log*
+
+# Taste skill
+.taste-skill/
+
+# OS
+.DS_Store
+Thumbs.db
