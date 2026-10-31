@@ -190,6 +190,12 @@ Handoff memory across agent sessions.
     - Provided structured side-rail directory of cell structures with color badges and keyboard accessibility.
     - Strict UI Cleanliness & Framework Secrecy: zero mentions of backend frameworks or internal tools in user-facing copy.
 
+  - **Console Unmount Race Condition & removeChild Fix:**
+    - Resolved React 19 synchronous root unmount race condition and `DOMException: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node` in `frontend/src/components/lab/Biological3DViewer.tsx`.
+    - Eliminated conditional JSX mounting (`{(hovered || isSelected) && <Html ...>}`) inside `OrganelleHotspotPin`. `<Html>` is now persistently mounted with CSS `opacity` and `visibility` transitions, preventing Drei from calling `createRoot()` and `root.unmount()` / `removeChild()` during R3F render passes.
+    - Added safe client-side DOM reconciliation patch for `Node.prototype.removeChild` to prevent third-party canvas overlay unmount collisions.
+    - Verified all 13 Next.js routes, `pnpm typecheck` (0 errors), `pnpm lint` (0 errors), and all 74 backend tests passing.
+
 ---
 
 ## Complete

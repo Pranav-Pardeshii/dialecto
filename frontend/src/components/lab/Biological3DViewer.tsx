@@ -30,6 +30,20 @@ import {
 } from "@/lib/cellMaterials";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 
+// Client-side DOM safety patch for React 19 + Drei <Html> unmount race condition
+if (typeof window !== "undefined") {
+  const originalRemoveChild = Node.prototype.removeChild;
+  Node.prototype.removeChild = function <T extends Node>(child: T): T {
+    if (child && child.parentNode !== this) {
+      if (child.parentNode) {
+        return child.parentNode.removeChild(child) as T;
+      }
+      return child;
+    }
+    return originalRemoveChild.call(this, child) as T;
+  };
+}
+
 // Error Boundary to prevent 3D canvas crashes and show authentic unavailable state
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -186,41 +200,44 @@ function OrganelleHotspotPin({
         />
       </mesh>
 
-      {/* Label Tooltip */}
-      {(hovered || isSelected) && (
-        <Html
-          position={[0, radius * 2.8, 0]}
-          center
-          distanceFactor={6}
-          style={{ pointerEvents: "none" }}
+      {/* Label Tooltip - Persistently mounted to avoid React 19 Drei root unmount race conditions */}
+      <Html
+        position={[0, radius * 2.8, 0]}
+        center
+        distanceFactor={6}
+        style={{
+          pointerEvents: "none",
+          transition: "opacity 150ms ease, transform 150ms ease",
+          opacity: hovered || isSelected ? 1 : 0,
+          visibility: hovered || isSelected ? "visible" : "hidden",
+        }}
+      >
+        <div
+          className={`px-2.5 py-1.5 rounded-lg text-xs font-sans transition-all duration-150 border shadow-sm select-none pointer-events-none whitespace-nowrap flex flex-col gap-0.5 ${
+            isSelected
+              ? "bg-stone-900/95 text-stone-100 border-emerald-500 shadow-md ring-2 ring-emerald-500/25"
+              : "bg-surface/95 text-ink-primary border-border-subtle shadow-xs backdrop-blur-xs"
+          }`}
         >
-          <div
-            className={`px-2.5 py-1.5 rounded-lg text-xs font-sans transition-all duration-200 border shadow-sm select-none pointer-events-none whitespace-nowrap flex flex-col gap-0.5 ${
-              isSelected
-                ? "bg-stone-900/95 text-stone-100 border-emerald-500 shadow-md ring-2 ring-emerald-500/25"
-                : "bg-surface/95 text-ink-primary border-border-subtle shadow-xs backdrop-blur-xs"
-            }`}
-          >
-            <div className="flex items-center gap-1.5">
-              <span
-                className="w-2 h-2 rounded-full inline-block shrink-0 ring-1 ring-white/50"
-                style={{ backgroundColor: organelle.color }}
-              />
-              <span className="font-semibold text-xs tracking-tight">{organelle.name}</span>
-              {isSelected && (
-                <span className="px-1 py-0.2 rounded text-[9px] font-bold uppercase bg-emerald-600 text-white tracking-wider ml-1">
-                  Selected
-                </span>
-              )}
-            </div>
-            {organelle.subtitle && (
-              <span className={`text-[10px] leading-tight ${isSelected ? "text-stone-300" : "text-ink-muted"}`}>
-                {organelle.subtitle}
+          <div className="flex items-center gap-1.5">
+            <span
+              className="w-2 h-2 rounded-full inline-block shrink-0 ring-1 ring-white/50"
+              style={{ backgroundColor: organelle.color }}
+            />
+            <span className="font-semibold text-xs tracking-tight">{organelle.name}</span>
+            {isSelected && (
+              <span className="px-1 py-0.2 rounded text-[9px] font-bold uppercase bg-emerald-600 text-white tracking-wider ml-1">
+                Selected
               </span>
             )}
           </div>
-        </Html>
-      )}
+          {organelle.subtitle && (
+            <span className={`text-[10px] leading-tight ${isSelected ? "text-stone-300" : "text-ink-muted"}`}>
+              {organelle.subtitle}
+            </span>
+          )}
+        </div>
+      </Html>
     </group>
   );
 }
