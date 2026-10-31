@@ -76,25 +76,33 @@ Handoff memory across agent sessions.
 
 ---
 
+- **Milestone M5 Complete (Teacher Dashboard & Spaced Reviews - Heatmap, Gaps, At-Risk, 30-Student Real-Math Seeder):**
+  - Spaced review scheduler in `backend/app/services/review_service.py` and `backend/app/api/v1/endpoints/review.py` (`GET /api/v1/reviews/due`) prioritizing overdue concepts and decayed mastery.
+  - Teacher analytics service in `backend/app/services/teacher_service.py` and `backend/app/api/v1/endpoints/teacher.py` (with teacher role check):
+    - `GET /api/v1/teacher/classrooms/{id}/heatmap`: $30 \times 20$ student-concept effective mastery matrix.
+    - `GET /api/v1/teacher/classrooms/{id}/gaps`: curriculum concepts ranked by failure rate and lowest average mastery.
+    - `GET /api/v1/teacher/classrooms/{id}/misconceptions`: ranked prevalence of active misconceptions across the classroom.
+    - `GET /api/v1/teacher/classrooms/{id}/at-risk`: students flagged with average mastery $< 45\%$ or $3+$ overdue concepts.
+    - `GET /api/v1/teacher/classrooms/{id}/students/{student_id}`: comprehensive student drill-down with concept masteries, active misconceptions, and recent attempts.
+  - Seeder expanded in `backend/app/db/seed.py`: 30 simulated students generated strictly via domain math (BKT, Elo, SM-2) with back-dated attempts, realistic clusters (5 high, 18 average, 7 struggling), and active misconception hotspots.
+  - Frontend screens:
+    - `/class`: Full Instructor Heatmap & Insights with 4 interactive tabs (Knowledge Matrix with hover tooltips, Curriculum Gaps with failure percentage bars, Misconception Hotspots with student counts, and At-Risk Learners with slide-over drill-down drawer).
+    - `/review`: Spaced Review Queue with overdue day indicators, progress bars, and one-click launch into practice.
+  - All 48 unit and integration backend tests passing.
+
+---
+
 ## In Progress
-- Transitioning to **Milestone M5: Teacher Dashboard & Spaced Reviews (Class Heatmap, Gap Analysis, Review Queue, 30-Student Real-Math Seeder)**.
+- Transitioning to **Milestone M6: Speech Fallback (Groq Whisper), Final Polish & End-to-End Verification**.
 
 ---
 
 ## Next
-- **Milestone M5 Plan:**
-  1. Spaced review scheduler endpoint in `app/api/v1/endpoints/review.py`:
-     - `GET /api/v1/reviews/due`: returns concepts due for SM-2 repetition, ordered by priority.
-  2. Teacher classroom analytics in `app/services/teacher_service.py` and `app/api/v1/endpoints/teacher.py`:
-     - `GET /api/v1/teacher/classrooms/{id}/heatmap`: $30 \times 20$ student-concept effective mastery matrix.
-     - `GET /api/v1/teacher/classrooms/{id}/gaps`: concepts ranked by mean mastery and % students below 50%.
-     - `GET /api/v1/teacher/classrooms/{id}/misconceptions`: curriculum misconceptions ranked by prevalence.
-     - `GET /api/v1/teacher/classrooms/{id}/at-risk`: students with overall mastery below 0.4 or 3+ overdue concepts.
-     - `GET /api/v1/teacher/classrooms/{id}/students/{user_id}`: student drill-down with concept masteries and attempt history.
-  3. Expand `app/db/seed.py` with 30 simulated students generated strictly via domain math with back-dated attempts, realistic clusters, and class-wide weak spots.
-  4. Build Teacher Heatmap & Insights UI at `frontend/src/app/(teacher)/class/page.tsx` with student/concept hover cards, filter bars, and gap rankings.
-  5. Build Review Queue UI at `frontend/src/app/(student)/review/page.tsx`.
-  6. Run checks, commit, and push.
+- **Milestone M6 Plan:**
+  1. Add Groq Whisper speech-to-text endpoint at `POST /api/v1/speech/transcriptions` in `backend/app/api/v1/endpoints/speech.py`.
+  2. Wire client-side audio recording fallback in `frontend/src/components/ui/VoiceFriendlyTextarea.tsx` when user clicks the mic button.
+  3. Run full verification test suite across backend and frontend (`make check`).
+  4. Final commit, push, and review against PRD user stories.
 
 ---
 

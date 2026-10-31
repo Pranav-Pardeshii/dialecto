@@ -324,6 +324,126 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/reviews/due": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Due Reviews
+         * @description Retrieve biological concepts due for spaced review, prioritized by SM-2 delay and decay.
+         */
+        get: operations["get_due_reviews_api_v1_reviews_due_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teacher/classrooms/{classroom_id}/heatmap": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Classroom Heatmap
+         * @description Retrieve full 30x20 student-concept effective mastery matrix.
+         */
+        get: operations["get_classroom_heatmap_api_v1_teacher_classrooms__classroom_id__heatmap_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teacher/classrooms/{classroom_id}/gaps": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Classroom Gaps
+         * @description Retrieve concepts ranked by classroom failure rate and average mastery.
+         */
+        get: operations["get_classroom_gaps_api_v1_teacher_classrooms__classroom_id__gaps_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teacher/classrooms/{classroom_id}/misconceptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Classroom Misconceptions
+         * @description Retrieve classroom misconceptions sorted by prevalence across students.
+         */
+        get: operations["get_classroom_misconceptions_api_v1_teacher_classrooms__classroom_id__misconceptions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teacher/classrooms/{classroom_id}/at-risk": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get At Risk Students
+         * @description Retrieve list of students at risk due to critical misconceptions or low mastery.
+         */
+        get: operations["get_at_risk_students_api_v1_teacher_classrooms__classroom_id__at_risk_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teacher/classrooms/{classroom_id}/students/{student_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Student Drilldown
+         * @description Retrieve deep dive into a student's concept masteries and active misconceptions.
+         */
+        get: operations["get_student_drilldown_api_v1_teacher_classrooms__classroom_id__students__student_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/ops/llm-stats": {
         parameters: {
             query?: never;
@@ -371,6 +491,19 @@ export interface components {
             statement: string;
             /** Concept Id */
             concept_id: string;
+        };
+        /** AtRiskStudentItem */
+        AtRiskStudentItem: {
+            /** Student Id */
+            student_id: number;
+            /** Display Name */
+            display_name: string;
+            /** Mean Mastery */
+            mean_mastery: number;
+            /** Overdue Count */
+            overdue_count: number;
+            /** Active Misconceptions Count */
+            active_misconceptions_count: number;
         };
         /** ConceptDetailResponse */
         ConceptDetailResponse: {
@@ -421,6 +554,21 @@ export interface components {
             /** Position */
             position: number;
             mastery?: components["schemas"]["ConceptMasterySummary"] | null;
+        };
+        /** CurriculumGapItem */
+        CurriculumGapItem: {
+            /** Concept Id */
+            concept_id: string;
+            /** Name */
+            name: string;
+            /** Chapter */
+            chapter: string;
+            /** Mean Mastery */
+            mean_mastery: number;
+            /** Pct Below 50 */
+            pct_below_50: number;
+            /** N Students */
+            n_students: number;
         };
         /** DiagnosticAnswerRequest */
         DiagnosticAnswerRequest: {
@@ -499,6 +647,31 @@ export interface components {
              */
             status: string;
         };
+        /** HeatmapCellOut */
+        HeatmapCellOut: {
+            /** Student Id */
+            student_id: number;
+            /** Concept Id */
+            concept_id: string;
+            /** P Effective */
+            p_effective: number;
+        };
+        /** HeatmapConceptOut */
+        HeatmapConceptOut: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Chapter */
+            chapter: string;
+        };
+        /** HeatmapStudentOut */
+        HeatmapStudentOut: {
+            /** Id */
+            id: number;
+            /** Display Name */
+            display_name: string;
+        };
         /** LLMStatsResponse */
         LLMStatsResponse: {
             /** Primary Model */
@@ -575,6 +748,19 @@ export interface components {
             source: string;
             /** Confidence */
             confidence: number;
+        };
+        /** MisconceptionPrevalenceItem */
+        MisconceptionPrevalenceItem: {
+            /** Misconception Id */
+            misconception_id: string;
+            /** Statement */
+            statement: string;
+            /** Concept Id */
+            concept_id: string;
+            /** Concept Name */
+            concept_name: string;
+            /** N Students */
+            n_students: number;
         };
         /** ModelBreakerStatus */
         ModelBreakerStatus: {
@@ -746,10 +932,87 @@ export interface components {
             /** Created At */
             created_at: string;
         };
+        /** ReviewDueItem */
+        ReviewDueItem: {
+            /** Concept Id */
+            concept_id: string;
+            /** Name */
+            name: string;
+            /** Chapter */
+            chapter: string;
+            /** P Effective */
+            p_effective: number;
+            /** Days Overdue */
+            days_overdue: number;
+            /** Next Due At */
+            next_due_at?: string | null;
+        };
         /** RubricOut */
         RubricOut: {
             /** Key Points */
             key_points: string[];
+        };
+        /** StudentAttemptBrief */
+        StudentAttemptBrief: {
+            /** Id */
+            id: number;
+            /** Question Id */
+            question_id: string;
+            /** Concept Id */
+            concept_id: string;
+            /** Is Correct */
+            is_correct: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** StudentDetailResponse */
+        StudentDetailResponse: {
+            /** Student Id */
+            student_id: number;
+            /** Display Name */
+            display_name: string;
+            /** Overall Mastery */
+            overall_mastery: number;
+            /** Masteries */
+            masteries: components["schemas"]["StudentMasteryDetail"][];
+            /** Active Misconceptions */
+            active_misconceptions: components["schemas"]["StudentMisconceptionDetail"][];
+            /** Recent Attempts */
+            recent_attempts: components["schemas"]["StudentAttemptBrief"][];
+        };
+        /** StudentMasteryDetail */
+        StudentMasteryDetail: {
+            /** Concept Id */
+            concept_id: string;
+            /** Concept Name */
+            concept_name: string;
+            /** P Mastery */
+            p_mastery: number;
+            /** P Effective */
+            p_effective: number;
+            /** Status */
+            status: string;
+            /** Next Due At */
+            next_due_at?: string | null;
+        };
+        /** StudentMisconceptionDetail */
+        StudentMisconceptionDetail: {
+            /** Misconception Id */
+            misconception_id: string;
+            /** Statement */
+            statement: string;
+            /** Source */
+            source: string;
+            /** Confidence */
+            confidence: number;
+            /**
+             * Detected At
+             * Format: date-time
+             */
+            detected_at: string;
         };
         /** TeachbackDetailResponse */
         TeachbackDetailResponse: {
@@ -851,6 +1114,19 @@ export interface components {
             finished: boolean;
             result?: components["schemas"]["TeachbackResultOut"] | null;
             ai: components["schemas"]["AIFallbackMeta"];
+        };
+        /** TeacherHeatmapResponse */
+        TeacherHeatmapResponse: {
+            /** Classroom Id */
+            classroom_id: number;
+            /** Classroom Name */
+            classroom_name: string;
+            /** Concepts */
+            concepts: components["schemas"]["HeatmapConceptOut"][];
+            /** Students */
+            students: components["schemas"]["HeatmapStudentOut"][];
+            /** Cells */
+            cells: components["schemas"]["HeatmapCellOut"][];
         };
         /** UserOut */
         UserOut: {
@@ -1384,6 +1660,203 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TeachbackDetailResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_due_reviews_api_v1_reviews_due_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewDueItem"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_classroom_heatmap_api_v1_teacher_classrooms__classroom_id__heatmap_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path: {
+                classroom_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeacherHeatmapResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_classroom_gaps_api_v1_teacher_classrooms__classroom_id__gaps_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path: {
+                classroom_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CurriculumGapItem"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_classroom_misconceptions_api_v1_teacher_classrooms__classroom_id__misconceptions_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path: {
+                classroom_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MisconceptionPrevalenceItem"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_at_risk_students_api_v1_teacher_classrooms__classroom_id__at_risk_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path: {
+                classroom_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AtRiskStudentItem"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_student_drilldown_api_v1_teacher_classrooms__classroom_id__students__student_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path: {
+                classroom_id: number;
+                student_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentDetailResponse"];
                 };
             };
             /** @description Validation Error */

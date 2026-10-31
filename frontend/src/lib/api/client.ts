@@ -89,6 +89,14 @@ export type TeachbackSessionStartResponse = paths["/api/v1/teachback/sessions"][
 export type TeachbackTurnResponse = paths["/api/v1/teachback/sessions/{session_id}/turns"]["post"]["responses"][200]["content"]["application/json"];
 export type TeachbackDetailResponse = paths["/api/v1/teachback/sessions/{session_id}"]["get"]["responses"][200]["content"]["application/json"];
 
+export type ReviewDueItem = paths["/api/v1/reviews/due"]["get"]["responses"][200]["content"]["application/json"][number];
+
+export type TeacherHeatmapResponse = paths["/api/v1/teacher/classrooms/{classroom_id}/heatmap"]["get"]["responses"][200]["content"]["application/json"];
+export type CurriculumGapItem = paths["/api/v1/teacher/classrooms/{classroom_id}/gaps"]["get"]["responses"][200]["content"]["application/json"][number];
+export type MisconceptionPrevalenceItem = paths["/api/v1/teacher/classrooms/{classroom_id}/misconceptions"]["get"]["responses"][200]["content"]["application/json"][number];
+export type AtRiskStudentItem = paths["/api/v1/teacher/classrooms/{classroom_id}/at-risk"]["get"]["responses"][200]["content"]["application/json"][number];
+export type StudentDetailResponse = paths["/api/v1/teacher/classrooms/{classroom_id}/students/{student_id}"]["get"]["responses"][200]["content"]["application/json"];
+
 export const api = {
   getUsers: (includeSimulated = false) =>
     apiFetch<User[]>(`/api/v1/users?include_simulated=${includeSimulated}`),
@@ -137,6 +145,21 @@ export const api = {
     }),
   getTeachbackSession: (sessionId: number) =>
     apiFetch<TeachbackDetailResponse>(`/api/v1/teachback/sessions/${sessionId}`),
+
+  // Reviews
+  getDueReviews: () => apiFetch<ReviewDueItem[]>("/api/v1/reviews/due"),
+
+  // Teacher Analytics
+  getTeacherHeatmap: (classroomId = 1) =>
+    apiFetch<TeacherHeatmapResponse>(`/api/v1/teacher/classrooms/${classroomId}/heatmap`),
+  getTeacherGaps: (classroomId = 1) =>
+    apiFetch<CurriculumGapItem[]>(`/api/v1/teacher/classrooms/${classroomId}/gaps`),
+  getTeacherMisconceptions: (classroomId = 1) =>
+    apiFetch<MisconceptionPrevalenceItem[]>(`/api/v1/teacher/classrooms/${classroomId}/misconceptions`),
+  getTeacherAtRisk: (classroomId = 1) =>
+    apiFetch<AtRiskStudentItem[]>(`/api/v1/teacher/classrooms/${classroomId}/at-risk`),
+  getTeacherStudentDetail: (studentId: number, classroomId = 1) =>
+    apiFetch<StudentDetailResponse>(`/api/v1/teacher/classrooms/${classroomId}/students/${studentId}`),
 
   // Learner
   getLearnerMastery: () => apiFetch<LearnerMasteryItem[]>("/api/v1/learner/mastery"),

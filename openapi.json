@@ -832,6 +832,376 @@
         }
       }
     },
+    "/api/v1/reviews/due": {
+      "get": {
+        "tags": [
+          "Spaced Repetition Reviews"
+        ],
+        "summary": "Get Due Reviews",
+        "description": "Retrieve biological concepts due for spaced review, prioritized by SM-2 delay and decay.",
+        "operationId": "get_due_reviews_api_v1_reviews_due_get",
+        "parameters": [
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReviewDueItem"
+                  },
+                  "title": "Response Get Due Reviews Api V1 Reviews Due Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/teacher/classrooms/{classroom_id}/heatmap": {
+      "get": {
+        "tags": [
+          "Teacher Analytics"
+        ],
+        "summary": "Get Classroom Heatmap",
+        "description": "Retrieve full 30x20 student-concept effective mastery matrix.",
+        "operationId": "get_classroom_heatmap_api_v1_teacher_classrooms__classroom_id__heatmap_get",
+        "parameters": [
+          {
+            "name": "classroom_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Classroom Id"
+            }
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeacherHeatmapResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/teacher/classrooms/{classroom_id}/gaps": {
+      "get": {
+        "tags": [
+          "Teacher Analytics"
+        ],
+        "summary": "Get Classroom Gaps",
+        "description": "Retrieve concepts ranked by classroom failure rate and average mastery.",
+        "operationId": "get_classroom_gaps_api_v1_teacher_classrooms__classroom_id__gaps_get",
+        "parameters": [
+          {
+            "name": "classroom_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Classroom Id"
+            }
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CurriculumGapItem"
+                  },
+                  "title": "Response Get Classroom Gaps Api V1 Teacher Classrooms  Classroom Id  Gaps Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/teacher/classrooms/{classroom_id}/misconceptions": {
+      "get": {
+        "tags": [
+          "Teacher Analytics"
+        ],
+        "summary": "Get Classroom Misconceptions",
+        "description": "Retrieve classroom misconceptions sorted by prevalence across students.",
+        "operationId": "get_classroom_misconceptions_api_v1_teacher_classrooms__classroom_id__misconceptions_get",
+        "parameters": [
+          {
+            "name": "classroom_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Classroom Id"
+            }
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MisconceptionPrevalenceItem"
+                  },
+                  "title": "Response Get Classroom Misconceptions Api V1 Teacher Classrooms  Classroom Id  Misconceptions Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/teacher/classrooms/{classroom_id}/at-risk": {
+      "get": {
+        "tags": [
+          "Teacher Analytics"
+        ],
+        "summary": "Get At Risk Students",
+        "description": "Retrieve list of students at risk due to critical misconceptions or low mastery.",
+        "operationId": "get_at_risk_students_api_v1_teacher_classrooms__classroom_id__at_risk_get",
+        "parameters": [
+          {
+            "name": "classroom_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Classroom Id"
+            }
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AtRiskStudentItem"
+                  },
+                  "title": "Response Get At Risk Students Api V1 Teacher Classrooms  Classroom Id  At Risk Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/teacher/classrooms/{classroom_id}/students/{student_id}": {
+      "get": {
+        "tags": [
+          "Teacher Analytics"
+        ],
+        "summary": "Get Student Drilldown",
+        "description": "Retrieve deep dive into a student's concept masteries and active misconceptions.",
+        "operationId": "get_student_drilldown_api_v1_teacher_classrooms__classroom_id__students__student_id__get",
+        "parameters": [
+          {
+            "name": "classroom_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Classroom Id"
+            }
+          },
+          {
+            "name": "student_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Student Id"
+            }
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudentDetailResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/ops/llm-stats": {
       "get": {
         "tags": [
@@ -908,6 +1278,44 @@
           "concept_id"
         ],
         "title": "ActiveMisconceptionItem"
+      },
+      "AtRiskStudentItem": {
+        "properties": {
+          "student_id": {
+            "type": "integer",
+            "title": "Student Id"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "mean_mastery": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Mean Mastery"
+          },
+          "overdue_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Overdue Count"
+          },
+          "active_misconceptions_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Active Misconceptions Count"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "student_id",
+          "display_name",
+          "mean_mastery",
+          "overdue_count",
+          "active_misconceptions_count"
+        ],
+        "title": "AtRiskStudentItem"
       },
       "ConceptDetailResponse": {
         "properties": {
@@ -1059,6 +1467,50 @@
           "position"
         ],
         "title": "ConceptNode"
+      },
+      "CurriculumGapItem": {
+        "properties": {
+          "concept_id": {
+            "type": "string",
+            "title": "Concept Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "chapter": {
+            "type": "string",
+            "title": "Chapter"
+          },
+          "mean_mastery": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Mean Mastery"
+          },
+          "pct_below_50": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Pct Below 50"
+          },
+          "n_students": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "N Students"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "concept_id",
+          "name",
+          "chapter",
+          "mean_mastery",
+          "pct_below_50",
+          "n_students"
+        ],
+        "title": "CurriculumGapItem"
       },
       "DiagnosticAnswerRequest": {
         "properties": {
@@ -1265,6 +1717,75 @@
         "additionalProperties": false,
         "type": "object",
         "title": "HealthResponse"
+      },
+      "HeatmapCellOut": {
+        "properties": {
+          "student_id": {
+            "type": "integer",
+            "title": "Student Id"
+          },
+          "concept_id": {
+            "type": "string",
+            "title": "Concept Id"
+          },
+          "p_effective": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "P Effective"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "student_id",
+          "concept_id",
+          "p_effective"
+        ],
+        "title": "HeatmapCellOut"
+      },
+      "HeatmapConceptOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "chapter": {
+            "type": "string",
+            "title": "Chapter"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "chapter"
+        ],
+        "title": "HeatmapConceptOut"
+      },
+      "HeatmapStudentOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "display_name"
+        ],
+        "title": "HeatmapStudentOut"
       },
       "LLMStatsResponse": {
         "properties": {
@@ -1500,6 +2021,41 @@
           "confidence"
         ],
         "title": "MisconceptionFeedback"
+      },
+      "MisconceptionPrevalenceItem": {
+        "properties": {
+          "misconception_id": {
+            "type": "string",
+            "title": "Misconception Id"
+          },
+          "statement": {
+            "type": "string",
+            "title": "Statement"
+          },
+          "concept_id": {
+            "type": "string",
+            "title": "Concept Id"
+          },
+          "concept_name": {
+            "type": "string",
+            "title": "Concept Name"
+          },
+          "n_students": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "N Students"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "misconception_id",
+          "statement",
+          "concept_id",
+          "concept_name",
+          "n_students"
+        ],
+        "title": "MisconceptionPrevalenceItem"
       },
       "ModelBreakerStatus": {
         "properties": {
@@ -1912,6 +2468,55 @@
         ],
         "title": "RecentCallOut"
       },
+      "ReviewDueItem": {
+        "properties": {
+          "concept_id": {
+            "type": "string",
+            "title": "Concept Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "chapter": {
+            "type": "string",
+            "title": "Chapter"
+          },
+          "p_effective": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "P Effective"
+          },
+          "days_overdue": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Days Overdue"
+          },
+          "next_due_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Due At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "concept_id",
+          "name",
+          "chapter",
+          "p_effective",
+          "days_overdue"
+        ],
+        "title": "ReviewDueItem"
+      },
       "RubricOut": {
         "properties": {
           "key_points": {
@@ -1928,6 +2533,170 @@
           "key_points"
         ],
         "title": "RubricOut"
+      },
+      "StudentAttemptBrief": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "question_id": {
+            "type": "string",
+            "title": "Question Id"
+          },
+          "concept_id": {
+            "type": "string",
+            "title": "Concept Id"
+          },
+          "is_correct": {
+            "type": "boolean",
+            "title": "Is Correct"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "question_id",
+          "concept_id",
+          "is_correct",
+          "created_at"
+        ],
+        "title": "StudentAttemptBrief"
+      },
+      "StudentDetailResponse": {
+        "properties": {
+          "student_id": {
+            "type": "integer",
+            "title": "Student Id"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "overall_mastery": {
+            "type": "number",
+            "title": "Overall Mastery"
+          },
+          "masteries": {
+            "items": {
+              "$ref": "#/components/schemas/StudentMasteryDetail"
+            },
+            "type": "array",
+            "title": "Masteries"
+          },
+          "active_misconceptions": {
+            "items": {
+              "$ref": "#/components/schemas/StudentMisconceptionDetail"
+            },
+            "type": "array",
+            "title": "Active Misconceptions"
+          },
+          "recent_attempts": {
+            "items": {
+              "$ref": "#/components/schemas/StudentAttemptBrief"
+            },
+            "type": "array",
+            "title": "Recent Attempts"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "student_id",
+          "display_name",
+          "overall_mastery",
+          "masteries",
+          "active_misconceptions",
+          "recent_attempts"
+        ],
+        "title": "StudentDetailResponse"
+      },
+      "StudentMasteryDetail": {
+        "properties": {
+          "concept_id": {
+            "type": "string",
+            "title": "Concept Id"
+          },
+          "concept_name": {
+            "type": "string",
+            "title": "Concept Name"
+          },
+          "p_mastery": {
+            "type": "number",
+            "title": "P Mastery"
+          },
+          "p_effective": {
+            "type": "number",
+            "title": "P Effective"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "next_due_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Due At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "concept_id",
+          "concept_name",
+          "p_mastery",
+          "p_effective",
+          "status"
+        ],
+        "title": "StudentMasteryDetail"
+      },
+      "StudentMisconceptionDetail": {
+        "properties": {
+          "misconception_id": {
+            "type": "string",
+            "title": "Misconception Id"
+          },
+          "statement": {
+            "type": "string",
+            "title": "Statement"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "confidence": {
+            "type": "number",
+            "title": "Confidence"
+          },
+          "detected_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Detected At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "misconception_id",
+          "statement",
+          "source",
+          "confidence",
+          "detected_at"
+        ],
+        "title": "StudentMisconceptionDetail"
       },
       "TeachbackDetailResponse": {
         "properties": {
@@ -2238,6 +3007,49 @@
           "ai"
         ],
         "title": "TeachbackTurnResponse"
+      },
+      "TeacherHeatmapResponse": {
+        "properties": {
+          "classroom_id": {
+            "type": "integer",
+            "title": "Classroom Id"
+          },
+          "classroom_name": {
+            "type": "string",
+            "title": "Classroom Name"
+          },
+          "concepts": {
+            "items": {
+              "$ref": "#/components/schemas/HeatmapConceptOut"
+            },
+            "type": "array",
+            "title": "Concepts"
+          },
+          "students": {
+            "items": {
+              "$ref": "#/components/schemas/HeatmapStudentOut"
+            },
+            "type": "array",
+            "title": "Students"
+          },
+          "cells": {
+            "items": {
+              "$ref": "#/components/schemas/HeatmapCellOut"
+            },
+            "type": "array",
+            "title": "Cells"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "classroom_id",
+          "classroom_name",
+          "concepts",
+          "students",
+          "cells"
+        ],
+        "title": "TeacherHeatmapResponse"
       },
       "UserOut": {
         "properties": {
