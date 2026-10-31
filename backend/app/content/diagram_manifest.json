@@ -1,0 +1,575 @@
+{
+  "diagrams": [
+    {
+      "id": "animal",
+      "concept_id": "lp-respiration",
+      "chapter": "life-processes",
+      "display_name": "Animal Cell: Metabolic & Cellular Architecture",
+      "subtitle": "Eukaryotic cellular system coordinating respiration, protein packaging, and genetic governance",
+      "model_type": "cellular_organelles",
+      "asset_url": "/models/animal-cell-nih.glb",
+      "scale": 0.044,
+      "rotation": [0.24, -0.08, 0.03],
+      "position": [0, -0.03, 0],
+      "licence": {
+        "source": "NIH 3D Model 3DPX-015797 via Cell Architecture Studio",
+        "creator": "National Institutes of Health (NIH 3D Exchange) & Cell Architecture Studio",
+        "licence_type": "Public Domain / CC0",
+        "attribution": "3D specimen based on verified anatomical NIH 3D model 3DPX-015797 via Cell Architecture Studio."
+      },
+      "structures": [
+        {
+          "id": "mitochondrion",
+          "name": "Mitochondrion",
+          "aliases": ["mitochondrion", "mitochondria", "powerhouse of the cell", "atp generator", "cristae", "energy converter"],
+          "mesh_id": "mesh_mitochondria",
+          "description": "Double-membraned organelle with folded inner cristae housing the electron transport chain.",
+          "function": "Site of aerobic cellular respiration where pyruvate is broken down in the presence of oxygen to synthesize ATP molecules.",
+          "related_misconception_id": "m-resp-is-breathing",
+          "color": "#CF6F42"
+        },
+        {
+          "id": "nucleus",
+          "name": "Nucleus",
+          "aliases": ["nucleus", "cell control center", "genetic vault", "command room", "nucleolus"],
+          "mesh_id": "mesh_nucleus",
+          "description": "Large spherical organelle enclosed by a porous double nuclear membrane containing chromatin and DNA.",
+          "function": "Stores chromosomes, directs cellular metabolic activities, transcription, and division.",
+          "related_misconception_id": null,
+          "color": "#7A49B0"
+        },
+        {
+          "id": "golgi",
+          "name": "Golgi Apparatus",
+          "aliases": ["golgi", "golgi apparatus", "golgi body", "golgi complex", "packaging stack"],
+          "mesh_id": "mesh_golgi",
+          "description": "Stack of flattened, membrane-bound cisternae with distinct cis and trans faces.",
+          "function": "Modifies, sorts, packages, and tags proteins and lipids into vesicles for delivery inside or outside the cell.",
+          "related_misconception_id": null,
+          "color": "#D49057"
+        }
+      ],
+      "pathways": [
+        {
+          "id": "respiration_pathway",
+          "name": "Aerobic Cellular Respiration Flow",
+          "description": "Glycolysis in cytoplasm followed by oxidative phosphorylation in mitochondria",
+          "ordered_structure_ids": ["nucleus", "mitochondrion", "golgi"]
+        }
+      ],
+      "assessments": [
+        {
+          "id": "q-diag-animal-01",
+          "type": "identification",
+          "prompt": "Identify the double-membraned organelle where aerobic respiration occurs to release chemical energy stored as ATP.",
+          "target_structure_id": "mitochondrion",
+          "hint": "Often termed the 'powerhouse of the cell' with folded inner cristae.",
+          "rubric": "Names or selects Mitochondrion."
+        },
+        {
+          "id": "q-diag-animal-02",
+          "type": "explanation",
+          "prompt": "Explain the difference in ATP yield and cellular location between aerobic respiration and anaerobic glycolysis.",
+          "rubric_points": [
+            "Glycolysis occurs in the cytoplasm and yields only 2 ATP per glucose molecule without oxygen",
+            "Aerobic respiration occurs inside mitochondria in the presence of oxygen",
+            "Mitochondrial breakdown of pyruvate yields high ATP (up to 36-38 ATP per glucose)",
+            "Aerobic respiration produces carbon dioxide and water as harmless end products"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "plant",
+      "concept_id": "lp-photosynthesis",
+      "chapter": "life-processes",
+      "display_name": "Plant Cell: Photosynthetic Architecture",
+      "subtitle": "Photosynthetic eukaryotic cell featuring cellulose cell wall, chloroplasts, and turgor-regulating vacuole",
+      "model_type": "cellular_organelles",
+      "asset_url": "/models/plant-cell-first001.glb",
+      "scale": 2.36,
+      "rotation": [0.08, -1.42, -0.02],
+      "position": [0, 0, 0],
+      "licence": {
+        "source": "Cell Architecture Studio",
+        "creator": "Cell Architecture Studio",
+        "licence_type": "CC-BY-4.0 / Educational Use",
+        "attribution": "Plant cell architecture and GLB asset from Cell Architecture Studio open educational assets."
+      },
+      "structures": [
+        {
+          "id": "cellWall",
+          "name": "Cell Wall",
+          "aliases": ["cell wall", "wall", "cellulose wall", "rigid frame", "outer boundary"],
+          "mesh_id": "mesh_cell_wall",
+          "description": "Rigid outer protective layer composed of cellulose microfibrils providing mechanical tensile strength.",
+          "function": "Provides structural shape, prevents osmotic lysis when water enters, and maintains plant upright posture.",
+          "related_misconception_id": null,
+          "color": "#7AA647"
+        },
+        {
+          "id": "chloroplast",
+          "name": "Chloroplast",
+          "aliases": ["chloroplast", "chloroplasts", "plastid", "thylakoid", "chlorophyll", "light harvester"],
+          "mesh_id": "mesh_chloroplast",
+          "description": "Double-membraned photosynthetic plastids containing chlorophyll pigment within stacked thylakoids.",
+          "function": "Site of photosynthesis: chlorophyll absorbs light photons, splits water molecules (photolysis) to release oxygen, and reduces carbon dioxide into glucose.",
+          "related_misconception_id": "m-resp-is-breathing",
+          "color": "#5FA842"
+        },
+        {
+          "id": "vacuole",
+          "name": "Central Vacuole",
+          "aliases": ["vacuole", "central vacuole", "tonoplast", "sap vacuole", "pressure reservoir"],
+          "mesh_id": "mesh_central_vacuole",
+          "description": "Enormous fluid-filled central compartment enclosed by the tonoplast membrane, occupying most of mature plant cell volume.",
+          "function": "Maintains turgor pressure against the cell wall, stores cell sap containing nutrients, and keeps non-woody plants firm.",
+          "related_misconception_id": null,
+          "color": "#62BDD2"
+        },
+        {
+          "id": "nucleus",
+          "name": "Nucleus",
+          "aliases": ["nucleus", "plant nucleus", "control center", "genetic core"],
+          "mesh_id": "mesh_nucleus",
+          "description": "Double-membrane spherical organelle pushed toward the cell periphery by the expansive central vacuole.",
+          "function": "Governs cellular metabolism, transcription, and holds nuclear DNA encoding plant developmental enzymes.",
+          "related_misconception_id": null,
+          "color": "#7047A8"
+        }
+      ],
+      "pathways": [
+        {
+          "id": "photosynthesis_energy_flow",
+          "name": "Photosynthetic Energy Conversion",
+          "description": "Light absorption in chloroplast thylakoids yielding glucose stored in cytoplasm and vacuole",
+          "ordered_structure_ids": ["cellWall", "chloroplast", "vacuole", "nucleus"]
+        }
+      ],
+      "assessments": [
+        {
+          "id": "q-diag-plant-01",
+          "type": "identification",
+          "prompt": "Identify the green double-membraned organelle where chlorophyll absorbs solar photons to split water molecules during photosynthesis.",
+          "target_structure_id": "chloroplast",
+          "hint": "Contains stacked thylakoids and chlorophyll pigments giving plants their green appearance.",
+          "rubric": "Names or selects Chloroplast."
+        },
+        {
+          "id": "q-diag-plant-02",
+          "type": "explanation",
+          "prompt": "Explain why plant cells possess a rigid outer cell wall and large central vacuole, whereas animal cells do not.",
+          "rubric_points": [
+            "Cell wall prevents osmotic bursting (lysis) when plant cells absorb water by osmosis",
+            "Central vacuole creates turgor pressure pressing against the rigid wall to keep herbaceous plants upright",
+            "Animals have skeletal support and locomotive mobility so they do not require rigid cellular walls",
+            "Vacuole serves as a large storage reservoir for cell sap, amino acids, and water"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "neuron",
+      "concept_id": "cc-neuron",
+      "chapter": "control-coordination",
+      "display_name": "Neuron Architecture & Electrochemical Transmission",
+      "subtitle": "Excitable neural cell specialized for unidirectional electrical impulse conduction and synaptic signaling",
+      "model_type": "neural_architecture",
+      "asset_url": "/models/neuron-nih.glb",
+      "scale": 3.15,
+      "rotation": [0.18, -0.24, -0.18],
+      "position": [0, 0.05, 0],
+      "licence": {
+        "source": "NIH 3D Model 3DPX-015796 via Cell Architecture Studio",
+        "creator": "National Institutes of Health (NIH 3D Exchange) & Cell Architecture Studio",
+        "licence_type": "Public Domain / CC0",
+        "attribution": "Neuron 3D specimen from verified NIH 3D model 3DPX-015796 via Cell Architecture Studio."
+      },
+      "structures": [
+        {
+          "id": "dendrites",
+          "name": "Dendrites",
+          "aliases": ["dendrite", "dendrites", "dendritic branches", "receptor tips", "receiving branches"],
+          "mesh_id": "mesh_dendrites",
+          "description": "Highly branched protoplasmic tree-like extensions emanating from the neuronal soma.",
+          "function": "Detects chemical and physical environmental stimuli or neurotransmitters from upstream neurons, generating an initial electrical impulse.",
+          "related_misconception_id": null,
+          "color": "#7D9BCF"
+        },
+        {
+          "id": "soma",
+          "name": "Soma (Cell Body)",
+          "aliases": ["soma", "cell body", "cyton", "perikaryon", "metabolic hub"],
+          "mesh_id": "mesh_soma",
+          "description": "Central bulbous portion of the neuron containing a prominent spherical nucleus and mitochondria.",
+          "function": "Metabolic maintenance center integrating incoming dendritic electrical potentials and funnelling action potentials into the axon.",
+          "related_misconception_id": null,
+          "color": "#7C52B7"
+        },
+        {
+          "id": "axon",
+          "name": "Axon",
+          "aliases": ["axon", "nerve fiber", "axis cylinder", "signal highway", "myelin"],
+          "mesh_id": "mesh_axon",
+          "description": "Elongated, slender cylindrical projection extending from the cyton toward terminal arborizations.",
+          "function": "Conducts electrical action potentials rapidly and unidirectionally away from the cyton toward target synapses.",
+          "related_misconception_id": null,
+          "color": "#6B7DC6"
+        }
+      ],
+      "pathways": [
+        {
+          "id": "nerve_impulse_transmission",
+          "name": "Unidirectional Nerve Impulse Pathway",
+          "description": "Electrochemical conduction from sensory dendritic tip through soma to axon terminal release",
+          "ordered_structure_ids": ["dendrites", "soma", "axon"]
+        }
+      ],
+      "assessments": [
+        {
+          "id": "q-diag-neuron-01",
+          "type": "identification",
+          "prompt": "Identify the branched extensions of the neuron that receive incoming chemical signals and initiate the electrical nerve impulse.",
+          "target_structure_id": "dendrites",
+          "hint": "Branching arborizations protruding directly from the cell body.",
+          "rubric": "Names or selects Dendrites."
+        },
+        {
+          "id": "q-diag-neuron-02",
+          "type": "sequence",
+          "prompt": "Arrange the neural components in the strict physiological order that a nerve impulse travels through a single neuron.",
+          "target_sequence": ["dendrites", "soma", "axon"],
+          "hint": "Impulse travels unidirectionally from the receiving tips to the conducting fiber.",
+          "rubric": "Dendrites -> Soma -> Axon."
+        },
+        {
+          "id": "q-diag-neuron-03",
+          "type": "explanation",
+          "prompt": "Explain why the transmission of a nerve impulse across a chemical synapse is strictly unidirectional.",
+          "rubric_points": [
+            "Synaptic vesicles containing neurotransmitters are present exclusively in the axon terminals of the presynaptic neuron",
+            "Neurotransmitter receptors are located exclusively on the dendritic membrane of the postsynaptic neuron",
+            "Chemical messengers can only diffuse across the synaptic cleft from terminal to dendrite, never in reverse",
+            "This structural asymmetry ensures electrical signaling follows an orderly, non-colliding circuit"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bacteria",
+      "concept_id": "lp-nutrition",
+      "chapter": "life-processes",
+      "display_name": "Bacteria Cell: Prokaryotic Architecture",
+      "subtitle": "Single-celled prokaryotic organism with peptidoglycan wall, flagellar motor, and nucleoid chromosome",
+      "model_type": "cellular_organelles",
+      "asset_url": "/models/bacteria-wall-nih.glb",
+      "scale": 0.00185,
+      "rotation": [0.08, -0.44, -0.08],
+      "position": [0, -0.1, 0],
+      "licence": {
+        "source": "NIH 3D Model 3DPX-010752 via Cell Architecture Studio",
+        "creator": "National Institutes of Health (NIH 3D Exchange) & Cell Architecture Studio",
+        "licence_type": "Public Domain / CC0",
+        "attribution": "Gram-positive bacterial cell wall specimen from verified NIH 3D model 3DPX-010752 via Cell Architecture Studio."
+      },
+      "structures": [
+        {
+          "id": "cellWall",
+          "name": "Peptidoglycan Cell Wall",
+          "aliases": ["cell wall", "wall", "peptidoglycan wall", "bacterial wall", "protective shell"],
+          "mesh_id": "mesh_cell_wall",
+          "description": "Rigid meshwork composed of polysaccharide chains cross-linked by short amino acid peptides.",
+          "function": "Maintains bacterial cell shape, prevents osmotic lysis in aqueous hypotonic environments, and protects against host defenses.",
+          "related_misconception_id": null,
+          "color": "#55AA89"
+        },
+        {
+          "id": "nucleoid",
+          "name": "Nucleoid (Bacterial Chromosome)",
+          "aliases": ["nucleoid", "naked dna", "bacterial chromosome", "genophore", "naked genome"],
+          "mesh_id": "mesh_nucleoid",
+          "description": "Irregularly shaped region within prokaryotic cytoplasm containing circular double-stranded DNA not enclosed by a membrane.",
+          "function": "Carries the essential genetic instructions governing bacterial metabolism, binary fission, and enzymatic synthesis.",
+          "related_misconception_id": null,
+          "color": "#7A43AD"
+        },
+        {
+          "id": "flagellum",
+          "name": "Bacterial Flagellum",
+          "aliases": ["flagellum", "flagella", "motility motor", "tail", "swimming tail"],
+          "mesh_id": "mesh_flagellum",
+          "description": "Helical filament composed of flagellin protein embedded in a rotary motor complex driven by proton motive force.",
+          "function": "Rotates at high speeds to propel the bacterium towards nutrients (chemotaxis) and away from noxious substances.",
+          "related_misconception_id": null,
+          "color": "#B87438"
+        }
+      ],
+      "pathways": [
+        {
+          "id": "prokaryote_envelope",
+          "name": "Prokaryotic Cell Boundary & Motility",
+          "description": "Cell wall protective barrier coordinates with rotary flagellar motor",
+          "ordered_structure_ids": ["cellWall", "nucleoid", "flagellum"]
+        }
+      ],
+      "assessments": [
+        {
+          "id": "q-diag-bact-01",
+          "type": "identification",
+          "prompt": "Identify the cytoplasm region containing the circular bacterial genetic material that lacks a surrounding nuclear envelope.",
+          "target_structure_id": "nucleoid",
+          "hint": "The naked DNA region characteristic of prokaryotes.",
+          "rubric": "Names or selects Nucleoid."
+        },
+        {
+          "id": "q-diag-bact-02",
+          "type": "explanation",
+          "prompt": "Explain the major structural differences between a prokaryotic bacterium and a eukaryotic animal cell.",
+          "rubric_points": [
+            "Prokaryotes lack a membrane-bound nucleus; their DNA floats freely in the nucleoid region",
+            "Prokaryotes lack membrane-bound organelles such as mitochondria and Golgi apparatus",
+            "Bacteria possess a rigid cell wall composed of peptidoglycan, whereas animal cells have no cell wall",
+            "Bacterial ribosomes are 70S compared to eukaryotic 80S cytoplasmic ribosomes"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "whiteBlood",
+      "concept_id": "lp-circulation",
+      "chapter": "life-processes",
+      "display_name": "White Blood Cell (Leucocyte): Immune Defense",
+      "subtitle": "Specialized motile immune cell featuring lobed nucleus, digestive lysosomes, and defensive granules",
+      "model_type": "cellular_organelles",
+      "asset_url": "/models/white-blood-cell-user.glb",
+      "scale": 3.18,
+      "rotation": [0.02, -0.18, 0],
+      "position": [0, 0, 0],
+      "licence": {
+        "source": "Cell Architecture Studio",
+        "creator": "Cell Architecture Studio",
+        "licence_type": "CC-BY-4.0 / Educational Use",
+        "attribution": "Immune cell morphology and GLB asset from Cell Architecture Studio open educational assets."
+      },
+      "structures": [
+        {
+          "id": "nucleus",
+          "name": "Lobed Nucleus",
+          "aliases": ["lobed nucleus", "multilobed nucleus", "polymorphic nucleus", "nucleus", "genome vault"],
+          "mesh_id": "mesh_lobed_nucleus",
+          "description": "Multi-segmented flexible nucleus interconnected by thin chromatin strands.",
+          "function": "Provides structural malleability, allowing the leucocyte to deform and migrate through endothelial junctions (diapedesis) into infected tissue.",
+          "related_misconception_id": null,
+          "color": "#6F35A1"
+        },
+        {
+          "id": "lysosome",
+          "name": "Lysosome",
+          "aliases": ["lysosomes", "lysosome", "phagolysosome", "digestive vesicle", "cleanup vesicle"],
+          "mesh_id": "mesh_lysosomes",
+          "description": "Enzyme-filled membrane vesicles fusing with phagosomes to form phagolysosomes.",
+          "function": "Degrades and digests engulfed pathogenic bacteria, cellular debris, and foreign antigens using acidic hydrolases.",
+          "related_misconception_id": null,
+          "color": "#8B54B7"
+        },
+        {
+          "id": "granules",
+          "name": "Antimicrobial Granules",
+          "aliases": ["granules", "secretory granules", "antimicrobial packets", "chemical packets"],
+          "mesh_id": "mesh_granules",
+          "description": "Cytoplasmic storage vesicles packed with defensins, lysozyme, and myeloperoxidase.",
+          "function": "Releases bactericidal enzymes to destroy invading microorganisms and signal inflammatory mediators.",
+          "related_misconception_id": null,
+          "color": "#C06696"
+        }
+      ],
+      "pathways": [
+        {
+          "id": "phagocytosis_pathway",
+          "name": "Phagocytosis & Intracellular Killing Flow",
+          "description": "Pathogen recognition followed by phagolysosome degradation and granule degranulation",
+          "ordered_structure_ids": ["nucleus", "lysosome", "granules"]
+        }
+      ],
+      "assessments": [
+        {
+          "id": "q-diag-wbc-01",
+          "type": "identification",
+          "prompt": "Identify the flexible multi-lobed cellular organelle that enables white blood cells to squeeze through blood capillary walls.",
+          "target_structure_id": "nucleus",
+          "hint": "Multi-segmented nucleus specialized for cellular deformability and diapedesis.",
+          "rubric": "Names or selects Lobed Nucleus."
+        },
+        {
+          "id": "q-diag-wbc-02",
+          "type": "explanation",
+          "prompt": "Explain the biological importance of diapedesis and phagocytosis in human defense against bacterial infections.",
+          "rubric_points": [
+            "Diapedesis allows white blood cells to squeeze between capillary endothelial cells to reach infected tissue sites",
+            "Phagocytosis allows white blood cells to engulf and destroy invading pathogenic bacteria",
+            "Lysosomes fuse with the ingested vesicle to degrade microbes with hydrolytic enzymes",
+            "Antimicrobial granules discharge bactericidal enzymes to neutralize pathogens"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "epithelial",
+      "concept_id": "lp-digestion",
+      "chapter": "life-processes",
+      "display_name": "Epithelial Cell: Barrier & Absorption",
+      "subtitle": "Polarized tissue cell lining mucosal surfaces featuring apical microvilli brush border and tight junction seals",
+      "model_type": "tissue_architecture",
+      "asset_url": null,
+      "scale": 1.08,
+      "rotation": [0.08, -0.22, 0],
+      "position": [0, 0, 0],
+      "licence": {
+        "source": "Cell Architecture Studio",
+        "creator": "Cell Architecture Studio",
+        "licence_type": "MIT",
+        "attribution": "Procedural columnar epithelial architecture from Cell Architecture Studio."
+      },
+      "structures": [
+        {
+          "id": "microvilli",
+          "name": "Microvilli",
+          "aliases": ["microvilli", "microvillus", "brush border", "absorption brush", "apical projections"],
+          "mesh_id": "mesh_microvilli",
+          "description": "Dense microscopic finger-like protoplasmic projections packed on the apical cell surface.",
+          "function": "Dramatically expands surface area (brush border) for rapid absorption of digested nutrients, water, and ions.",
+          "related_misconception_id": null,
+          "color": "#C86F80"
+        },
+        {
+          "id": "junctions",
+          "name": "Tight Junctions",
+          "aliases": ["tight junctions", "junctions", "zonula occludens", "sealed seams", "barrier"],
+          "mesh_id": "mesh_junctions",
+          "description": "Continuous belt-like multiprotein complexes sealing the intercellular space between adjacent cells.",
+          "function": "Forms a selectively impermeable barrier preventing paracellular leakage and maintaining epithelial cell polarity.",
+          "related_misconception_id": null,
+          "color": "#9F6CBD"
+        },
+        {
+          "id": "nucleus",
+          "name": "Nucleus",
+          "aliases": ["nucleus", "basal nucleus", "instruction store", "oval nucleus"],
+          "mesh_id": "mesh_nucleus",
+          "description": "Oval diploid nucleus positioned toward the basal cytoplasm of the columnar epithelial cell.",
+          "function": "Stores genetic blueprints, orchestrating protein synthesis for digestive enzymes and transport carrier channels.",
+          "related_misconception_id": null,
+          "color": "#7A4AA2"
+        }
+      ],
+      "pathways": [
+        {
+          "id": "nutrient_absorption_pathway",
+          "name": "Transcellular Nutrient Absorption Flow",
+          "description": "Apical uptake across microvilli brush border into basal vascular transport",
+          "ordered_structure_ids": ["microvilli", "junctions", "nucleus"]
+        }
+      ],
+      "assessments": [
+        {
+          "id": "q-diag-epi-01",
+          "type": "identification",
+          "prompt": "Identify the apical brush border projections that dramatically expand cellular surface area for nutrient absorption.",
+          "target_structure_id": "microvilli",
+          "hint": "Microscopic hair-like projections lining intestinal and renal epithelial cells.",
+          "rubric": "Names or selects Microvilli."
+        },
+        {
+          "id": "q-diag-epi-02",
+          "type": "explanation",
+          "prompt": "Explain how tight junctions preserve epithelial barrier integrity and prevent paracellular leakage in the intestinal lining.",
+          "rubric_points": [
+            "Tight junctions form an occluding seal between neighboring epithelial plasma membranes",
+            "Prevent uncontrolled paracellular diffusion of digestive enzymes and pathogens into internal tissues",
+            "Preserve cellular polarity by separating apical transport proteins from basolateral channels",
+            "Forces nutrients to traverse selectively via regulated transcellular absorption"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "muscle",
+      "concept_id": "lp-respiration",
+      "chapter": "life-processes",
+      "display_name": "Muscle Cell (Fiber): Contractile Architecture",
+      "subtitle": "Elongated multinucleated contractile fiber packed with repeating sarcomere myofibrils and mitochondria",
+      "model_type": "tissue_architecture",
+      "asset_url": null,
+      "scale": 1.0,
+      "rotation": [0.12, -0.18, -0.03],
+      "position": [0, 0, 0],
+      "licence": {
+        "source": "Cell Architecture Studio",
+        "creator": "Cell Architecture Studio",
+        "licence_type": "MIT",
+        "attribution": "Procedural skeletal muscle fiber architecture from Cell Architecture Studio."
+      },
+      "structures": [
+        {
+          "id": "myofibril",
+          "name": "Myofibril",
+          "aliases": ["myofibril", "myofibrils", "sarcomere", "contractile thread", "striated bundles"],
+          "mesh_id": "mesh_myofibril",
+          "description": "Cylindrical contractile organelles composed of repeating sarcomere units of actin and myosin myofilaments.",
+          "function": "Shortens via sliding filament mechanism during muscle contraction, generating mechanical force and body movement.",
+          "related_misconception_id": null,
+          "color": "#BD3D51"
+        },
+        {
+          "id": "sarcolemma",
+          "name": "Sarcolemma",
+          "aliases": ["sarcolemma", "muscle membrane", "excitable membrane", "t tubules"],
+          "mesh_id": "mesh_sarcolemma",
+          "description": "Specialized excitable plasma membrane enclosing the multinucleated muscle fiber.",
+          "function": "Propagates electrical action potentials along the fiber surface and down transverse T-tubules to trigger calcium release.",
+          "related_misconception_id": null,
+          "color": "#D7B284"
+        },
+        {
+          "id": "mitochondria",
+          "name": "Mitochondria",
+          "aliases": ["mitochondria", "mitochondrion", "endurance supply", "atp site"],
+          "mesh_id": "mesh_mitochondria",
+          "description": "Numerous energy-converting organelles densely packed between parallel myofibril bundles.",
+          "function": "Continuously synthesizes ATP to fuel myosin head detachment and calcium pumping during repeated muscular contraction.",
+          "related_misconception_id": "m-resp-is-breathing",
+          "color": "#CF7042"
+        }
+      ],
+      "pathways": [
+        {
+          "id": "excitation_contraction_coupling",
+          "name": "Excitation-Contraction Coupling Flow",
+          "description": "Membrane excitation across sarcolemma activating myofibril shortening fueled by mitochondrial ATP",
+          "ordered_structure_ids": ["sarcolemma", "mitochondria", "myofibril"]
+        }
+      ],
+      "assessments": [
+        {
+          "id": "q-diag-musc-01",
+          "type": "identification",
+          "prompt": "Identify the contractile filament bundles exhibiting repeating sarcomere striations that shorten to generate muscular force.",
+          "target_structure_id": "myofibril",
+          "hint": "Cylindrical protein threads packed with actin and myosin.",
+          "rubric": "Names or selects Myofibril."
+        },
+        {
+          "id": "q-diag-musc-02",
+          "type": "explanation",
+          "prompt": "Explain why muscle cells require high mitochondrial density and describe the anaerobic pathway in human muscle during vigorous exercise.",
+          "rubric_points": [
+            "Muscular contraction consumes high quantities of ATP for cross-bridge cycling and calcium reuptake",
+            "High mitochondrial density ensures continuous aerobic ATP synthesis under normal oxygen supply",
+            "During vigorous exercise when oxygen delivery is insufficient, muscle cells switch to anaerobic glycolysis",
+            "Pyruvate is converted to lactic acid in cytoplasm, yielding only 2 ATP per glucose and leading to muscle fatigue and cramps"
+          ]
+        }
+      ]
+    }
+  ]
+}
