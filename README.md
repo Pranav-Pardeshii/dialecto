@@ -296,6 +296,4 @@ Wispr Flow has no public API, so Dialecto does not integrate it in code. It is a
 
 Real authentication; Redis-backed shared rate limits and a task queue for multi-instance deployment; more subjects; teacher-authored question banks; streaming Teach-Back replies.
 
-## Team
 
-Solo build. Add your name and LinkedIn link here.

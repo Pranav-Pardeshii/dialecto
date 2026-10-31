@@ -222,6 +222,12 @@ Handoff memory across agent sessions.
       - All 83 backend tests passing (`pytest tests -v`).
       - 0 errors in backend `ruff` and `mypy` across 81 files.
       - 0 ESLint errors or warnings, `tsc --noEmit` 0 errors, Next.js production build (`pnpm build` across 12/12 routes) passing cleanly.
+- **CI stabilization (backend job):**
+  - Root cause of failing Actions run `41223917616` was an uninitialized Postgres test database (`relation "concepts" does not exist`).
+  - Updated `.github/workflows/ci.yml` backend test step to run migrations and seed data before pytest:
+    - `uv run alembic upgrade head`
+    - `uv run python -m app.db.seed`
+  - Reproduced locally and verified passing after fix (`83 passed`).
 
 ---
 
@@ -254,4 +260,9 @@ cd frontend && pnpm build
 
 # Seed database
 cd backend && uv run python -m app.db.seed
+
+# CI-equivalent backend test flow
+cd backend && uv run alembic upgrade head
+cd backend && uv run python -m app.db.seed
+cd backend && uv run pytest tests/unit tests/integration -v
 ```
