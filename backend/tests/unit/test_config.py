@@ -7,3 +7,4 @@ def test_settings_load() -> None:
     assert "openai/gpt-oss-120b" in settings.LLM_PRIMARY_MODEL
     assert len(settings.fallback_models_list) > 0
     assert len(settings.cors_origins_list) > 0
+

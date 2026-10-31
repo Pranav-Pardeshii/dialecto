@@ -66,6 +66,10 @@ export async function apiFetch<T>(
 }
 
 export type User = paths["/api/v1/users"]["get"]["responses"][200]["content"]["application/json"][number];
+export type ConceptGraph = paths["/api/v1/concepts"]["get"]["responses"][200]["content"]["application/json"];
+export type ConceptNode = ConceptGraph["nodes"][number];
+export type ConceptEdge = ConceptGraph["edges"][number];
+export type ConceptDetail = paths["/api/v1/concepts/{concept_id}"]["get"]["responses"][200]["content"]["application/json"];
 
 export const api = {
   getUsers: (includeSimulated = false) =>
@@ -73,4 +77,8 @@ export const api = {
   getMe: () => apiFetch<User>("/api/v1/me"),
   getHealth: () => apiFetch<{ status: string }>("/health"),
   getReady: () => apiFetch<{ status: string; database: string }>("/ready"),
+  getConceptGraph: () => apiFetch<ConceptGraph>("/api/v1/concepts"),
+  getConceptDetail: (conceptId: string) =>
+    apiFetch<ConceptDetail>(`/api/v1/concepts/${conceptId}`),
 };
+

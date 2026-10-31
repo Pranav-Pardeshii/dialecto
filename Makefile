@@ -29,3 +29,4 @@ migrate:
 
 seed:
 	cd backend && uv run python -m app.db.seed
+

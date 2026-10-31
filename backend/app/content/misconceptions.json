@@ -1,0 +1,163 @@
+[
+  {
+    "id": "m-plants-soil-food",
+    "concept_id": "lp-nutrition",
+    "statement": "Plants obtain their organic food directly from the soil.",
+    "correction": "Soil provides water and dissolved minerals; plants synthesize their own organic food via photosynthesis using CO2 and light energy.",
+    "verified": true
+  },
+  {
+    "id": "m-o2-from-co2",
+    "concept_id": "lp-photosynthesis",
+    "statement": "The oxygen gas released during photosynthesis originates from carbon dioxide.",
+    "correction": "Oxygen gas is released exclusively from the photolysis (splitting) of water molecules in the light reaction.",
+    "verified": true
+  },
+  {
+    "id": "m-stomata-absorb-water",
+    "concept_id": "lp-stomata",
+    "statement": "Stomata absorb water from the atmosphere for plant hydration.",
+    "correction": "Plant roots absorb water from soil; stomata permit gaseous exchange and release water vapour via transpiration.",
+    "verified": true
+  },
+  {
+    "id": "m-bile-enzymes",
+    "concept_id": "lp-digestion",
+    "statement": "Bile juice contains enzymes that chemically digest fats.",
+    "correction": "Bile contains bile salts and pigments but zero digestive enzymes; it mechanically emulsifies large lipid droplets into micro-droplets.",
+    "verified": true
+  },
+  {
+    "id": "m-digestion-stomach-only",
+    "concept_id": "lp-digestion",
+    "statement": "The entire process of food digestion and absorption happens inside the stomach.",
+    "correction": "Digestion starts in the mouth with salivary amylase and is completed in the small intestine, where nutrient absorption occurs across villi.",
+    "verified": true
+  },
+  {
+    "id": "m-resp-is-breathing",
+    "concept_id": "lp-respiration",
+    "statement": "Respiration is simply inhaling oxygen and exhaling carbon dioxide.",
+    "correction": "Breathing is physical gas exchange; respiration is the cellular oxidation of glucose to synthesize chemical ATP energy.",
+    "verified": true
+  },
+  {
+    "id": "m-plants-dont-respire",
+    "concept_id": "lp-respiration",
+    "statement": "Plants only photosynthesize and do not perform respiration.",
+    "correction": "Plants respire aerobically 24 hours a day to sustain cellular metabolism; photosynthesis occurs only in the presence of light.",
+    "verified": true
+  },
+  {
+    "id": "m-lungs-contract",
+    "concept_id": "lp-gas-exchange",
+    "statement": "The lungs contract and expand by their own muscular tissue to pump air.",
+    "correction": "Lungs are passive spongy organs; thoracic volume changes are driven by the muscular diaphragm and intercostal rib muscles.",
+    "verified": true
+  },
+  {
+    "id": "m-arteries-oxygenated",
+    "concept_id": "lp-circulation",
+    "statement": "All arteries without exception carry oxygenated blood, and all veins carry deoxygenated blood.",
+    "correction": "The pulmonary artery carries deoxygenated blood to the lungs, and the pulmonary veins carry oxygenated blood to the heart.",
+    "verified": true
+  },
+  {
+    "id": "m-veins-thicker",
+    "concept_id": "lp-vessels-blood",
+    "statement": "Veins have thicker muscular walls than arteries because they carry more volume.",
+    "correction": "Arteries have thicker, more elastic muscular walls to withstand high hydrostatic pressure; veins have thinner walls with valves.",
+    "verified": true
+  },
+  {
+    "id": "m-phloem-water",
+    "concept_id": "lp-plant-transport",
+    "statement": "Phloem conducts water and minerals from the roots upwards.",
+    "correction": "Xylem transports water and minerals unidirectionally; phloem translocates synthesized sugars bidirectionally with ATP energy.",
+    "verified": true
+  },
+  {
+    "id": "m-no-reabsorption",
+    "concept_id": "lp-excretion",
+    "statement": "All fluid and dissolved substances filtered at the glomerulus are eliminated as urine.",
+    "correction": "Over 99% of glomerular filtrate (including glucose, amino acids, ions, and water) is selectively reabsorbed along the nephron tubule.",
+    "verified": true
+  },
+  {
+    "id": "m-impulse-direction",
+    "concept_id": "cc-neuron",
+    "statement": "Nerve impulses can travel backward from axon terminals toward dendrites.",
+    "correction": "Impulses travel strictly one-way: from dendrite tip to cell body to axon, and across the synapse to the next neuron.",
+    "verified": true
+  },
+  {
+    "id": "m-reflex-brain",
+    "concept_id": "cc-reflex",
+    "statement": "Reflex actions are deliberated and executed directly by the cerebrum of the brain.",
+    "correction": "Reflexes are processed rapidly in the spinal cord to minimize response latency; the brain is notified after the action occurs.",
+    "verified": true
+  },
+  {
+    "id": "m-cerebellum-thinks",
+    "concept_id": "cc-brain",
+    "statement": "The cerebellum is responsible for conscious thoughts and memory retention.",
+    "correction": "The cerebrum governs conscious thought, planning, and memory; the cerebellum coordinates muscular balance, posture, and motor precision.",
+    "verified": true
+  },
+  {
+    "id": "m-auxin-lit-side",
+    "concept_id": "cc-plant-hormones",
+    "statement": "During phototropism, auxin hormone accumulates on the illuminated side of the stem.",
+    "correction": "Auxin diffuses away from light to the shaded side, stimulating elongation of shaded cells and causing the stem to curve toward light.",
+    "verified": true
+  },
+  {
+    "id": "m-hormone-via-nerves",
+    "concept_id": "cc-animal-hormones",
+    "statement": "Hormones are conducted along nerve axons to target organs.",
+    "correction": "Hormones are biochemical messengers secreted into the bloodstream by endocrine glands and distributed by systemic circulation.",
+    "verified": true
+  },
+  {
+    "id": "m-insulin-raises",
+    "concept_id": "cc-animal-hormones",
+    "statement": "Insulin is secreted to elevate low blood sugar levels.",
+    "correction": "Insulin lowers elevated blood glucose by promoting cellular absorption and glycogen synthesis in the liver.",
+    "verified": true
+  },
+  {
+    "id": "m-variation-need",
+    "concept_id": "he-variation",
+    "statement": "Organisms deliberately produce variations because they need to adapt to their environment.",
+    "correction": "Genetic variations arise spontaneously by chance inaccuracies in DNA copying; natural selection subsequently favors advantageous variants.",
+    "verified": true
+  },
+  {
+    "id": "m-acquired-inherited",
+    "concept_id": "he-genes-traits",
+    "statement": "Physical traits or muscular strength acquired during an individual's lifetime are inherited by offspring.",
+    "correction": "Only genetic changes in reproductive germ cells (sperm and egg) can be inherited; somatic adaptations do not alter gametic DNA.",
+    "verified": true
+  },
+  {
+    "id": "m-recessive-lost",
+    "concept_id": "he-monohybrid",
+    "statement": "In Mendel's monohybrid cross, the dwarf recessive trait was destroyed or blended in the F1 generation.",
+    "correction": "The recessive allele remains unaltered and unblended in heterozygous F1 plants, segregating to reappear in a 3:1 ratio in F2.",
+    "verified": true
+  },
+  {
+    "id": "m-traits-stay-together",
+    "concept_id": "he-dihybrid",
+    "statement": "Traits inherited together from one parent cannot separate into new combinations in future generations.",
+    "correction": "Mendel's law of independent assortment proves that non-allelic gene pairs assort independently into gametes, producing novel combinations.",
+    "verified": true
+  },
+  {
+    "id": "m-mother-decides-sex",
+    "concept_id": "he-sex-determination",
+    "statement": "The mother's ovum determines whether the newborn child is biologically male or female.",
+    "correction": "Maternal ova always supply an X chromosome; paternal sperm contribute either an X or Y chromosome, determining biological sex.",
+    "verified": true
+  }
+]

@@ -148,10 +148,254 @@
           }
         }
       }
+    },
+    "/api/v1/concepts": {
+      "get": {
+        "tags": [
+          "Concepts"
+        ],
+        "summary": "Get Concept Graph",
+        "description": "Retrieve full concept graph (nodes with mastery and directed prerequisite edges).",
+        "operationId": "get_concept_graph_api_v1_concepts_get",
+        "parameters": [
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConceptGraphResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/concepts/{concept_id}": {
+      "get": {
+        "tags": [
+          "Concepts"
+        ],
+        "summary": "Get Concept Detail",
+        "description": "Retrieve individual concept details and lesson markdown (excludes rubric key points).",
+        "operationId": "get_concept_detail_api_v1_concepts__concept_id__get",
+        "parameters": [
+          {
+            "name": "concept_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Concept Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConceptDetailResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "ConceptDetailResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "chapter": {
+            "type": "string",
+            "title": "Chapter"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "lesson_md": {
+            "type": "string",
+            "title": "Lesson Md"
+          },
+          "prerequisites": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Prerequisites"
+          },
+          "misconception_count": {
+            "type": "integer",
+            "title": "Misconception Count"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "chapter",
+          "description",
+          "lesson_md",
+          "prerequisites",
+          "misconception_count"
+        ],
+        "title": "ConceptDetailResponse"
+      },
+      "ConceptEdge": {
+        "properties": {
+          "from": {
+            "type": "string",
+            "title": "From"
+          },
+          "to": {
+            "type": "string",
+            "title": "To"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "from",
+          "to"
+        ],
+        "title": "ConceptEdge"
+      },
+      "ConceptGraphResponse": {
+        "properties": {
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/ConceptNode"
+            },
+            "type": "array",
+            "title": "Nodes"
+          },
+          "edges": {
+            "items": {
+              "$ref": "#/components/schemas/ConceptEdge"
+            },
+            "type": "array",
+            "title": "Edges"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "nodes",
+          "edges"
+        ],
+        "title": "ConceptGraphResponse"
+      },
+      "ConceptMasterySummary": {
+        "properties": {
+          "p_effective": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "P Effective"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "p_effective",
+          "status"
+        ],
+        "title": "ConceptMasterySummary"
+      },
+      "ConceptNode": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "chapter": {
+            "type": "string",
+            "title": "Chapter"
+          },
+          "position": {
+            "type": "integer",
+            "title": "Position"
+          },
+          "mastery": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ConceptMasterySummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "chapter",
+          "position"
+        ],
+        "title": "ConceptNode"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {

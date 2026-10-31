@@ -84,10 +84,100 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/concepts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Concept Graph
+         * @description Retrieve full concept graph (nodes with mastery and directed prerequisite edges).
+         */
+        get: operations["get_concept_graph_api_v1_concepts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/concepts/{concept_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Concept Detail
+         * @description Retrieve individual concept details and lesson markdown (excludes rubric key points).
+         */
+        get: operations["get_concept_detail_api_v1_concepts__concept_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** ConceptDetailResponse */
+        ConceptDetailResponse: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Chapter */
+            chapter: string;
+            /** Description */
+            description: string;
+            /** Lesson Md */
+            lesson_md: string;
+            /** Prerequisites */
+            prerequisites: string[];
+            /** Misconception Count */
+            misconception_count: number;
+        };
+        /** ConceptEdge */
+        ConceptEdge: {
+            /** From */
+            from: string;
+            /** To */
+            to: string;
+        };
+        /** ConceptGraphResponse */
+        ConceptGraphResponse: {
+            /** Nodes */
+            nodes: components["schemas"]["ConceptNode"][];
+            /** Edges */
+            edges: components["schemas"]["ConceptEdge"][];
+        };
+        /** ConceptMasterySummary */
+        ConceptMasterySummary: {
+            /** P Effective */
+            p_effective: number;
+            /** Status */
+            status: string;
+        };
+        /** ConceptNode */
+        ConceptNode: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Chapter */
+            chapter: string;
+            /** Position */
+            position: number;
+            mastery?: components["schemas"]["ConceptMasterySummary"] | null;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -252,6 +342,68 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_concept_graph_api_v1_concepts_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConceptGraphResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_concept_detail_api_v1_concepts__concept_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                concept_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConceptDetailResponse"];
                 };
             };
             /** @description Validation Error */

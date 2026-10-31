@@ -1,0 +1,385 @@
+[
+  {
+    "id": "lp-nutrition",
+    "chapter": "life-processes",
+    "name": "Modes of Nutrition",
+    "description": "Autotrophic and heterotrophic modes of nutrition in living organisms.",
+    "lesson_md": "Autotrophs synthesize their own organic food from simple inorganic raw materials like carbon dioxide and water in the presence of sunlight. Heterotrophs cannot synthesize their own food and depend on autotrophs directly or indirectly. Heterotrophic nutrition is classified into holozoic (ingestion of solid organic matter, e.g., humans, Amoeba), saprophytic (absorbing nutrients from dead and decaying matter, e.g., fungi), and parasitic (deriving nutrition from a host without killing it, e.g., Cuscuta, tapeworms).",
+    "key_points": [
+      "Autotrophs make their own food from CO2 and water using energy",
+      "Heterotrophs depend on other organisms for food",
+      "Heterotrophic modes include holozoic, saprophytic, and parasitic nutrition"
+    ],
+    "prerequisites": [],
+    "p_l0": 0.35,
+    "p_t": 0.15,
+    "p_s": 0.10,
+    "position": 1,
+    "verified": true
+  },
+  {
+    "id": "lp-photosynthesis",
+    "chapter": "life-processes",
+    "name": "Photosynthesis",
+    "description": "Mechanism of light absorption, photolysis of water, and carbon reduction in plants.",
+    "lesson_md": "Photosynthesis is the photochemical process by which green plants convert light energy into chemical energy stored in glucose. The essential requirements are sunlight, chlorophyll, carbon dioxide, and water. Major events: 1) Absorption of light energy by chlorophyll; 2) Conversion of light energy to chemical energy and splitting of water molecules into hydrogen and oxygen (photolysis); 3) Reduction of carbon dioxide to carbohydrates. The oxygen released originates entirely from the splitting of water. Excess carbohydrates are stored as starch.",
+    "key_points": [
+      "Requires sunlight, chlorophyll, CO2, and water",
+      "Light energy is converted to chemical energy stored as carbohydrates",
+      "Water is split (photolysis) and CO2 is reduced to carbohydrates",
+      "Oxygen released originates from the photolysis of water, not carbon dioxide",
+      "Excess carbohydrates are stored in plant tissues as starch"
+    ],
+    "prerequisites": ["lp-nutrition"],
+    "p_l0": 0.30,
+    "p_t": 0.15,
+    "p_s": 0.10,
+    "position": 2,
+    "verified": true
+  },
+  {
+    "id": "lp-stomata",
+    "chapter": "life-processes",
+    "name": "Stomata and Plant Gas Exchange",
+    "description": "Structure and regulation of stomatal pores for transpiration and gaseous exchange.",
+    "lesson_md": "Stomata are microscopic pores located primarily on the epidermal surface of leaves. They facilitate gas exchange (intake of CO2 and release of O2) and transpiration. Each stomatal pore is flanked by specialized kidney-shaped guard cells (dumbbell-shaped in grasses). The opening and closing of the pore is governed by turgor pressure: when water flows into guard cells, they swell, curve outward, and open the pore. When guard cells lose water, they become flaccid and the pore closes.",
+    "key_points": [
+      "Stomata are tiny epidermal pores bordered by guard cells",
+      "Enable gas exchange (CO2 and O2) and transpiration of water vapour",
+      "Guard cells swell when water flows in, opening the pore",
+      "Guard cells lose water and shrink, closing the pore to prevent water loss"
+    ],
+    "prerequisites": ["lp-photosynthesis"],
+    "p_l0": 0.30,
+    "p_t": 0.15,
+    "p_s": 0.10,
+    "position": 3,
+    "verified": true
+  },
+  {
+    "id": "lp-digestion",
+    "chapter": "life-processes",
+    "name": "Human Alimentary Canal & Digestion",
+    "description": "Mechanical and enzymatic breakdown of food and nutrient absorption.",
+    "lesson_md": "Digestion is the catabolic breakdown of complex food macromolecules into simpler absorbable forms. In the mouth, salivary amylase hydrolyzes starch into maltose. In the stomach, gastric glands secrete hydrochloric acid (creates acidic medium and activates pepsinogen to pepsin for protein breakdown) and mucus (protects gastric lining). In the small intestine, bile from the liver emulsifies large fat globules into smaller micelles and neutralizes acidity. Pancreatic juice provides trypsin (proteins) and lipase (fats). Intestinal wall villi provide large surface area for nutrient absorption.",
+    "key_points": [
+      "Digestion begins in the mouth (salivary amylase) and completes in the small intestine",
+      "Stomach secretes HCl, pepsin for proteins, and mucus for protection",
+      "Bile from the liver emulsifies fats mechanically and alkalinizes the chime (contains no digestive enzymes)",
+      "Pancreatic enzymes include trypsin and lipase",
+      "Villi in the small intestine absorb digested nutrients into blood and lymph"
+    ],
+    "prerequisites": ["lp-nutrition"],
+    "p_l0": 0.30,
+    "p_t": 0.15,
+    "p_s": 0.10,
+    "position": 4,
+    "verified": true
+  },
+  {
+    "id": "lp-respiration",
+    "chapter": "life-processes",
+    "name": "Cellular Respiration Pathways",
+    "description": "Aerobic and anaerobic breakdown of glucose to generate ATP.",
+    "lesson_md": "Respiration is the cellular biochemical oxidation of glucose to release energy stored in ATP molecules. The first step is glycolysis occurring in cytoplasm: glucose (6C) is cleaved into pyruvate (3C). In the presence of oxygen (aerobic respiration in mitochondria), pyruvate is completely oxidized into CO2, water, and 36-38 ATP. In the absence of oxygen (anaerobic respiration): in yeast, pyruvate ferments into ethanol, CO2, and 2 ATP; in human skeletal muscle during strenuous exercise, anaerobic pathway converts pyruvate into lactic acid, causing cramps.",
+    "key_points": [
+      "Respiration is a cellular chemical process breaking down glucose into ATP",
+      "Glycolysis in cytoplasm splits glucose into pyruvate",
+      "Aerobic respiration in mitochondria yields CO2, water, and high energy",
+      "Anaerobic respiration produces ethanol and CO2 in yeast, and lactic acid in muscle cells",
+      "Plants respire continuously day and night"
+    ],
+    "prerequisites": ["lp-nutrition"],
+    "p_l0": 0.30,
+    "p_t": 0.15,
+    "p_s": 0.10,
+    "position": 5,
+    "verified": true
+  },
+  {
+    "id": "lp-gas-exchange",
+    "chapter": "life-processes",
+    "name": "Human Respiratory System & Gas Exchange",
+    "description": "Mechanism of breathing and alveolar diffusion of respiratory gases.",
+    "lesson_md": "Inhaled air passes through nostrils (filtered by fine hairs and mucus), pharynx, larynx, trachea (supported by cartilaginous rings to prevent collapse), bronchi, bronchioles, and terminates in alveoli. Alveoli provide an extensive thin-walled surface richly vascularized with blood capillaries for rapid diffusion. Inhalation is active: diaphragm contracts and flattens, intercostal muscles lift ribs, thoracic cavity volume increases, reducing pressure and drawing air in. Haemoglobin in RBCs binds and carries oxygen; CO2 is predominantly transported dissolved in blood plasma.",
+    "key_points": [
+      "Air flows through trachea, bronchi, bronchioles to alveoli",
+      "Alveoli provide massive surface area and thin walls for diffusion",
+      "Inhalation is driven by flattening of diaphragm and expansion of rib cage",
+      "Haemoglobin transports oxygen; carbon dioxide is transported dissolved in plasma"
+    ],
+    "prerequisites": ["lp-respiration"],
+    "p_l0": 0.30,
+    "p_t": 0.15,
+    "p_s": 0.10,
+    "position": 6,
+    "verified": true
+  },
+  {
+    "id": "lp-circulation",
+    "chapter": "life-processes",
+    "name": "Heart & Double Circulation",
+    "description": "Four-chambered human heart mechanics and dual pulmonary-systemic circulation.",
+    "lesson_md": "The human heart possesses four chambers: right atrium and ventricle (receive and pump deoxygenated blood), and left atrium and ventricle (receive and pump oxygenated blood), preventing any intermixing. Double circulation entails two distinct circuits per cardiac cycle: 1) Pulmonary circulation: right ventricle pumps deoxygenated blood via pulmonary artery to lungs; oxygenated blood returns via pulmonary veins to left atrium; 2) Systemic circulation: left ventricle pumps oxygenated blood via aorta to systemic tissues; deoxygenated blood returns via vena cava to right atrium.",
+    "key_points": [
+      "Four chambers cleanly separate oxygenated and deoxygenated blood",
+      "Double circulation means blood passes through the heart twice per body cycle",
+      "Pulmonary artery carries deoxygenated blood to lungs; pulmonary vein carries oxygenated blood to heart",
+      "Left ventricle possesses thicker muscular walls to pump blood throughout entire systemic circuit"
+    ],
+    "prerequisites": ["lp-gas-exchange"],
+    "p_l0": 0.30,
+    "p_t": 0.15,
+    "p_s": 0.10,
+    "position": 7,
+    "verified": true
+  },
+  {
+    "id": "lp-vessels-blood",
+    "chapter": "life-processes",
+    "name": "Blood, Vessels & Lymphatic Fluid",
+    "description": "Structural differences in arteries, veins, capillaries, and components of blood and lymph.",
+    "lesson_md": "Arteries carry blood away from the heart under high pulsatile pressure; they possess thick, elastic muscular walls and no valves. Veins return blood to the heart under low pressure; they have thinner walls, wider lumens, and internal semilunar valves to prevent backward flow. Capillaries have single-cell-thick walls enabling metabolic exchange with tissues. Blood consists of fluid plasma containing RBCs (carry O2), WBCs (immunity), and platelets (thrombocytes for clotting). Lymph is tissue fluid containing white blood cells that drains extracellular fluid back into the venous system and transports absorbed dietary fats.",
+    "key_points": [
+      "Arteries have thick elastic walls and transport blood away from heart under high pressure",
+      "Veins have thinner walls, wider lumens, and valves to prevent backflow",
+      "Capillaries are one cell thick to permit diffusion",
+      "Platelets initiate blood clotting at wound sites",
+      "Lymph carries tissue fluid and absorbed fats back to circulation"
+    ],
+    "prerequisites": ["lp-circulation"],
+    "p_l0": 0.30,
+    "p_t": 0.15,
+    "p_s": 0.10,
+    "position": 8,
+    "verified": true
+  },
+  {
+    "id": "lp-plant-transport",
+    "chapter": "life-processes",
+    "name": "Vascular Transport in Plants",
+    "description": "Xylem sap ascent via transpiration pull and phloem translocation of sucrose.",
+    "lesson_md": "Plants transport water and minerals via xylem tissue (tracheids and vessels), primarily in a unidirectional upward flow. Transpiration from stomatal pores generates negative pressure (transpiration pull) that draws continuous water columns up tall trees; root pressure aids ascent at night. Phloem tissue (sieve tubes and companion cells) carries soluble products of photosynthesis (translocation), primarily sucrose, amino acids, and hormones. Translocation occurs bidirectionally (from source leaves to sinks like roots/fruits) and actively utilizes ATP energy.",
+    "key_points": [
+      "Xylem conducts water and dissolved mineral salts unidirectionally upward",
+      "Transpiration pull is the primary driving suction force for water ascent",
+      "Phloem translocates soluble photosynthates (sucrose) bidirectionally",
+      "Translocation in phloem is active and requires ATP metabolic energy"
+    ],
+    "prerequisites": ["lp-stomata"],
+    "p_l0": 0.30,
+    "p_t": 0.15,
+    "p_s": 0.10,
+    "position": 9,
+    "verified": true
+  },
+  {
+    "id": "lp-excretion",
+    "chapter": "life-processes",
+    "name": "Human Excretion & Nephron Function",
+    "description": "Renal ultrafiltration, selective tubular reabsorption, and urine excretion.",
+    "lesson_md": "Excretion is the biological removal of toxic nitrogenous metabolic wastes (mainly urea) from the body. Kidneys filter blood through microscopic functional units called nephrons. Each nephron consists of a Bowman's capsule enclosing a capillary glomerulus, leading into convoluted renal tubules. Blood is filtered under high hydrostatic pressure in the glomerulus (ultrafiltration). As the filtrate passes along the tubule, essential molecules (glucose, amino acids, salts, water) are selectively reabsorbed into peritubular capillaries. The remaining concentrated liquid (urine) passes via ureters to the urinary bladder.",
+    "key_points": [
+      "Nephron is the basic structural and functional filtration unit of kidneys",
+      "Glomerular ultrafiltration filters water and solutes into Bowman capsule",
+      "Selective reabsorption along renal tubules recaptures glucose, amino acids, and water",
+      "Urine containing urea, uric acid, and excess ions is eliminated via ureters and bladder"
+    ],
+    "prerequisites": ["lp-circulation"],
+    "p_l0": 0.30,
+    "p_t": 0.15,
+    "p_s": 0.10,
+    "position": 10,
+    "verified": true
+  },
+  {
+    "id": "cc-neuron",
+    "chapter": "control-coordination",
+    "name": "Neuron Structure & Nerve Impulse",
+    "description": "Anatomy of motor/sensory neurons and electrochemical transmission across synapses.",
+    "lesson_md": "The neuron is the specialized structural unit of nervous tissue. It consists of dendrites, a cyton (cell body containing nucleus), and an elongated axon ending in nerve terminals. Dendrites detect sensory environmental stimuli and generate an electrical impulse. The impulse travels sequentially: dendrite tip → cell body → along axon → axon terminal. At the terminal, the electrical signal triggers release of chemical neurotransmitters across the microscopic gap (synapse), stimulating an electrical impulse in the adjacent neuron or effector muscle.",
+    "key_points": [
+      "Neuron consists of dendrites, cell body (cyton), and axon",
+      "Nerve impulse travels strictly unidirectional: dendrite → cyton → axon → axon terminal",
+      "At synaptic clefts, electrical impulses trigger neurotransmitter chemicals to bridge the gap"
+    ],
+    "prerequisites": [],
+    "p_l0": 0.35,
+    "p_t": 0.15,
+    "p_s": 0.10,
+    "position": 11,
+    "verified": true
+  },
+  {
+    "id": "cc-reflex",
+    "chapter": "control-coordination",
+    "name": "Reflex Action & Reflex Arc",
+    "description": "Involuntary spinal reflex circuitry minimizing response latency.",
+    "lesson_md": "A reflex action is an automatic, involuntary, and rapid physiological response to an immediate noxious stimulus, protecting the organism from damage. The neural pathway mediating this action is called a reflex arc: receptor detects stimulus → sensory neuron transmits impulse to spinal cord → relay neuron in spinal cord processes signal → motor neuron carries impulse to effector muscle or gland. Because the processing occurs at the level of the spinal cord without waiting for cerebral deliberation, the response is instantaneous.",
+    "key_points": [
+      "Reflex actions are rapid, involuntary, automatic responses to stimuli",
+      "Reflex arc pathway: receptor → sensory neuron → relay neuron (spinal cord) → motor neuron → effector",
+      "Processed locally in the spinal cord to save precious time; brain is informed subsequently"
+    ],
+    "prerequisites": ["cc-neuron"],
+    "p_l0": 0.30,
+    "p_t": 0.15,
+    "p_s": 0.10,
+    "position": 12,
+    "verified": true
+  },
+  {
+    "id": "cc-brain",
+    "chapter": "control-coordination",
+    "name": "Human Brain Architecture",
+    "description": "Functional specialization of forebrain, midbrain, and hindbrain.",
+    "lesson_md": "The human brain is protected by the bony cranium and cushioning cerebrospinal fluid. It comprises three divisions: 1) Forebrain (Cerebrum): largest region, handles conscious thought, sensory interpretation, reasoning, learning, and voluntary motor actions; 2) Midbrain: coordinates involuntary visual, auditory, and pupillary reflexes; 3) Hindbrain: consists of cerebellum (coordinates voluntary muscular precision, posture, and equilibrium), pons (respiratory rhythm), and medulla oblongata (vital autonomic control: heartbeat, blood pressure, salivation, vomiting).",
+    "key_points": [
+      "Cerebrum (forebrain) governs conscious thought, memory, sensory interpretation, and voluntary motor actions",
+      "Cerebellum controls muscular precision, balance, and body posture",
+      "Medulla oblongata controls vital involuntary autonomic reflexes (heartbeat, blood pressure, peristalsis)",
+      "Protected by bony skull (cranium) and shock-absorbing cerebrospinal fluid"
+    ],
+    "prerequisites": ["cc-neuron"],
+    "p_l0": 0.30,
+    "p_t": 0.15,
+    "p_s": 0.10,
+    "position": 13,
+    "verified": true
+  },
+  {
+    "id": "cc-plant-hormones",
+    "chapter": "control-coordination",
+    "name": "Plant Hormones & Tropisms",
+    "description": "Phytohormone regulation and directional growth movements in plants.",
+    "lesson_md": "Plants coordinate growth responses via chemical phytohormones and tropisms (directional growth movements in response to stimuli). Auxins synthesized at shoot tips promote cellular elongation; during phototropism, auxin diffuses to the shaded side, causing shaded cells to elongate more rapidly and bending the stem toward light. Gibberellins promote stem elongation. Cytokinins stimulate rapid cell division (concentrated in fruits and seeds). Abscisic acid (ABA) is a growth inhibitor causing stomatal closure and leaf wilting. Major tropisms include phototropism (light), geotropism (gravity), hydrotropism (water), and chemotropism (pollen tube growth toward ovules).",
+    "key_points": [
+      "Auxin promotes cell elongation and diffuses to the shaded side, bending shoots toward light",
+      "Gibberellins stimulate stem growth; cytokinins promote cell division",
+      "Abscisic acid (ABA) acts as a growth inhibitor causing stomatal closure and leaf fall",
+      "Tropisms are directional growth movements (phototropism, geotropism, hydrotropism, chemotropism)"
+    ],
+    "prerequisites": [],
+    "p_l0": 0.35,
+    "p_t": 0.15,
+    "p_s": 0.10,
+    "position": 14,
+    "verified": true
+  },
+  {
+    "id": "cc-animal-hormones",
+    "chapter": "control-coordination",
+    "name": "Endocrine System & Hormones",
+    "description": "Endocrine gland secretions, feedback regulation, and metabolic homeostasis.",
+    "lesson_md": "Endocrine glands are ductless glands that secrete hormones directly into the bloodstream to target distant organs. Pituitary gland secretes growth hormone (deficiency causes dwarfism, excess causes gigantism). Thyroid gland produces thyroxine (requires iodine in diet; regulates carbohydrate, protein, and fat metabolism; deficiency causes goitre). Pancreas produces insulin, which lowers blood glucose levels by promoting cellular uptake. Adrenal glands secrete adrenaline ('fight or flight' hormone increasing heart rate and oxygen supply to muscles). Hormone secretion timing and amount are tightly regulated by negative feedback loops.",
+    "key_points": [
+      "Hormones are chemical messengers secreted directly into blood by ductless endocrine glands",
+      "Thyroxine requires iodine to regulate general basal metabolism; deficiency causes goitre",
+      "Insulin secreted by pancreas regulates and lowers elevated blood sugar levels",
+      "Adrenaline prepares physiological fight-or-flight emergency responses",
+      "Endocrine secretions are regulated by negative feedback mechanisms"
+    ],
+    "prerequisites": [],
+    "p_l0": 0.35,
+    "p_t": 0.15,
+    "p_s": 0.10,
+    "position": 15,
+    "verified": true
+  },
+  {
+    "id": "he-variation",
+    "chapter": "heredity",
+    "name": "Variation & Biological Evolution",
+    "description": "DNA replication fidelity, origin of genetic variation, and survival advantages.",
+    "lesson_md": "Reproduction involves biochemical replication of cellular DNA. Although DNA copying is highly reliable, subtle inaccuracies occur during biochemical replication, creating genetic variations. In asexual reproduction, variations are minimal and accumulate slowly. In sexual reproduction, combination of genetic material from two distinct parents yields substantial genetic diversity. Variation provides raw material for natural selection: while some variants may be neutral, variants adapted to sudden environmental shifts (e.g., heat-resistant bacteria in a thermal upsurge) survive and perpetuate the species.",
+    "key_points": [
+      "Inaccuracies during DNA copying produce genetic variations",
+      "Sexual reproduction generates significantly greater variation than asexual reproduction",
+      "Variation arises by chance and confers survival advantages when environmental conditions change"
+    ],
+    "prerequisites": [],
+    "p_l0": 0.35,
+    "p_t": 0.15,
+    "p_s": 0.10,
+    "position": 16,
+    "verified": true
+  },
+  {
+    "id": "he-genes-traits",
+    "chapter": "heredity",
+    "name": "Genes & Inheritance of Traits",
+    "description": "Chromosomal basis of inheritance, DNA genes, and germline transmission.",
+    "lesson_md": "Heredity is the biological transmission of genetically determined characteristics from parents to offspring. Specific structural sections of DNA called genes provide instructions for synthesizing specific cellular proteins that express physical traits. In sexually reproducing diploid organisms, each trait is governed by two copies of a gene (alleles) situated on homologous chromosome pairs, one inherited from each parent. Crucially, somatic modifications acquired during an individual's lifetime (e.g., muscle building, scar tissue) do not alter reproductive germ cell DNA and cannot be passed to progeny.",
+    "key_points": [
+      "Traits are controlled by genes situated on chromosomes made of DNA",
+      "Each diploid organism inherits two alleles for every trait, one from each parent",
+      "Only genetic alterations in reproductive germ cells (gametes) are inherited by offspring",
+      "Acquired somatic traits gained during an individual's life cannot be inherited"
+    ],
+    "prerequisites": ["he-variation"],
+    "p_l0": 0.30,
+    "p_t": 0.15,
+    "p_s": 0.10,
+    "position": 17,
+    "verified": true
+  },
+  {
+    "id": "he-monohybrid",
+    "chapter": "heredity",
+    "name": "Mendel's Monohybrid Cross",
+    "description": "Inheritance of single traits, dominant and recessive alleles, and phenotypic ratios.",
+    "lesson_md": "Gregor Mendel investigated inheritance patterns in Garden Pea (Pisum sativum). In a monohybrid cross, he tracked one contrasting trait: pure-breeding tall (TT) and dwarf (tt) plants. The first filial (F1) generation consisted entirely of tall plants (Tt), demonstrating that tallness is dominant and dwarfness is recessive. When F1 plants were self-pollinated, the hidden recessive allele reappeared in the F2 generation with a phenotypic ratio of 3 tall : 1 dwarf, and a genotypic ratio of 1 TT : 2 Tt : 1 tt, proving that alleles do not blend but segregate during gamete formation.",
+    "key_points": [
+      "Mendel crossed pure tall (TT) and dwarf (tt) pea plants",
+      "F1 generation expressed only the dominant trait (100% tall, heterozygous Tt)",
+      "F2 generation exhibited a 3:1 phenotypic ratio (3 tall : 1 dwarf)",
+      "F2 genotypic ratio is 1:2:1 (1 TT : 2 Tt : 1 tt)",
+      "Recessive alleles are not destroyed or blended in F1; they segregate and reappear in F2"
+    ],
+    "prerequisites": ["he-genes-traits"],
+    "p_l0": 0.30,
+    "p_t": 0.15,
+    "p_s": 0.10,
+    "position": 18,
+    "verified": true
+  },
+  {
+    "id": "he-dihybrid",
+    "chapter": "heredity",
+    "name": "Dihybrid Cross & Independent Assortment",
+    "description": "Simultaneous inheritance of two independent gene pairs and 9:3:3:1 ratios.",
+    "lesson_md": "In a dihybrid cross, Mendel simultaneously tracked two independent pairs of contrasting traits: seed shape (round R vs. wrinkled r) and seed color (yellow Y vs. green y). Crossing homozygous round yellow (RRYY) with wrinkled green (rryy) produced an F1 generation displaying all round yellow seeds (RrYy). Self-pollinating F1 individuals produced an F2 generation with four distinct phenotypes in the classic ratio 9 round yellow : 3 round green : 3 wrinkled yellow : 1 wrinkled green. This demonstrates that different pairs of traits assort independently of each other into gametes.",
+    "key_points": [
+      "Mendel crossed round yellow (RRYY) with wrinkled green (rryy) pea plants",
+      "F1 generation produced 100% round yellow seeds (RrYy)",
+      "F2 generation yielded a phenotypic ratio of 9:3:3:1",
+      "Demonstrates independent assortment: gene pairs separate and recombine independently"
+    ],
+    "prerequisites": ["he-monohybrid"],
+    "p_l0": 0.30,
+    "p_t": 0.15,
+    "p_s": 0.10,
+    "position": 19,
+    "verified": true
+  },
+  {
+    "id": "he-sex-determination",
+    "chapter": "heredity",
+    "name": "Sex Determination in Humans",
+    "description": "Chromosomal basis of human sex determination (XX and XY mechanisms).",
+    "lesson_md": "Human somatic cells contain 23 pairs (46 total) of chromosomes: 22 pairs are autosomes and 1 pair constitutes sex chromosomes. Females possess two homologous X chromosomes (XX), while males possess one X and one smaller Y chromosome (XY). During gametogenesis, all maternal ova carry an X chromosome (homogametic). Paternal sperm cells are heterogametic: 50% carry an X chromosome and 50% carry a Y chromosome. Fertilization by an X-bearing sperm produces a female child (XX); fertilization by a Y-bearing sperm produces a male child (XY). Hence, the father's gamete determines the child's sex with an exact 50% probability.",
+    "key_points": [
+      "Humans have 23 chromosome pairs: 22 pairs of autosomes and 1 pair of sex chromosomes",
+      "Females are XX (homogametic); males are XY (heterogametic)",
+      "Mother's ovum always contributes an X chromosome",
+      "Father's sperm delivers either an X or Y chromosome, determining biological sex",
+      "Every conception has an independent 50% probability of being male or female"
+    ],
+    "prerequisites": ["he-genes-traits"],
+    "p_l0": 0.30,
+    "p_t": 0.15,
+    "p_s": 0.10,
+    "position": 20,
+    "verified": true
+  }
+]

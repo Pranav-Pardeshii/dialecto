@@ -11,34 +11,43 @@ Handoff memory across agent sessions.
   - Created Phase 0 docs: `design.md`, `prd.md`, `features.md`, `testing.md`, `setup.md`, `DECISIONS.md`.
   - Enforced strict rule: **Zero mentions of backend frameworks or third-party tools in UI code or copy.**
 - **Milestone M0 Complete (Setup, Monorepo Skeleton, Design Foundation):**
-  - Scaffolded `backend/`: FastAPI async modular monolith, Python 3.12 with `uv`, `app/core/` (settings, logging, error envelope, tracing middleware, rate limits), `app/api/v1/` (`/health`, `/ready`, `/users`, `/me`), `app/db/` (asyncpg session).
-  - Scaffolded `frontend/`: Next.js 15 App Router, TypeScript strict, Tailwind themed per Taste Skill tokens (`Fraunces` + `Plus Jakarta Sans` + `JetBrains Mono`), TanStack Query, generated typed API client (`pnpm gen:api`).
-  - Built App Shell with demo identity role switcher (`Aarav` Class 10 student / `Ms. Rao` Biology instructor).
-  - Root configuration: `Makefile`, `docker-compose.yml`, `.env.example`, `.github/workflows/ci.yml`, `backend/Dockerfile`, `frontend/Dockerfile`.
-  - Verified: `ruff` (clean), `mypy` (clean), `pytest` (5 passed), `pnpm lint` (clean), `pnpm typecheck` (clean), `pnpm build` (clean).
+  - Scaffolded `backend/` and `frontend/` monorepo.
+  - App Shell with demo identity role switcher (`Aarav` Class 10 student / `Ms. Rao` Biology instructor).
+  - Multi-stage Dockerfiles, root `Makefile`, `docker-compose.yml`, `ci.yml`.
+- **Milestone M1 Complete (Data and Concept Graph):**
+  - Verified content datasets created: `backend/app/content/concepts.json` (20 concepts across 3 chapters), `misconceptions.json` (23 NCERT misconceptions), `questions.json` (verified starter question bank).
+  - Full SQLAlchemy 2.0 ORM models in `backend/app/models/entities.py`.
+  - Alembic async migrations configured with baseline migration `001_initial_schema.py`.
+  - Pure domain DAG validation with topological sort and prerequisite cycle detection in `backend/app/domain/graph.py` with 100% unit test coverage.
+  - Concept repository and service implementing effective mastery decay and status computation.
+  - Endpoints `GET /api/v1/concepts` and `GET /api/v1/concepts/{concept_id}` tested and verified.
+  - Seeder script `backend/app/db/seed.py` for idempotent data ingestion.
+  - Interactive Concept Graph UI built with `@xyflow/react` on `/dashboard` with custom node cards, chapter badges, mastery indicators, and `ConceptDetailModal` lesson reader.
+  - Offline question generator script `backend/scripts/generate_questions.py`.
 
 ---
 
 ## In Progress
-- Transitioning to **Milestone M1: Data & Concept Graph**.
+- Transitioning to **Milestone M2: Learner Core (BKT, Elo, SM-2, Selector, Diagnostic & Practice Endpoints/Screens)**.
 
 ---
 
 ## Next
-- **Milestone M1 Plan:**
-  1. Define SQLAlchemy 2.0 ORM models in `backend/app/models/` matching `docs/database.md` (`Classroom`, `User`, `Concept`, `ConceptPrerequisite`, `Misconception`, `Question`, `Mastery`, `Session`, `Attempt`, `DetectedMisconception`, `TeachbackSession`, `TeachbackTurn`, `LLMCall`).
-  2. Setup Alembic async migrations (`alembic init -t async migrations`) and generate initial migration.
-  3. Convert `docs/curriculum.md` into `app/content/concepts.json` and `app/content/misconceptions.json`.
-  4. Write idempotent seeder `python -m app.db.seed` (loads content JSON, creates classroom and demo users Aarav and Ms. Rao).
-  5. Implement `GET /api/v1/concepts` and `GET /api/v1/concepts/{concept_id}` endpoints.
-  6. Build interactive Concept Graph in frontend (`src/components/graph/` using `@xyflow/react`) with custom nodes showing chapter, mastery ring, and locked/unlocked state.
-  7. Regenerate API types (`pnpm gen:api`), run checks, update `progress.md`, and commit.
-
----
-
-## Known Bugs / Notes
-- Local service `postgresql-x64-18` is running on host port 5432. When using Docker Compose, port 5432 should be used after stopping the local service or configuring credentials, or using a cloud database (Neon) for live deployment.
-- Strict UI framework secrecy is active and enforced across all screens.
+- **Milestone M2 Plan:**
+  1. Build pure domain modules in `backend/app/domain/`:
+     - `bkt.py`: Bayesian Knowledge Tracing with slip/guess adjustments and soft evidence bounds.
+     - `elo.py`: Question difficulty rating calibration ($b \leftarrow b + K(\sigma(\theta - b) - y)$).
+     - `sm2.py`: SM-2 spaced repetition scheduler (quality score $q$, $EF'$, repetition intervals, decay).
+     - `selector.py`: Next question selector targeting weak, unlocked concepts near 70% expected success.
+  2. Implement unit tests with hand-calculated expected values for all domain math.
+  3. Implement Practice & Diagnostic services and repositories:
+     - `POST /api/v1/diagnostic/sessions`, `POST /api/v1/diagnostic/sessions/{id}/answers`, `GET /api/v1/diagnostic/sessions/{id}/result`.
+     - `POST /api/v1/practice/next`, `POST /api/v1/practice/answers` (atomic transaction with `client_attempt_id` idempotency and row lock).
+     - `GET /api/v1/learner/mastery`, `GET /api/v1/learner/summary`.
+  4. Build full frontend interactive screens:
+     - Diagnostic flow on `/diagnostic`: 15 adaptive questions with uncertainty sampler and final mastery profile.
+     - Targeted practice on `/practice`: Clean MCQ card, `VoiceFriendlyTextarea` reasoning box, animated mastery delta reveal.
+  5. Run checks (`make check`), commit, and push.
 
 ---
 
@@ -52,10 +61,6 @@ cd frontend && pnpm lint
 cd frontend && pnpm typecheck
 cd frontend && pnpm build
 
-# Type generation
-cd frontend && pnpm gen:api
-
-# Run dev servers
-cd backend && uv run uvicorn app.main:app --reload --port 8000
-cd frontend && pnpm dev
+# Seed database
+cd backend && uv run python -m app.db.seed
 ```
