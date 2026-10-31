@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getActiveDemoUserId, setActiveDemoUserId } from "@/lib/api/client";
@@ -35,8 +36,15 @@ export function Navbar() {
         {/* Brand */}
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-ink-primary text-canvas font-serif text-sm font-semibold transition group-hover:scale-105">
-              D
+            <div className="relative flex h-8 w-8 items-center justify-center transition group-hover:scale-105">
+              <Image
+                src="/logo.png"
+                alt="Dialecto"
+                width={32}
+                height={32}
+                className="object-contain"
+                priority
+              />
             </div>
             <div className="flex flex-col">
               <span className="font-serif text-base font-semibold tracking-tight text-ink-primary">

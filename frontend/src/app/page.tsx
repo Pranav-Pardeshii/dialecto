@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { setActiveDemoUserId } from "@/lib/api/client";
 import { GraduationCap, Users, ArrowRight } from "lucide-react";
@@ -18,8 +19,15 @@ export default function HomePage() {
       <header className="border-b border-border-subtle/80 bg-canvas/60 px-6 py-4">
         <div className="mx-auto max-w-5xl flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-ink-primary text-canvas font-serif text-sm font-semibold">
-              D
+            <div className="relative flex h-8 w-8 items-center justify-center">
+              <Image
+                src="/logo.png"
+                alt="Dialecto"
+                width={32}
+                height={32}
+                className="object-contain"
+                priority
+              />
             </div>
             <span className="font-serif text-lg font-semibold tracking-tight text-ink-primary">
               Dialecto
@@ -32,6 +40,16 @@ export default function HomePage() {
       {/* Main Content Area */}
       <main className="mx-auto max-w-4xl px-4 py-16 sm:px-6 w-full my-auto">
         <div className="text-center max-w-2xl mx-auto mb-12">
+          <div className="inline-flex items-center justify-center mb-6">
+            <Image
+              src="/logo.png"
+              alt="Dialecto"
+              width={72}
+              height={72}
+              className="object-contain"
+              priority
+            />
+          </div>
           <h1 className="font-serif text-3xl sm:text-4xl font-normal tracking-tight text-ink-primary mb-3">
             An adaptive study space that tracks what you truly understand.
           </h1>

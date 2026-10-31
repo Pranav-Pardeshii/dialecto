@@ -25,6 +25,11 @@ export const metadata: Metadata = {
   title: "Dialecto — Adaptive CBSE Biology Study Companion",
   description:
     "Master Class 10 Biology through personalized concept modeling, active inquiry, and targeted practice.",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/icon-192.png",
+  },
 };
 
 export default function RootLayout({
