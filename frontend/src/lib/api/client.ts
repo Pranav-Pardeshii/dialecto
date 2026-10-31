@@ -85,6 +85,10 @@ export type LearnerSummary = paths["/api/v1/learner/summary"]["get"]["responses"
 
 export type LLMStatsResponse = paths["/api/v1/ops/llm-stats"]["get"]["responses"][200]["content"]["application/json"];
 
+export type TeachbackSessionStartResponse = paths["/api/v1/teachback/sessions"]["post"]["responses"][200]["content"]["application/json"];
+export type TeachbackTurnResponse = paths["/api/v1/teachback/sessions/{session_id}/turns"]["post"]["responses"][200]["content"]["application/json"];
+export type TeachbackDetailResponse = paths["/api/v1/teachback/sessions/{session_id}"]["get"]["responses"][200]["content"]["application/json"];
+
 export const api = {
   getUsers: (includeSimulated = false) =>
     apiFetch<User[]>(`/api/v1/users?include_simulated=${includeSimulated}`),
@@ -119,6 +123,20 @@ export const api = {
     }),
   getDiagnosticResult: (sessionId: number) =>
     apiFetch<DiagnosticResultResponse>(`/api/v1/diagnostic/sessions/${sessionId}/result`),
+
+  // Teach-Back with Pip
+  startTeachback: (conceptId: string) =>
+    apiFetch<TeachbackSessionStartResponse>("/api/v1/teachback/sessions", {
+      method: "POST",
+      body: JSON.stringify({ concept_id: conceptId }),
+    }),
+  submitTeachbackTurn: (sessionId: number, content: string) =>
+    apiFetch<TeachbackTurnResponse>(`/api/v1/teachback/sessions/${sessionId}/turns`, {
+      method: "POST",
+      body: JSON.stringify({ content }),
+    }),
+  getTeachbackSession: (sessionId: number) =>
+    apiFetch<TeachbackDetailResponse>(`/api/v1/teachback/sessions/${sessionId}`),
 
   // Learner
   getLearnerMastery: () => apiFetch<LearnerMasteryItem[]>("/api/v1/learner/mastery"),

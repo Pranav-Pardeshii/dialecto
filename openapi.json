@@ -644,6 +644,194 @@
         }
       }
     },
+    "/api/v1/teachback/sessions": {
+      "post": {
+        "tags": [
+          "Teach-Back Mode with Pip"
+        ],
+        "summary": "Start Teachback Session",
+        "description": "Initialize a Teach-Back dialogue session with Pip, returning Pip's opening question and the concept rubric.",
+        "operationId": "start_teachback_session_api_v1_teachback_sessions_post",
+        "parameters": [
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeachbackStartRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeachbackSessionStartResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/teachback/sessions/{session_id}/turns": {
+      "post": {
+        "tags": [
+          "Teach-Back Mode with Pip"
+        ],
+        "summary": "Submit Teachback Turn",
+        "description": "Submit a teaching explanation to Pip. Returns Pip's dialogue, rubric coverage feedback, and soft evidence delta.",
+        "operationId": "submit_teachback_turn_api_v1_teachback_sessions__session_id__turns_post",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeachbackTurnRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeachbackTurnResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/teachback/sessions/{session_id}": {
+      "get": {
+        "tags": [
+          "Teach-Back Mode with Pip"
+        ],
+        "summary": "Get Teachback Session",
+        "description": "Retrieve full transcript and state of a Teach-Back dialogue session.",
+        "operationId": "get_teachback_session_api_v1_teachback_sessions__session_id__get",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeachbackDetailResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/ops/llm-stats": {
       "get": {
         "tags": [
@@ -1410,6 +1598,27 @@
         ],
         "title": "ModelTokenBudgetStatus"
       },
+      "PipTurnOut": {
+        "properties": {
+          "content": {
+            "type": "string",
+            "title": "Content"
+          },
+          "level": {
+            "type": "integer",
+            "maximum": 3.0,
+            "minimum": 0.0,
+            "title": "Level"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "content",
+          "level"
+        ],
+        "title": "PipTurnOut"
+      },
       "PracticeAnswerRequest": {
         "properties": {
           "client_attempt_id": {
@@ -1702,6 +1911,333 @@
           "created_at"
         ],
         "title": "RecentCallOut"
+      },
+      "RubricOut": {
+        "properties": {
+          "key_points": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Key Points"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key_points"
+        ],
+        "title": "RubricOut"
+      },
+      "TeachbackDetailResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "concept_id": {
+            "type": "string",
+            "title": "Concept Id"
+          },
+          "concept_name": {
+            "type": "string",
+            "title": "Concept Name"
+          },
+          "turn_count": {
+            "type": "integer",
+            "title": "Turn Count"
+          },
+          "current_level": {
+            "type": "integer",
+            "title": "Current Level"
+          },
+          "finished": {
+            "type": "boolean",
+            "title": "Finished"
+          },
+          "final_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Final Score"
+          },
+          "turns": {
+            "items": {
+              "$ref": "#/components/schemas/TeachbackTranscriptTurn"
+            },
+            "type": "array",
+            "title": "Turns"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "concept_id",
+          "concept_name",
+          "turn_count",
+          "current_level",
+          "finished",
+          "turns"
+        ],
+        "title": "TeachbackDetailResponse"
+      },
+      "TeachbackMisconceptionFeedback": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "statement": {
+            "type": "string",
+            "title": "Statement"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "statement"
+        ],
+        "title": "TeachbackMisconceptionFeedback"
+      },
+      "TeachbackResultOut": {
+        "properties": {
+          "final_score": {
+            "type": "number",
+            "title": "Final Score"
+          },
+          "final_level": {
+            "type": "integer",
+            "title": "Final Level"
+          },
+          "mastery": {
+            "$ref": "#/components/schemas/MasteryDelta"
+          },
+          "strengths": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Strengths"
+          },
+          "gaps": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Gaps"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "final_score",
+          "final_level",
+          "mastery",
+          "strengths",
+          "gaps"
+        ],
+        "title": "TeachbackResultOut"
+      },
+      "TeachbackSessionStartResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "concept_id": {
+            "type": "string",
+            "title": "Concept Id"
+          },
+          "concept_name": {
+            "type": "string",
+            "title": "Concept Name"
+          },
+          "turn_count": {
+            "type": "integer",
+            "title": "Turn Count"
+          },
+          "pip": {
+            "$ref": "#/components/schemas/PipTurnOut"
+          },
+          "rubric": {
+            "$ref": "#/components/schemas/RubricOut"
+          },
+          "finished": {
+            "type": "boolean",
+            "title": "Finished"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "concept_id",
+          "concept_name",
+          "turn_count",
+          "pip",
+          "rubric",
+          "finished"
+        ],
+        "title": "TeachbackSessionStartResponse"
+      },
+      "TeachbackStartRequest": {
+        "properties": {
+          "concept_id": {
+            "type": "string",
+            "title": "Concept Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "concept_id"
+        ],
+        "title": "TeachbackStartRequest"
+      },
+      "TeachbackTranscriptTurn": {
+        "properties": {
+          "idx": {
+            "type": "integer",
+            "title": "Idx"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Level"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "idx",
+          "role",
+          "content",
+          "created_at"
+        ],
+        "title": "TeachbackTranscriptTurn"
+      },
+      "TeachbackTurnFeedback": {
+        "properties": {
+          "score": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Score"
+          },
+          "covered": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Covered"
+          },
+          "missing": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Missing"
+          },
+          "misconceptions": {
+            "items": {
+              "$ref": "#/components/schemas/TeachbackMisconceptionFeedback"
+            },
+            "type": "array",
+            "title": "Misconceptions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "score",
+          "covered",
+          "missing",
+          "misconceptions"
+        ],
+        "title": "TeachbackTurnFeedback"
+      },
+      "TeachbackTurnRequest": {
+        "properties": {
+          "content": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Content"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "content"
+        ],
+        "title": "TeachbackTurnRequest"
+      },
+      "TeachbackTurnResponse": {
+        "properties": {
+          "turn_index": {
+            "type": "integer",
+            "title": "Turn Index"
+          },
+          "pip": {
+            "$ref": "#/components/schemas/PipTurnOut"
+          },
+          "feedback": {
+            "$ref": "#/components/schemas/TeachbackTurnFeedback"
+          },
+          "finished": {
+            "type": "boolean",
+            "title": "Finished"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TeachbackResultOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ai": {
+            "$ref": "#/components/schemas/AIFallbackMeta"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "turn_index",
+          "pip",
+          "feedback",
+          "finished",
+          "ai"
+        ],
+        "title": "TeachbackTurnResponse"
       },
       "UserOut": {
         "properties": {

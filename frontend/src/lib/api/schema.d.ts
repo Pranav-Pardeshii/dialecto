@@ -264,6 +264,66 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/teachback/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start Teachback Session
+         * @description Initialize a Teach-Back dialogue session with Pip, returning Pip's opening question and the concept rubric.
+         */
+        post: operations["start_teachback_session_api_v1_teachback_sessions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teachback/sessions/{session_id}/turns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Submit Teachback Turn
+         * @description Submit a teaching explanation to Pip. Returns Pip's dialogue, rubric coverage feedback, and soft evidence delta.
+         */
+        post: operations["submit_teachback_turn_api_v1_teachback_sessions__session_id__turns_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teachback/sessions/{session_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Teachback Session
+         * @description Retrieve full transcript and state of a Teach-Back dialogue session.
+         */
+        get: operations["get_teachback_session_api_v1_teachback_sessions__session_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/ops/llm-stats": {
         parameters: {
             query?: never;
@@ -565,6 +625,13 @@ export interface components {
             /** Pct Remaining */
             pct_remaining: number;
         };
+        /** PipTurnOut */
+        PipTurnOut: {
+            /** Content */
+            content: string;
+            /** Level */
+            level: number;
+        };
         /** PracticeAnswerRequest */
         PracticeAnswerRequest: {
             /**
@@ -678,6 +745,112 @@ export interface components {
             tokens: number;
             /** Created At */
             created_at: string;
+        };
+        /** RubricOut */
+        RubricOut: {
+            /** Key Points */
+            key_points: string[];
+        };
+        /** TeachbackDetailResponse */
+        TeachbackDetailResponse: {
+            /** Id */
+            id: number;
+            /** Concept Id */
+            concept_id: string;
+            /** Concept Name */
+            concept_name: string;
+            /** Turn Count */
+            turn_count: number;
+            /** Current Level */
+            current_level: number;
+            /** Finished */
+            finished: boolean;
+            /** Final Score */
+            final_score?: number | null;
+            /** Turns */
+            turns: components["schemas"]["TeachbackTranscriptTurn"][];
+        };
+        /** TeachbackMisconceptionFeedback */
+        TeachbackMisconceptionFeedback: {
+            /** Id */
+            id: string;
+            /** Statement */
+            statement: string;
+        };
+        /** TeachbackResultOut */
+        TeachbackResultOut: {
+            /** Final Score */
+            final_score: number;
+            /** Final Level */
+            final_level: number;
+            mastery: components["schemas"]["MasteryDelta"];
+            /** Strengths */
+            strengths: string[];
+            /** Gaps */
+            gaps: string[];
+        };
+        /** TeachbackSessionStartResponse */
+        TeachbackSessionStartResponse: {
+            /** Id */
+            id: number;
+            /** Concept Id */
+            concept_id: string;
+            /** Concept Name */
+            concept_name: string;
+            /** Turn Count */
+            turn_count: number;
+            pip: components["schemas"]["PipTurnOut"];
+            rubric: components["schemas"]["RubricOut"];
+            /** Finished */
+            finished: boolean;
+        };
+        /** TeachbackStartRequest */
+        TeachbackStartRequest: {
+            /** Concept Id */
+            concept_id: string;
+        };
+        /** TeachbackTranscriptTurn */
+        TeachbackTranscriptTurn: {
+            /** Idx */
+            idx: number;
+            /** Role */
+            role: string;
+            /** Content */
+            content: string;
+            /** Level */
+            level?: number | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** TeachbackTurnFeedback */
+        TeachbackTurnFeedback: {
+            /** Score */
+            score: number;
+            /** Covered */
+            covered: string[];
+            /** Missing */
+            missing: string[];
+            /** Misconceptions */
+            misconceptions: components["schemas"]["TeachbackMisconceptionFeedback"][];
+        };
+        /** TeachbackTurnRequest */
+        TeachbackTurnRequest: {
+            /** Content */
+            content: string;
+        };
+        /** TeachbackTurnResponse */
+        TeachbackTurnResponse: {
+            /** Turn Index */
+            turn_index: number;
+            pip: components["schemas"]["PipTurnOut"];
+            feedback: components["schemas"]["TeachbackTurnFeedback"];
+            /** Finished */
+            finished: boolean;
+            result?: components["schemas"]["TeachbackResultOut"] | null;
+            ai: components["schemas"]["AIFallbackMeta"];
         };
         /** UserOut */
         UserOut: {
@@ -1106,6 +1279,111 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["LearnerSummaryResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    start_teachback_session_api_v1_teachback_sessions_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TeachbackStartRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeachbackSessionStartResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    submit_teachback_turn_api_v1_teachback_sessions__session_id__turns_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path: {
+                session_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TeachbackTurnRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeachbackTurnResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_teachback_session_api_v1_teachback_sessions__session_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path: {
+                session_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeachbackDetailResponse"];
                 };
             };
             /** @description Validation Error */

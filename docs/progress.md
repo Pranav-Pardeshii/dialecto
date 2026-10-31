@@ -60,28 +60,41 @@ Handoff memory across agent sessions.
 
 ---
 
+- **Milestone M4 Complete (Teach-Back Mode with Pip - Persona, Rubric Judge, Interactive Arena):**
+  - Rubric judge agent implemented in `backend/app/ai/agents/judge.py` using prompt `app/ai/prompts/judge.md` with structured output schema, rubric checklist evaluation, misconception identification, and keyword-based fallback.
+  - Student persona agent implemented in `backend/app/ai/agents/student_persona.py` with calibrated comprehension states (Levels 0 through 3) for Pip the peer learner.
+  - Teach-Back service implemented in `backend/app/services/teachback_service.py`:
+    - In-process per-session concurrency lock (`_session_locks`) preventing double clicks (`409 turn_in_progress`).
+    - Turn limit ceiling (max 4 turns or Level 3) enforcing clean session conclusion (`409 session_closed`).
+    - Soft-evidence Bayesian Knowledge Tracing update ($P_{\text{new}} = P_{\text{prior}} + w(P_{\text{bkt}} - P_{\text{prior}})$ with $w = \min(0.7, \text{confidence})$).
+    - Zero DB transactions held across LLM calls; atomic write transaction for turn storage and mastery updates.
+  - Endpoints `POST /api/v1/teachback/sessions`, `POST /api/v1/teachback/sessions/{id}/turns`, and `GET /api/v1/teachback/sessions/{id}` tested and verified.
+  - Interactive Teach-Back Arena UI built at `frontend/src/app/(student)/teach-back/[conceptId]/page.tsx`:
+    - Left column: Pip avatar with live comprehension level badges (Level 0: Confused → Level 3: Mastered!) and NCERT rubric checklist with live checkmarks.
+    - Right column: Real-time dialogue scroll thread with Pip character speech bubbles, turn score feedback, `VoiceFriendlyTextarea` optimized for voice dictation, and completion celebration card.
+  - All 41 unit and integration backend tests passing.
+
+---
+
 ## In Progress
-- Transitioning to **Milestone M4: Teach-Back Mode with Pip (Student Persona, Rubric Judge, Interactive Arena)**.
+- Transitioning to **Milestone M5: Teacher Dashboard & Spaced Reviews (Class Heatmap, Gap Analysis, Review Queue, 30-Student Real-Math Seeder)**.
 
 ---
 
 ## Next
-- **Milestone M4 Plan:**
-  1. Build rubric judge agent in `backend/app/ai/agents/judge.py`:
-     - Compares student free-text explanation against verified NCERT `key_points`.
-     - Returns `{comprehension_level: 0..3, accuracy_score: 0.0..1.0, confidence, covered_points, missing_points, misconceptions_found, feedback_summary}`.
-  2. Build student persona agent in `backend/app/ai/agents/student_persona.py`:
-     - Pip the naive peer student with persona behavior calibrated to levels 0..3.
-  3. Build Teach-Back service in `backend/app/services/teachback_service.py`:
-     - Atomic session creation `POST /api/v1/teachback/sessions`.
-     - Turn-based exchange `POST /api/v1/teachback/sessions/{id}/turns` with per-session lock (preventing double clicks/concurrent turns).
-     - Session termination when Pip reaches Level 3 or turn count reaches 4.
-     - Soft-evidence Bayesian Knowledge Tracing update ($P_{\text{new}} = P_{\text{prior}} + w(P_{\text{bkt}} - P_{\text{prior}})$ with $w = \min(0.7, \text{confidence})$).
-     - Full transcript retrieval `GET /api/v1/teachback/sessions/{id}`.
-  4. Write unit and integration tests for Teach-Back mode.
-  5. Build Teach-Back Arena UI at `frontend/src/app/(student)/teach-back/[conceptId]/page.tsx`:
-     - Split screen: Left side shows Pip avatar, comprehension level pill, rubric progress badge; Right side shows transcript chat and `VoiceFriendlyTextarea`.
-  6. Regenerate API types (`pnpm gen:api`), run checks, commit, and push.
+- **Milestone M5 Plan:**
+  1. Spaced review scheduler endpoint in `app/api/v1/endpoints/review.py`:
+     - `GET /api/v1/reviews/due`: returns concepts due for SM-2 repetition, ordered by priority.
+  2. Teacher classroom analytics in `app/services/teacher_service.py` and `app/api/v1/endpoints/teacher.py`:
+     - `GET /api/v1/teacher/classrooms/{id}/heatmap`: $30 \times 20$ student-concept effective mastery matrix.
+     - `GET /api/v1/teacher/classrooms/{id}/gaps`: concepts ranked by mean mastery and % students below 50%.
+     - `GET /api/v1/teacher/classrooms/{id}/misconceptions`: curriculum misconceptions ranked by prevalence.
+     - `GET /api/v1/teacher/classrooms/{id}/at-risk`: students with overall mastery below 0.4 or 3+ overdue concepts.
+     - `GET /api/v1/teacher/classrooms/{id}/students/{user_id}`: student drill-down with concept masteries and attempt history.
+  3. Expand `app/db/seed.py` with 30 simulated students generated strictly via domain math with back-dated attempts, realistic clusters, and class-wide weak spots.
+  4. Build Teacher Heatmap & Insights UI at `frontend/src/app/(teacher)/class/page.tsx` with student/concept hover cards, filter bars, and gap rankings.
+  5. Build Review Queue UI at `frontend/src/app/(student)/review/page.tsx`.
+  6. Run checks, commit, and push.
 
 ---
 

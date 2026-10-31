@@ -10,6 +10,7 @@ interface VoiceFriendlyTextareaProps {
   placeholder?: string;
   disabled?: boolean;
   minRows?: number;
+  maxLength?: number;
   autoFocus?: boolean;
   helperText?: string;
 }
@@ -21,6 +22,7 @@ export function VoiceFriendlyTextarea({
   placeholder = "Speak out loud or type your explanation here...",
   disabled = false,
   minRows = 8,
+  maxLength,
   autoFocus = false,
   helperText = "Press your dictation key to speak naturally, or type directly.",
 }: VoiceFriendlyTextareaProps) {
@@ -56,6 +58,7 @@ export function VoiceFriendlyTextarea({
         placeholder={placeholder}
         disabled={disabled}
         rows={minRows}
+        maxLength={maxLength}
         className="w-full resize-y rounded-t-xl bg-transparent px-4 py-3.5 text-sm text-ink-primary placeholder:text-ink-muted focus:outline-none disabled:opacity-50 leading-relaxed font-sans"
       />
 
