@@ -71,6 +71,18 @@ export type ConceptNode = ConceptGraph["nodes"][number];
 export type ConceptEdge = ConceptGraph["edges"][number];
 export type ConceptDetail = paths["/api/v1/concepts/{concept_id}"]["get"]["responses"][200]["content"]["application/json"];
 
+export type PracticeNextResponse = paths["/api/v1/practice/next"]["post"]["responses"][200]["content"]["application/json"];
+export type PracticeAnswerRequest = paths["/api/v1/practice/answers"]["post"]["requestBody"]["content"]["application/json"];
+export type PracticeAnswerResponse = paths["/api/v1/practice/answers"]["post"]["responses"][200]["content"]["application/json"];
+
+export type DiagnosticStartResponse = paths["/api/v1/diagnostic/sessions"]["post"]["responses"][200]["content"]["application/json"];
+export type DiagnosticAnswerRequest = paths["/api/v1/diagnostic/sessions/{session_id}/answers"]["post"]["requestBody"]["content"]["application/json"];
+export type DiagnosticAnswerResponse = paths["/api/v1/diagnostic/sessions/{session_id}/answers"]["post"]["responses"][200]["content"]["application/json"];
+export type DiagnosticResultResponse = paths["/api/v1/diagnostic/sessions/{session_id}/result"]["get"]["responses"][200]["content"]["application/json"];
+
+export type LearnerMasteryItem = paths["/api/v1/learner/mastery"]["get"]["responses"][200]["content"]["application/json"][number];
+export type LearnerSummary = paths["/api/v1/learner/summary"]["get"]["responses"][200]["content"]["application/json"];
+
 export const api = {
   getUsers: (includeSimulated = false) =>
     apiFetch<User[]>(`/api/v1/users?include_simulated=${includeSimulated}`),
@@ -80,5 +92,34 @@ export const api = {
   getConceptGraph: () => apiFetch<ConceptGraph>("/api/v1/concepts"),
   getConceptDetail: (conceptId: string) =>
     apiFetch<ConceptDetail>(`/api/v1/concepts/${conceptId}`),
+
+  // Practice
+  getPracticeNext: (mode = "adaptive", conceptId?: string) =>
+    apiFetch<PracticeNextResponse>("/api/v1/practice/next", {
+      method: "POST",
+      body: JSON.stringify({ mode, concept_id: conceptId || null }),
+    }),
+  submitPracticeAnswer: (req: PracticeAnswerRequest) =>
+    apiFetch<PracticeAnswerResponse>("/api/v1/practice/answers", {
+      method: "POST",
+      body: JSON.stringify(req),
+    }),
+
+  // Diagnostic
+  startDiagnostic: () =>
+    apiFetch<DiagnosticStartResponse>("/api/v1/diagnostic/sessions", {
+      method: "POST",
+    }),
+  submitDiagnosticAnswer: (sessionId: number, req: DiagnosticAnswerRequest) =>
+    apiFetch<DiagnosticAnswerResponse>(`/api/v1/diagnostic/sessions/${sessionId}/answers`, {
+      method: "POST",
+      body: JSON.stringify(req),
+    }),
+  getDiagnosticResult: (sessionId: number) =>
+    apiFetch<DiagnosticResultResponse>(`/api/v1/diagnostic/sessions/${sessionId}/result`),
+
+  // Learner
+  getLearnerMastery: () => apiFetch<LearnerMasteryItem[]>("/api/v1/learner/mastery"),
+  getLearnerSummary: () => apiFetch<LearnerSummary>("/api/v1/learner/summary"),
 };
 

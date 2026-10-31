@@ -22,7 +22,9 @@ class ConceptRepository:
         result = await session.execute(stmt)
         return [(row[0], row[1]) for row in result.all()]
 
-    async def get_prerequisites_for_concept(self, session: AsyncSession, concept_id: str) -> list[str]:
+    async def get_prerequisites_for_concept(
+        self, session: AsyncSession, concept_id: str
+    ) -> list[str]:
         stmt = select(ConceptPrerequisite.prerequisite_id).where(
             ConceptPrerequisite.concept_id == concept_id
         )

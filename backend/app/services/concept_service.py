@@ -58,9 +58,7 @@ class ConceptService:
         for c in concepts:
             m_data = user_mastery_map.get(c.id)
             if m_data:
-                eff = self.compute_effective_mastery(
-                    m_data["p_mastery"], m_data["next_due_at"]
-                )
+                eff = self.compute_effective_mastery(m_data["p_mastery"], m_data["next_due_at"])
             else:
                 eff = c.p_l0
             effective_masteries[c.id] = eff

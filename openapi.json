@@ -241,10 +241,464 @@
           }
         }
       }
+    },
+    "/api/v1/diagnostic/sessions": {
+      "post": {
+        "tags": [
+          "Diagnostic"
+        ],
+        "summary": "Start Diagnostic",
+        "description": "Start an adaptive 15-question diagnostic assessment.",
+        "operationId": "start_diagnostic_api_v1_diagnostic_sessions_post",
+        "parameters": [
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiagnosticStartResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/diagnostic/sessions/{session_id}/answers": {
+      "post": {
+        "tags": [
+          "Diagnostic"
+        ],
+        "summary": "Submit Diagnostic Answer",
+        "description": "Submit diagnostic answer and progress to the next calibrated question.",
+        "operationId": "submit_diagnostic_answer_api_v1_diagnostic_sessions__session_id__answers_post",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DiagnosticAnswerRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiagnosticAnswerResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/diagnostic/sessions/{session_id}/result": {
+      "get": {
+        "tags": [
+          "Diagnostic"
+        ],
+        "summary": "Get Diagnostic Result",
+        "description": "Retrieve full mastery profile resulting from completed diagnostic session.",
+        "operationId": "get_diagnostic_result_api_v1_diagnostic_sessions__session_id__result_get",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiagnosticResultResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/practice/next": {
+      "post": {
+        "tags": [
+          "Practice"
+        ],
+        "summary": "Get Next Practice Question",
+        "description": "Fetch next targeted question calibrated to ~70% expected success with selection rationale.",
+        "operationId": "get_next_practice_question_api_v1_practice_next_post",
+        "parameters": [
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PracticeNextRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PracticeNextResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/practice/answers": {
+      "post": {
+        "tags": [
+          "Practice"
+        ],
+        "summary": "Submit Practice Answer",
+        "description": "Submit an answer to a practice question with atomic Bayesian mastery and SM-2 updates.",
+        "operationId": "submit_practice_answer_api_v1_practice_answers_post",
+        "parameters": [
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PracticeAnswerRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PracticeAnswerResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/learner/mastery": {
+      "get": {
+        "tags": [
+          "Learner"
+        ],
+        "summary": "Get Learner Mastery",
+        "description": "Retrieve full per-concept mastery details for current student.",
+        "operationId": "get_learner_mastery_api_v1_learner_mastery_get",
+        "parameters": [
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LearnerMasteryItem"
+                  },
+                  "title": "Response Get Learner Mastery Api V1 Learner Mastery Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/learner/summary": {
+      "get": {
+        "tags": [
+          "Learner"
+        ],
+        "summary": "Get Learner Summary",
+        "description": "Retrieve high-level learner summary (overall mastery, weakest concepts, due reviews, active misconceptions).",
+        "operationId": "get_learner_summary_api_v1_learner_summary_get",
+        "parameters": [
+          {
+            "name": "X-Demo-User-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LearnerSummaryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "AIFallbackMeta": {
+        "properties": {
+          "used": {
+            "type": "boolean",
+            "title": "Used",
+            "default": false
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "fallback": {
+            "type": "boolean",
+            "title": "Fallback",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "AIFallbackMeta"
+      },
+      "ActiveMisconceptionItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "statement": {
+            "type": "string",
+            "title": "Statement"
+          },
+          "concept_id": {
+            "type": "string",
+            "title": "Concept Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "statement",
+          "concept_id"
+        ],
+        "title": "ActiveMisconceptionItem"
+      },
       "ConceptDetailResponse": {
         "properties": {
           "id": {
@@ -396,6 +850,187 @@
         ],
         "title": "ConceptNode"
       },
+      "DiagnosticAnswerRequest": {
+        "properties": {
+          "client_attempt_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Client Attempt Id"
+          },
+          "question_id": {
+            "type": "string",
+            "title": "Question Id"
+          },
+          "selected_key": {
+            "type": "string",
+            "title": "Selected Key"
+          },
+          "reasoning": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 600
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reasoning"
+          },
+          "response_ms": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Response Ms",
+            "default": 0
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "client_attempt_id",
+          "question_id",
+          "selected_key"
+        ],
+        "title": "DiagnosticAnswerRequest"
+      },
+      "DiagnosticAnswerResponse": {
+        "properties": {
+          "is_correct": {
+            "type": "boolean",
+            "title": "Is Correct"
+          },
+          "next_question": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/QuestionOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "progress": {
+            "$ref": "#/components/schemas/DiagnosticProgress"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DiagnosticResultResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "is_correct",
+          "progress"
+        ],
+        "title": "DiagnosticAnswerResponse"
+      },
+      "DiagnosticConceptResult": {
+        "properties": {
+          "concept_id": {
+            "type": "string",
+            "title": "Concept Id"
+          },
+          "concept_name": {
+            "type": "string",
+            "title": "Concept Name"
+          },
+          "p_mastery": {
+            "type": "number",
+            "title": "P Mastery"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "concept_id",
+          "concept_name",
+          "p_mastery",
+          "status"
+        ],
+        "title": "DiagnosticConceptResult"
+      },
+      "DiagnosticProgress": {
+        "properties": {
+          "answered": {
+            "type": "integer",
+            "title": "Answered"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "default": 15
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "answered"
+        ],
+        "title": "DiagnosticProgress"
+      },
+      "DiagnosticResultResponse": {
+        "properties": {
+          "mastery": {
+            "items": {
+              "$ref": "#/components/schemas/DiagnosticConceptResult"
+            },
+            "type": "array",
+            "title": "Mastery"
+          },
+          "weakest": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Weakest"
+          },
+          "recommended_next": {
+            "type": "string",
+            "title": "Recommended Next"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "mastery",
+          "weakest",
+          "recommended_next"
+        ],
+        "title": "DiagnosticResultResponse"
+      },
+      "DiagnosticStartResponse": {
+        "properties": {
+          "session_id": {
+            "type": "integer",
+            "title": "Session Id"
+          },
+          "question": {
+            "$ref": "#/components/schemas/QuestionOut"
+          },
+          "progress": {
+            "$ref": "#/components/schemas/DiagnosticProgress"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "session_id",
+          "question",
+          "progress"
+        ],
+        "title": "DiagnosticStartResponse"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -420,6 +1055,385 @@
         "additionalProperties": false,
         "type": "object",
         "title": "HealthResponse"
+      },
+      "LearnerMasteryItem": {
+        "properties": {
+          "concept_id": {
+            "type": "string",
+            "title": "Concept Id"
+          },
+          "concept_name": {
+            "type": "string",
+            "title": "Concept Name"
+          },
+          "chapter": {
+            "type": "string",
+            "title": "Chapter"
+          },
+          "p_mastery": {
+            "type": "number",
+            "title": "P Mastery"
+          },
+          "p_effective": {
+            "type": "number",
+            "title": "P Effective"
+          },
+          "attempts": {
+            "type": "integer",
+            "title": "Attempts"
+          },
+          "last_seen_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Seen At"
+          },
+          "next_due_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Due At"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "concept_id",
+          "concept_name",
+          "chapter",
+          "p_mastery",
+          "p_effective",
+          "attempts",
+          "status"
+        ],
+        "title": "LearnerMasteryItem"
+      },
+      "LearnerSummaryResponse": {
+        "properties": {
+          "overall_mastery": {
+            "type": "number",
+            "title": "Overall Mastery"
+          },
+          "weakest": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Weakest"
+          },
+          "due_count": {
+            "type": "integer",
+            "title": "Due Count"
+          },
+          "active_misconceptions": {
+            "items": {
+              "$ref": "#/components/schemas/ActiveMisconceptionItem"
+            },
+            "type": "array",
+            "title": "Active Misconceptions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "overall_mastery",
+          "weakest",
+          "due_count",
+          "active_misconceptions"
+        ],
+        "title": "LearnerSummaryResponse"
+      },
+      "MasteryDelta": {
+        "properties": {
+          "concept_id": {
+            "type": "string",
+            "title": "Concept Id"
+          },
+          "before": {
+            "type": "number",
+            "title": "Before"
+          },
+          "after": {
+            "type": "number",
+            "title": "After"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "concept_id",
+          "before",
+          "after",
+          "status"
+        ],
+        "title": "MasteryDelta"
+      },
+      "MisconceptionFeedback": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "statement": {
+            "type": "string",
+            "title": "Statement"
+          },
+          "correction": {
+            "type": "string",
+            "title": "Correction"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "confidence": {
+            "type": "number",
+            "title": "Confidence"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "statement",
+          "correction",
+          "source",
+          "confidence"
+        ],
+        "title": "MisconceptionFeedback"
+      },
+      "PracticeAnswerRequest": {
+        "properties": {
+          "client_attempt_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Client Attempt Id"
+          },
+          "session_id": {
+            "type": "integer",
+            "title": "Session Id"
+          },
+          "question_id": {
+            "type": "string",
+            "title": "Question Id"
+          },
+          "selected_key": {
+            "type": "string",
+            "title": "Selected Key"
+          },
+          "reasoning": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 600
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reasoning"
+          },
+          "response_ms": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Response Ms",
+            "default": 0
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "client_attempt_id",
+          "session_id",
+          "question_id",
+          "selected_key"
+        ],
+        "title": "PracticeAnswerRequest"
+      },
+      "PracticeAnswerResponse": {
+        "properties": {
+          "is_correct": {
+            "type": "boolean",
+            "title": "Is Correct"
+          },
+          "correct_key": {
+            "type": "string",
+            "title": "Correct Key"
+          },
+          "explanation": {
+            "type": "string",
+            "title": "Explanation"
+          },
+          "mastery": {
+            "$ref": "#/components/schemas/MasteryDelta"
+          },
+          "next_due_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Due At"
+          },
+          "misconception": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MisconceptionFeedback"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ai": {
+            "$ref": "#/components/schemas/AIFallbackMeta"
+          },
+          "newly_unlocked": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Newly Unlocked",
+            "default": []
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "is_correct",
+          "correct_key",
+          "explanation",
+          "mastery",
+          "ai"
+        ],
+        "title": "PracticeAnswerResponse"
+      },
+      "PracticeNextRequest": {
+        "properties": {
+          "mode": {
+            "type": "string",
+            "pattern": "^(adaptive|review|concept)$",
+            "title": "Mode",
+            "default": "adaptive"
+          },
+          "concept_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Concept Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "PracticeNextRequest"
+      },
+      "PracticeNextResponse": {
+        "properties": {
+          "session_id": {
+            "type": "integer",
+            "title": "Session Id"
+          },
+          "question": {
+            "$ref": "#/components/schemas/QuestionOut"
+          },
+          "selection_reason": {
+            "type": "string",
+            "title": "Selection Reason"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "session_id",
+          "question",
+          "selection_reason"
+        ],
+        "title": "PracticeNextResponse"
+      },
+      "QuestionOptionOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "text"
+        ],
+        "title": "QuestionOptionOut"
+      },
+      "QuestionOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "concept_id": {
+            "type": "string",
+            "title": "Concept Id"
+          },
+          "stem": {
+            "type": "string",
+            "title": "Stem"
+          },
+          "options": {
+            "items": {
+              "$ref": "#/components/schemas/QuestionOptionOut"
+            },
+            "type": "array",
+            "title": "Options"
+          },
+          "difficulty_bucket": {
+            "type": "integer",
+            "title": "Difficulty Bucket"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "concept_id",
+          "stem",
+          "options",
+          "difficulty_bucket"
+        ],
+        "title": "QuestionOut"
       },
       "ReadyResponse": {
         "properties": {

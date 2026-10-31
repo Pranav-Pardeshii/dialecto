@@ -27,27 +27,38 @@ Handoff memory across agent sessions.
 
 ---
 
+- **Milestone M2 Complete (Learner Core - BKT, Elo, SM-2, Selector, Diagnostic & Practice Flow):**
+  - Pure domain mathematics implemented with 100% unit test coverage:
+    - `bkt.py`: Bayesian Knowledge Tracing with dynamic slip adjustment ($S_q = S + 0.05(d-2)$), guess rate $G=0.25$, and continuous soft-evidence update.
+    - `elo.py`: Question difficulty rating calibration ($b \leftarrow b + K(\text{expected} - y)$).
+    - `sm2.py`: SM-2 spaced repetition with quality score $q \in \{1,3,4,5\}$, ease factor updates, repetition intervals, and exponential decay ($p_{\text{eff}} = p \cdot \exp(-\text{days\_overdue}/14)$).
+    - `selector.py`: Adaptive next-item selector prioritizing weak unlocked concepts near 70% expected success.
+  - Question repository and atomic practice submission in `practice_service.py` with `SELECT ... FOR UPDATE` row locking, `client_attempt_id` idempotency, and single-transaction persistence.
+  - 15-question adaptive diagnostic assessment engine in `diagnostic_service.py` with uncertainty sampling.
+  - Learner mastery and summary endpoints in `learner_service.py`.
+  - Comprehensive unit and integration test suites: all 27 backend tests passing.
+  - Next.js interactive screens built with zero backend/framework mentions:
+    - `/practice`: Clean MCQ card, `VoiceFriendlyTextarea` optimized for voice dictation, instant animated mastery delta reveal, misconception alerts.
+    - `/diagnostic`: Adaptive 15-question exam-prep diagnostic with real-time progress and final concept mastery breakdown.
+
+---
+
 ## In Progress
-- Transitioning to **Milestone M2: Learner Core (BKT, Elo, SM-2, Selector, Diagnostic & Practice Endpoints/Screens)**.
+- Transitioning to **Milestone M3: AI Layer (Groq Router, Circuit Breaker, Token Budget, Misconception Classification, Ops Telemetry)**.
 
 ---
 
 ## Next
-- **Milestone M2 Plan:**
-  1. Build pure domain modules in `backend/app/domain/`:
-     - `bkt.py`: Bayesian Knowledge Tracing with slip/guess adjustments and soft evidence bounds.
-     - `elo.py`: Question difficulty rating calibration ($b \leftarrow b + K(\sigma(\theta - b) - y)$).
-     - `sm2.py`: SM-2 spaced repetition scheduler (quality score $q$, $EF'$, repetition intervals, decay).
-     - `selector.py`: Next question selector targeting weak, unlocked concepts near 70% expected success.
-  2. Implement unit tests with hand-calculated expected values for all domain math.
-  3. Implement Practice & Diagnostic services and repositories:
-     - `POST /api/v1/diagnostic/sessions`, `POST /api/v1/diagnostic/sessions/{id}/answers`, `GET /api/v1/diagnostic/sessions/{id}/result`.
-     - `POST /api/v1/practice/next`, `POST /api/v1/practice/answers` (atomic transaction with `client_attempt_id` idempotency and row lock).
-     - `GET /api/v1/learner/mastery`, `GET /api/v1/learner/summary`.
-  4. Build full frontend interactive screens:
-     - Diagnostic flow on `/diagnostic`: 15 adaptive questions with uncertainty sampler and final mastery profile.
-     - Targeted practice on `/practice`: Clean MCQ card, `VoiceFriendlyTextarea` reasoning box, animated mastery delta reveal.
-  5. Run checks (`make check`), commit, and push.
+- **Milestone M3 Plan:**
+  1. Groq async SDK client wrapper in `app/ai/llm/client.py` with startup model check.
+  2. In-process Circuit Breaker in `app/ai/llm/breaker.py` tripping on 429 rate limits.
+  3. Token budget manager in `app/ai/llm/budget.py`.
+  4. Async call telemetry recorder in `app/ai/llm/recorder.py` logging to `llm_calls` table.
+  5. `LLMRouter` in `app/ai/llm/router.py` with primary model `openai/gpt-oss-120b`, fallback chain (`llama-3.3-70b-versatile,llama-3.1-8b-instant`), exponential backoff, and JSON repair retry.
+  6. Prompt templates in `app/ai/prompts/*.md` (`misconception_classifier.md`, `judge.md`, `student_persona.md`).
+  7. Misconception classifier agent in `app/ai/agents/misconception_classifier.py` wired to practice submissions when reasoning is provided.
+  8. Telemetry endpoint `GET /api/v1/ops/llm-stats` and frontend ops status display.
+  9. Run checks, commit, and push.
 
 ---
 

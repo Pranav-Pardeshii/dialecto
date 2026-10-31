@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter, Depends, Query
 
 from app.api.deps import DEMO_USERS, get_current_user

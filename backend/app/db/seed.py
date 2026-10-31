@@ -25,7 +25,9 @@ logger = structlog.get_logger(__name__)
 CONTENT_DIR = Path(__file__).parent.parent / "content"
 
 
-async def load_content_data() -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+async def load_content_data() -> tuple[
+    list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]
+]:
     with open(CONTENT_DIR / "concepts.json", encoding="utf-8") as f:
         concepts = json.load(f)
     with open(CONTENT_DIR / "misconceptions.json", encoding="utf-8") as f:

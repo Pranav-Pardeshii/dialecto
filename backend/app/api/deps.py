@@ -9,8 +9,12 @@ from app.schemas.user import UserOut, UserRole
 
 # Standard demo identities as defined in docs/database.md
 DEMO_USERS = {
-    1: UserOut(id=1, display_name="Aarav", role=UserRole.STUDENT, is_simulated=False, classroom_id=1),
-    2: UserOut(id=2, display_name="Ms. Rao", role=UserRole.TEACHER, is_simulated=False, classroom_id=1),
+    1: UserOut(
+        id=1, display_name="Aarav", role=UserRole.STUDENT, is_simulated=False, classroom_id=1
+    ),
+    2: UserOut(
+        id=2, display_name="Ms. Rao", role=UserRole.TEACHER, is_simulated=False, classroom_id=1
+    ),
 }
 
 

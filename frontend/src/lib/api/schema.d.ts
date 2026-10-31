@@ -124,10 +124,174 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/diagnostic/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start Diagnostic
+         * @description Start an adaptive 15-question diagnostic assessment.
+         */
+        post: operations["start_diagnostic_api_v1_diagnostic_sessions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/diagnostic/sessions/{session_id}/answers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Submit Diagnostic Answer
+         * @description Submit diagnostic answer and progress to the next calibrated question.
+         */
+        post: operations["submit_diagnostic_answer_api_v1_diagnostic_sessions__session_id__answers_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/diagnostic/sessions/{session_id}/result": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Diagnostic Result
+         * @description Retrieve full mastery profile resulting from completed diagnostic session.
+         */
+        get: operations["get_diagnostic_result_api_v1_diagnostic_sessions__session_id__result_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/practice/next": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Get Next Practice Question
+         * @description Fetch next targeted question calibrated to ~70% expected success with selection rationale.
+         */
+        post: operations["get_next_practice_question_api_v1_practice_next_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/practice/answers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Submit Practice Answer
+         * @description Submit an answer to a practice question with atomic Bayesian mastery and SM-2 updates.
+         */
+        post: operations["submit_practice_answer_api_v1_practice_answers_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/learner/mastery": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Learner Mastery
+         * @description Retrieve full per-concept mastery details for current student.
+         */
+        get: operations["get_learner_mastery_api_v1_learner_mastery_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/learner/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Learner Summary
+         * @description Retrieve high-level learner summary (overall mastery, weakest concepts, due reviews, active misconceptions).
+         */
+        get: operations["get_learner_summary_api_v1_learner_summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AIFallbackMeta */
+        AIFallbackMeta: {
+            /**
+             * Used
+             * @default false
+             */
+            used: boolean;
+            /** Model */
+            model?: string | null;
+            /**
+             * Fallback
+             * @default false
+             */
+            fallback: boolean;
+        };
+        /** ActiveMisconceptionItem */
+        ActiveMisconceptionItem: {
+            /** Id */
+            id: string;
+            /** Statement */
+            statement: string;
+            /** Concept Id */
+            concept_id: string;
+        };
         /** ConceptDetailResponse */
         ConceptDetailResponse: {
             /** Id */
@@ -178,6 +342,70 @@ export interface components {
             position: number;
             mastery?: components["schemas"]["ConceptMasterySummary"] | null;
         };
+        /** DiagnosticAnswerRequest */
+        DiagnosticAnswerRequest: {
+            /**
+             * Client Attempt Id
+             * Format: uuid
+             */
+            client_attempt_id: string;
+            /** Question Id */
+            question_id: string;
+            /** Selected Key */
+            selected_key: string;
+            /** Reasoning */
+            reasoning?: string | null;
+            /**
+             * Response Ms
+             * @default 0
+             */
+            response_ms: number;
+        };
+        /** DiagnosticAnswerResponse */
+        DiagnosticAnswerResponse: {
+            /** Is Correct */
+            is_correct: boolean;
+            next_question?: components["schemas"]["QuestionOut"] | null;
+            progress: components["schemas"]["DiagnosticProgress"];
+            result?: components["schemas"]["DiagnosticResultResponse"] | null;
+        };
+        /** DiagnosticConceptResult */
+        DiagnosticConceptResult: {
+            /** Concept Id */
+            concept_id: string;
+            /** Concept Name */
+            concept_name: string;
+            /** P Mastery */
+            p_mastery: number;
+            /** Status */
+            status: string;
+        };
+        /** DiagnosticProgress */
+        DiagnosticProgress: {
+            /** Answered */
+            answered: number;
+            /**
+             * Total
+             * @default 15
+             */
+            total: number;
+        };
+        /** DiagnosticResultResponse */
+        DiagnosticResultResponse: {
+            /** Mastery */
+            mastery: components["schemas"]["DiagnosticConceptResult"][];
+            /** Weakest */
+            weakest: string[];
+            /** Recommended Next */
+            recommended_next: string;
+        };
+        /** DiagnosticStartResponse */
+        DiagnosticStartResponse: {
+            /** Session Id */
+            session_id: number;
+            question: components["schemas"]["QuestionOut"];
+            progress: components["schemas"]["DiagnosticProgress"];
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -190,6 +418,140 @@ export interface components {
              * @default ok
              */
             status: string;
+        };
+        /** LearnerMasteryItem */
+        LearnerMasteryItem: {
+            /** Concept Id */
+            concept_id: string;
+            /** Concept Name */
+            concept_name: string;
+            /** Chapter */
+            chapter: string;
+            /** P Mastery */
+            p_mastery: number;
+            /** P Effective */
+            p_effective: number;
+            /** Attempts */
+            attempts: number;
+            /** Last Seen At */
+            last_seen_at?: string | null;
+            /** Next Due At */
+            next_due_at?: string | null;
+            /** Status */
+            status: string;
+        };
+        /** LearnerSummaryResponse */
+        LearnerSummaryResponse: {
+            /** Overall Mastery */
+            overall_mastery: number;
+            /** Weakest */
+            weakest: string[];
+            /** Due Count */
+            due_count: number;
+            /** Active Misconceptions */
+            active_misconceptions: components["schemas"]["ActiveMisconceptionItem"][];
+        };
+        /** MasteryDelta */
+        MasteryDelta: {
+            /** Concept Id */
+            concept_id: string;
+            /** Before */
+            before: number;
+            /** After */
+            after: number;
+            /** Status */
+            status: string;
+        };
+        /** MisconceptionFeedback */
+        MisconceptionFeedback: {
+            /** Id */
+            id: string;
+            /** Statement */
+            statement: string;
+            /** Correction */
+            correction: string;
+            /** Source */
+            source: string;
+            /** Confidence */
+            confidence: number;
+        };
+        /** PracticeAnswerRequest */
+        PracticeAnswerRequest: {
+            /**
+             * Client Attempt Id
+             * Format: uuid
+             */
+            client_attempt_id: string;
+            /** Session Id */
+            session_id: number;
+            /** Question Id */
+            question_id: string;
+            /** Selected Key */
+            selected_key: string;
+            /** Reasoning */
+            reasoning?: string | null;
+            /**
+             * Response Ms
+             * @default 0
+             */
+            response_ms: number;
+        };
+        /** PracticeAnswerResponse */
+        PracticeAnswerResponse: {
+            /** Is Correct */
+            is_correct: boolean;
+            /** Correct Key */
+            correct_key: string;
+            /** Explanation */
+            explanation: string;
+            mastery: components["schemas"]["MasteryDelta"];
+            /** Next Due At */
+            next_due_at?: string | null;
+            misconception?: components["schemas"]["MisconceptionFeedback"] | null;
+            ai: components["schemas"]["AIFallbackMeta"];
+            /**
+             * Newly Unlocked
+             * @default []
+             */
+            newly_unlocked: string[];
+        };
+        /** PracticeNextRequest */
+        PracticeNextRequest: {
+            /**
+             * Mode
+             * @default adaptive
+             */
+            mode: string;
+            /** Concept Id */
+            concept_id?: string | null;
+        };
+        /** PracticeNextResponse */
+        PracticeNextResponse: {
+            /** Session Id */
+            session_id: number;
+            question: components["schemas"]["QuestionOut"];
+            /** Selection Reason */
+            selection_reason: string;
+        };
+        /** QuestionOptionOut */
+        QuestionOptionOut: {
+            /** Key */
+            key: string;
+            /** Text */
+            text: string;
+        };
+        /** QuestionOut */
+        QuestionOut: {
+            /** Id */
+            id: string;
+            /** Concept Id */
+            concept_id: string;
+            /** Stem */
+            stem: string;
+            /** Options */
+            options: components["schemas"]["QuestionOptionOut"][];
+            /** Difficulty Bucket */
+            difficulty_bucket: number;
         };
         /** ReadyResponse */
         ReadyResponse: {
@@ -404,6 +766,239 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ConceptDetailResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    start_diagnostic_api_v1_diagnostic_sessions_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiagnosticStartResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    submit_diagnostic_answer_api_v1_diagnostic_sessions__session_id__answers_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path: {
+                session_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DiagnosticAnswerRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiagnosticAnswerResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_diagnostic_result_api_v1_diagnostic_sessions__session_id__result_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path: {
+                session_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiagnosticResultResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_next_practice_question_api_v1_practice_next_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PracticeNextRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PracticeNextResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    submit_practice_answer_api_v1_practice_answers_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PracticeAnswerRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PracticeAnswerResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_learner_mastery_api_v1_learner_mastery_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LearnerMasteryItem"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_learner_summary_api_v1_learner_summary_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-User-Id"?: number | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LearnerSummaryResponse"];
                 };
             };
             /** @description Validation Error */

@@ -140,9 +140,7 @@ class ConceptPrerequisite(Base):
         String(100), ForeignKey("concepts.id", ondelete="CASCADE"), primary_key=True
     )
 
-    __table_args__ = (
-        CheckConstraint("concept_id <> prerequisite_id", name="chk_no_self_prereq"),
-    )
+    __table_args__ = (CheckConstraint("concept_id <> prerequisite_id", name="chk_no_self_prereq"),)
 
 
 class Misconception(Base):

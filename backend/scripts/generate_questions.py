@@ -34,8 +34,12 @@ class GeneratedQuestion(BaseModel):
 
 
 async def main() -> None:
-    parser = argparse.ArgumentParser(description="Generate offline question bank with dual-model verification")
-    parser.add_argument("--concept", type=str, default=None, help="Generate for a specific concept slug")
+    parser = argparse.ArgumentParser(
+        description="Generate offline question bank with dual-model verification"
+    )
+    parser.add_argument(
+        "--concept", type=str, default=None, help="Generate for a specific concept slug"
+    )
     parser.add_argument("--count", type=int, default=6, help="Target questions per concept")
     args = parser.parse_args()
 

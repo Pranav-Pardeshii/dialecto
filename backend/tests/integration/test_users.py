@@ -30,4 +30,3 @@ async def test_get_me_missing_header(client: AsyncClient) -> None:
     err = response.json()
     assert err["error"]["code"] == "unknown_user"
     assert "request_id" in err["error"]
-
