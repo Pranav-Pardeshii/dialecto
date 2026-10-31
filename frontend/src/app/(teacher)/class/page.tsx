@@ -20,7 +20,9 @@ import {
   ShieldAlert,
   AlertCircle,
   RotateCcw,
+  Sparkles,
 } from "lucide-react";
+import { InterventionPlannerTab } from "@/components/teacher/InterventionPlannerTab";
 
 function getConceptAbbr(id: string): string {
   const customMap: Record<string, string> = {
@@ -49,7 +51,7 @@ function getConceptAbbr(id: string): string {
 }
 
 export default function ClassHeatmapPage() {
-  const [activeTab, setActiveTab] = useState<"matrix" | "gaps" | "misconceptions" | "atrisk">("matrix");
+  const [activeTab, setActiveTab] = useState<"matrix" | "gaps" | "misconceptions" | "atrisk" | "interventions">("matrix");
   const [heatmap, setHeatmap] = useState<TeacherHeatmapResponse | null>(null);
   const [gaps, setGaps] = useState<CurriculumGapItem[]>([]);
   const [misconceptions, setMisconceptions] = useState<MisconceptionPrevalenceItem[]>([]);
@@ -133,10 +135,10 @@ export default function ClassHeatmapPage() {
   }
 
   const getHeatmapColor = (p: number) => {
-    if (p >= 0.80) return "bg-emerald-600 hover:ring-2 hover:ring-emerald-400 text-white font-bold";
-    if (p >= 0.50) return "bg-emerald-700/80 hover:ring-2 hover:ring-emerald-500 text-white font-semibold";
-    if (p >= 0.35) return "bg-amber-600/90 hover:ring-2 hover:ring-amber-400 text-white font-semibold";
-    return "bg-stone-300 dark:bg-stone-700 hover:ring-2 hover:ring-stone-400 text-stone-900 dark:text-stone-100 font-medium";
+    if (p >= 0.80) return "bg-[#216e39] hover:ring-2 hover:ring-[#40c463] text-white font-bold";
+    if (p >= 0.50) return "bg-[#30a14e] hover:ring-2 hover:ring-[#40c463] text-white font-semibold";
+    if (p >= 0.35) return "bg-[#40c463] hover:ring-2 hover:ring-[#216e39] text-[#0a3622] font-semibold";
+    return "bg-[#9be9a8] hover:ring-2 hover:ring-[#30a14e] text-[#0d381e] font-medium";
   };
 
   if (error) {
@@ -244,6 +246,18 @@ export default function ClassHeatmapPage() {
           <ShieldAlert className="h-3.5 w-3.5 text-earth-amber" />
           <span>At-Risk Students ({atRisk.length})</span>
         </button>
+
+        <button
+          onClick={() => setActiveTab("interventions")}
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition ${
+            activeTab === "interventions"
+              ? "bg-ink-primary text-canvas font-semibold shadow-subtle"
+              : "text-ink-secondary hover:text-ink-primary hover:bg-canvas-warm"
+          }`}
+        >
+          <Sparkles className="h-3.5 w-3.5 text-mastery-emerald" />
+          <span>Intervention Planner</span>
+        </button>
       </div>
 
       {/* Tab 1: Heatmap Matrix */}
@@ -262,19 +276,19 @@ export default function ClassHeatmapPage() {
             {/* Legend */}
             <div className="flex items-center gap-3 text-[11px] text-ink-secondary">
               <div className="flex items-center gap-1.5">
-                <div className="h-3 w-3 rounded bg-stone-300 dark:bg-stone-700 border border-stone-400" />
+                <div className="h-3 w-3 rounded bg-[#9be9a8] border border-[#85e89d]" />
                 <span>&lt; 35% (Untested / Needs Prep)</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="h-3 w-3 rounded bg-amber-600/90 border border-amber-600" />
+                <div className="h-3 w-3 rounded bg-[#40c463] border border-[#34b256]" />
                 <span>35 - 49% (Emerging)</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="h-3 w-3 rounded bg-emerald-700/80 border border-emerald-600" />
+                <div className="h-3 w-3 rounded bg-[#30a14e] border border-[#278641]" />
                 <span>50 - 79% (Learning)</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="h-3 w-3 rounded bg-emerald-600 border border-emerald-500" />
+                <div className="h-3 w-3 rounded bg-[#216e39] border border-[#1b582e]" />
                 <span>80%+ (Mastered)</span>
               </div>
             </div>
@@ -495,6 +509,11 @@ export default function ClassHeatmapPage() {
             ))}
           </div>
         </div>
+      )}
+
+      {/* Tab 5: Intervention Planner */}
+      {activeTab === "interventions" && (
+        <InterventionPlannerTab classroomId={1} />
       )}
 
       {/* Student Drill-Down Side Drawer / Modal */}
