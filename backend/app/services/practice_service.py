@@ -66,7 +66,7 @@ class PracticeService:
                 status=SessionStatusEnum.ACTIVE,
             )
             session.add(s)
-            await session.flush()
+            await session.commit()
         return s
 
     async def get_next_question(
@@ -391,6 +391,8 @@ class PracticeService:
 
         # Status & unlocks
         status = "mastered" if p_next >= 0.80 else "learning"
+
+        await session.commit()
 
         return PracticeAnswerResponse(
             is_correct=is_correct,

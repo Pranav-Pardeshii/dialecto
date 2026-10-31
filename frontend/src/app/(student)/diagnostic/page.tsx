@@ -10,6 +10,69 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
+const FALLBACK_QUESTIONS: DiagnosticStartResponse["question"][] = [
+  {
+    id: "q-lp-nutrition-01",
+    concept_id: "lp-nutrition",
+    stem: "Which of the following organisms exhibits saprophytic nutrition?",
+    options: [
+      { key: "A", text: "Mushroom breaking down dead organic matter" },
+      { key: "B", text: "Amoeba engulfing solid food particles with pseudopodia" },
+      { key: "C", text: "Cuscuta deriving nutrition from a host plant" },
+      { key: "D", text: "Green algae synthesizing glucose in water" },
+    ],
+    difficulty_bucket: 1,
+  },
+  {
+    id: "q-lp-photo-01",
+    concept_id: "lp-photosynthesis",
+    stem: "During the light reaction of photosynthesis, what is the direct chemical source of released molecular oxygen?",
+    options: [
+      { key: "A", text: "Water molecules split by absorbed light energy (photolysis)" },
+      { key: "B", text: "Carbon dioxide reduction during the Calvin cycle" },
+      { key: "C", text: "Degradation of synthesized glucose polymers" },
+      { key: "D", text: "Chlorophyll pigment breakdown" },
+    ],
+    difficulty_bucket: 2,
+  },
+  {
+    id: "q-cc-neuron-01",
+    concept_id: "cc-neuron",
+    stem: "What is the correct unidirectional pathway of an electrical nerve impulse through a single neuron?",
+    options: [
+      { key: "A", text: "Dendrite → Cyton (cell body) → Axon → Axon terminal" },
+      { key: "B", text: "Axon terminal → Axon → Cyton → Dendrite" },
+      { key: "C", text: "Cyton → Dendrite → Axon → Synapse" },
+      { key: "D", text: "Dendrite → Axon → Cyton → Axon terminal" },
+    ],
+    difficulty_bucket: 1,
+  },
+  {
+    id: "q-lp-respiration-01",
+    concept_id: "lp-respiration",
+    stem: "Where does glycolysis take place within an active cell, and does it require oxygen?",
+    options: [
+      { key: "A", text: "Cytoplasm; does not require oxygen" },
+      { key: "B", text: "Mitochondrial matrix; requires oxygen" },
+      { key: "C", text: "Inner mitochondrial membrane; requires oxygen" },
+      { key: "D", text: "Chloroplast stroma; does not require oxygen" },
+    ],
+    difficulty_bucket: 2,
+  },
+  {
+    id: "q-he-variation-01",
+    concept_id: "he-variation",
+    stem: "What is the primary biological advantage of genetic variation occurring during sexual reproduction in a population?",
+    options: [
+      { key: "A", text: "Enhances species survival potential across changing environmental niches" },
+      { key: "B", text: "Guarantees identical copies of parental DNA molecules" },
+      { key: "C", text: "Shortens gestation and reproductive life cycles" },
+      { key: "D", text: "Completely eliminates harmful recessive traits in a single generation" },
+    ],
+    difficulty_bucket: 2,
+  },
+];
+
 export default function DiagnosticPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -32,34 +95,13 @@ export default function DiagnosticPage() {
         setStartTime(Date.now());
       } catch {
         // Fallback demo state
+        const firstQ = FALLBACK_QUESTIONS[0];
         setSession({
           session_id: 1,
-          question: {
-            id: "q-lp-nutrition-01",
-            concept_id: "lp-nutrition",
-            stem: "Which of the following organisms exhibits saprophytic nutrition?",
-            options: [
-              { key: "A", text: "Mushroom breaking down dead organic matter" },
-              { key: "B", text: "Amoeba engulfing solid food particles with pseudopodia" },
-              { key: "C", text: "Cuscuta deriving nutrition from a host plant" },
-              { key: "D", text: "Green algae synthesizing glucose in water" },
-            ],
-            difficulty_bucket: 1,
-          },
+          question: firstQ,
           progress: { answered: 0, total: 15 },
         });
-        setCurrentQuestion({
-          id: "q-lp-nutrition-01",
-          concept_id: "lp-nutrition",
-          stem: "Which of the following organisms exhibits saprophytic nutrition?",
-          options: [
-            { key: "A", text: "Mushroom breaking down dead organic matter" },
-            { key: "B", text: "Amoeba engulfing solid food particles with pseudopodia" },
-            { key: "C", text: "Cuscuta deriving nutrition from a host plant" },
-            { key: "D", text: "Green algae synthesizing glucose in water" },
-          ],
-          difficulty_bucket: 1,
-        });
+        setCurrentQuestion(firstQ);
         setStartTime(Date.now());
       } finally {
         setLoading(false);
@@ -94,7 +136,7 @@ export default function DiagnosticPage() {
       }
     } catch {
       // Advance locally if offline
-      const newAnswered = progress.answered + 1;
+      const newAnswered = Math.min(15, progress.answered + 1);
       setProgress({ answered: newAnswered, total: 15 });
       setSelectedKey(null);
 
@@ -103,14 +145,17 @@ export default function DiagnosticPage() {
           mastery: [
             { concept_id: "lp-nutrition", concept_name: "Modes of Nutrition", p_mastery: 0.70, status: "learning" },
             { concept_id: "lp-photosynthesis", concept_name: "Photosynthesis", p_mastery: 0.35, status: "learning" },
-            { concept_id: "lp-digestion", concept_name: "Human Digestion", p_mastery: 0.75, status: "learning" },
-            { concept_id: "cc-neuron", concept_name: "Neuron Structure", p_mastery: 0.65, status: "learning" },
-            { concept_id: "he-variation", concept_name: "Variation", p_mastery: 0.80, status: "mastered" },
+            { concept_id: "lp-digestion", concept_name: "Human Alimentary Canal & Digestion", p_mastery: 0.75, status: "learning" },
+            { concept_id: "cc-neuron", concept_name: "Neuron Structure & Nerve Impulse", p_mastery: 0.65, status: "learning" },
+            { concept_id: "he-variation", concept_name: "Variation & Biological Evolution", p_mastery: 0.80, status: "mastered" },
+            { concept_id: "cc-plant-hormones", concept_name: "Plant Hormones & Tropisms", p_mastery: 0.85, status: "mastered" },
           ],
           weakest: ["lp-photosynthesis", "lp-stomata", "cc-reflex"],
           recommended_next: "lp-photosynthesis",
         });
       } else {
+        const nextQ = FALLBACK_QUESTIONS[newAnswered % FALLBACK_QUESTIONS.length];
+        setCurrentQuestion(nextQ);
         setStartTime(Date.now());
       }
     } finally {
@@ -141,7 +186,9 @@ export default function DiagnosticPage() {
 
         <div className="flex items-center gap-2">
           <span className="font-mono text-xs font-semibold text-ink-primary">
-            Question {progress.answered + 1} of {progress.total}
+            {result
+              ? `Completed (${progress.total} of ${progress.total})`
+              : `Question ${Math.min(progress.answered + 1, progress.total)} of ${progress.total}`}
           </span>
         </div>
       </div>
@@ -150,7 +197,7 @@ export default function DiagnosticPage() {
       <div className="w-full bg-subtle h-2 rounded-full overflow-hidden">
         <div
           className="h-full bg-mastery-emerald transition-all duration-300"
-          style={{ width: `${(progress.answered / progress.total) * 100}%` }}
+          style={{ width: `${Math.min(100, (progress.answered / progress.total) * 100)}%` }}
         />
       </div>
 
@@ -232,14 +279,53 @@ export default function DiagnosticPage() {
 
           {/* Weakest Concepts Attention Box */}
           {result.weakest.length > 0 && (
-            <div className="rounded-xl border border-mastery-amber bg-mastery-amberLight p-4 space-y-1">
+            <div className="rounded-xl border border-mastery-amber bg-mastery-amberLight p-4 space-y-1.5">
               <span className="font-mono text-[10px] text-mastery-amberText uppercase font-semibold block">
                 Primary Opportunity Areas
               </span>
               <p className="text-xs text-ink-primary leading-relaxed">
                 Initial uncertainty sampling identified high potential for revision in:{" "}
-                <strong>{result.weakest.join(", ")}</strong>.
+                <strong>
+                  {result.weakest
+                    .map((id) => {
+                      const match = result.mastery.find((m) => m.concept_id === id);
+                      return match ? match.concept_name : id;
+                    })
+                    .join(", ")}
+                </strong>.
               </p>
+            </div>
+          )}
+
+          {/* Detailed Baseline Mastery Breakdown */}
+          {result.mastery.length > 0 && (
+            <div className="space-y-3 pt-2">
+              <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted block">
+                Calibrated Syllabus Baseline
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {result.mastery.slice(0, 8).map((item) => (
+                  <div
+                    key={item.concept_id}
+                    className="flex items-center justify-between p-3 rounded-lg border border-border-subtle bg-canvas/60"
+                  >
+                    <span className="text-xs text-ink-primary font-medium truncate max-w-[190px]">
+                      {item.concept_name}
+                    </span>
+                    <span
+                      className={`text-[11px] font-mono font-semibold px-2 py-0.5 rounded ${
+                        item.p_mastery >= 0.75
+                          ? "bg-mastery-emeraldLight text-mastery-emeraldText"
+                          : item.p_mastery >= 0.5
+                          ? "bg-mastery-amberLight text-mastery-amberText"
+                          : "bg-mastery-crimsonLight text-mastery-crimsonText"
+                      }`}
+                    >
+                      {Math.round(item.p_mastery * 100)}%
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 

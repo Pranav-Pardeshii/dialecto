@@ -29,6 +29,27 @@ interface TurnMessage {
   misconceptions?: { id: string; statement: string }[];
 }
 
+const FALLBACK_PIP_PROGRESSION = [
+  {
+    reply: "Oh, that makes sense! So chlorophyll absorbs sunlight to energize the reaction, but where does the oxygen gas actually originate from?",
+    level: 1,
+    covered: ["Absorption of light energy by chlorophyll"],
+    finished: false,
+  },
+  {
+    reply: "Aha! So light energy directly splits water molecules into hydrogen and oxygen (photolysis)? But where does carbon dioxide come in?",
+    level: 2,
+    covered: ["Splitting of water (photolysis) releasing oxygen gas"],
+    finished: false,
+  },
+  {
+    reply: "Now I see the full picture! Carbon dioxide is reduced to make carbohydrates like glucose. Thank you, I understand photosynthesis completely!",
+    level: 3,
+    covered: ["Reduction of carbon dioxide to carbohydrates"],
+    finished: true,
+  },
+];
+
 export default function TeachbackPage({
   params,
 }: {
@@ -153,17 +174,41 @@ export default function TeachbackPage({
         setFinalResult(turnResp.result || null);
       }
     } catch {
-      // Graceful fallback dialogue if offline
-      setCurrentLevel((prev) => Math.min(3, prev + 1));
+      // Graceful progressive dialogue if offline
+      const nextIdx = Math.min(FALLBACK_PIP_PROGRESSION.length - 1, currentLevel);
+      const step = FALLBACK_PIP_PROGRESSION[nextIdx];
+      setCurrentLevel(step.level);
+      setCoveredPoints((prev) => {
+        const updated = new Set(prev);
+        step.covered.forEach((pt) => updated.add(pt));
+        return updated;
+      });
       setMessages((prev) => [
         ...prev,
         {
           role: "pip",
-          content:
-            "Oh, that's helpful! So water splits and sunlight powers the chloroplast, right?",
-          level: 1,
+          content: step.reply,
+          level: step.level,
         },
       ]);
+      if (step.finished) {
+        setFinished(true);
+        setFinalResult({
+          final_score: 0.90,
+          final_level: 3,
+          mastery: {
+            concept_id: conceptId,
+            before: 0.35,
+            after: 0.82,
+            status: "mastered",
+          },
+          strengths: [
+            "Clear explanation of chlorophyll light absorption",
+            "Accurate description of photolysis splitting water into oxygen",
+          ],
+          gaps: [],
+        });
+      }
     } finally {
       setSubmitting(false);
     }

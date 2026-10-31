@@ -87,7 +87,6 @@ class TeachbackService:
             turn_count=0,
             final_score=None,
             final_level=0,
-            created_at=now,
         )
         session.add(tb_session)
         await session.flush()

@@ -49,7 +49,7 @@ class DiagnosticService:
             status=SessionStatusEnum.ACTIVE,
         )
         session.add(diag_session)
-        await session.flush()
+        await session.commit()
 
         # Select first question (foundation with uncertainty closest to 0.5)
         q = await self._select_next_diagnostic_question(session, user_id, diag_session.id)
@@ -204,7 +204,7 @@ class DiagnosticService:
             created_at=now,
         )
         session.add(attempt)
-        await session.flush()
+        await session.commit()
 
         # Count answered
         answered_count = await self._count_session_attempts(session, session_id)
@@ -212,6 +212,7 @@ class DiagnosticService:
         if answered_count >= TOTAL_DIAGNOSTIC_QUESTIONS:
             diag_session.status = SessionStatusEnum.COMPLETED
             diag_session.ended_at = now
+            await session.commit()
             result = await self.get_session_result(session, session_id, user_id)
             return DiagnosticAnswerResponse(
                 is_correct=is_correct,
@@ -274,6 +275,9 @@ class DiagnosticService:
         asked_concept_stmt = select(Attempt.concept_id).where(Attempt.session_id == session_id)
         asked_concepts = set((await session.execute(asked_concept_stmt)).scalars().all())
 
+        asked_question_stmt = select(Attempt.question_id).where(Attempt.session_id == session_id)
+        asked_questions = set((await session.execute(asked_question_stmt)).scalars().all())
+
         concepts = await concept_repo.list_all(session)
         user_masteries = await concept_repo.get_user_masteries(session, user_id)
 
@@ -289,14 +293,16 @@ class DiagnosticService:
 
         best_concept = min(candidate_concepts, key=uncertainty_score)
 
-        # Pick question from that concept
-        questions = await question_repo.list_by_concept(session, best_concept.id)
-        if questions:
-            return questions[0]
+        # Pick unasked question from that concept
+        concept_questions = await question_repo.list_by_concept(session, best_concept.id)
+        unasked_concept_q = [q for q in concept_questions if q.id not in asked_questions]
+        if unasked_concept_q:
+            return unasked_concept_q[0]
 
-        # Fallback to any verified
+        # Fallback to any unasked verified question
         all_q = await question_repo.list_all_verified(session)
-        return all_q[0] if all_q else None
+        unasked_all = [q for q in all_q if q.id not in asked_questions]
+        return unasked_all[0] if unasked_all else (all_q[0] if all_q else None)
 
 
 diagnostic_service = DiagnosticService()
