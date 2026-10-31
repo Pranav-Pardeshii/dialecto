@@ -1,4 +1,5 @@
 import datetime
+from collections import defaultdict
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -36,12 +37,12 @@ class TeacherService:
         session: AsyncSession,
         classroom_id: int,
     ) -> TeacherHeatmapResponse:
-        """Generates a 30x20 effective mastery matrix for the classroom."""
+        """Generates dynamic student-concept effective mastery matrix for the classroom."""
         classroom = await session.get(Classroom, classroom_id)
         if not classroom:
             raise NotFoundError(f"Classroom '{classroom_id}' not found")
 
-        # Load students
+        # Load students belonging strictly to this classroom
         students_stmt = (
             select(User)
             .where(User.classroom_id == classroom_id, User.role == UserRoleEnum.STUDENT)
@@ -57,18 +58,17 @@ class TeacherService:
 
         # Load masteries for these students
         student_ids = [s.id for s in students]
-        masteries_stmt = select(Mastery).where(Mastery.user_id.in_(student_ids))
-        masteries = (await session.execute(masteries_stmt)).scalars().all()
-
-        mastery_lookup: dict[tuple[int, str], Mastery] = {
-            (m.user_id, m.concept_id): m for m in masteries
-        }
+        mastery_lookup: dict[tuple[int, str], Mastery] = {}
+        if student_ids:
+            masteries_stmt = select(Mastery).where(Mastery.user_id.in_(student_ids))
+            masteries = (await session.execute(masteries_stmt)).scalars().all()
+            mastery_lookup = {(m.user_id, m.concept_id): m for m in masteries}
 
         cells: list[HeatmapCellOut] = []
         for s in students:
             for c in concepts:
                 m = mastery_lookup.get((s.id, c.id))
-                if m:
+                if m and m.attempts > 0:
                     p_eff = compute_effective_mastery(m.p_mastery, m.next_due_at, now=now)
                 else:
                     p_eff = c.p_l0
@@ -135,7 +135,7 @@ class TeacherService:
         session: AsyncSession,
         classroom_id: int,
     ) -> list[MisconceptionPrevalenceItem]:
-        """Calculates most prevalent active misconceptions in the classroom."""
+        """Calculates most prevalent active misconceptions in the classroom using single efficient join query."""
         students_stmt = select(User.id).where(
             User.classroom_id == classroom_id, User.role == UserRoleEnum.STUDENT
         )
@@ -143,49 +143,42 @@ class TeacherService:
         if not student_ids:
             return []
 
+        # Single aggregated query eliminating N+1 DB round trips
         query = (
             select(
                 DetectedMisconception.misconception_id,
+                Misconception.statement,
+                Misconception.concept_id,
+                Concept.name.label("concept_name"),
                 func.count(func.distinct(DetectedMisconception.user_id)).label("student_count"),
             )
+            .join(Misconception, DetectedMisconception.misconception_id == Misconception.id)
+            .join(Concept, Misconception.concept_id == Concept.id)
             .where(
                 DetectedMisconception.user_id.in_(student_ids),
                 DetectedMisconception.resolved_at.is_(None),
             )
-            .group_by(DetectedMisconception.misconception_id)
+            .group_by(
+                DetectedMisconception.misconception_id,
+                Misconception.statement,
+                Misconception.concept_id,
+                Concept.name,
+            )
             .order_by(func.count(func.distinct(DetectedMisconception.user_id)).desc())
         )
         results = (await session.execute(query)).all()
 
         misc_items: list[MisconceptionPrevalenceItem] = []
-        for m_id, count in results:
-            misc_obj = (
-                (await session.execute(select(Misconception).where(Misconception.id == m_id)))
-                .scalars()
-                .first()
+        for m_id, statement, c_id, c_name, count in results:
+            misc_items.append(
+                MisconceptionPrevalenceItem(
+                    misconception_id=m_id,
+                    statement=statement,
+                    concept_id=c_id,
+                    concept_name=c_name,
+                    n_students=count,
+                )
             )
-
-            if misc_obj:
-                concept_obj = (
-                    (
-                        await session.execute(
-                            select(Concept).where(Concept.id == misc_obj.concept_id)
-                        )
-                    )
-                    .scalars()
-                    .first()
-                )
-                concept_name = concept_obj.name if concept_obj else misc_obj.concept_id
-
-                misc_items.append(
-                    MisconceptionPrevalenceItem(
-                        misconception_id=m_id,
-                        statement=misc_obj.statement,
-                        concept_id=misc_obj.concept_id,
-                        concept_name=concept_name,
-                        n_students=count,
-                    )
-                )
 
         return misc_items
 
@@ -194,31 +187,34 @@ class TeacherService:
         session: AsyncSession,
         classroom_id: int,
     ) -> list[AtRiskStudentItem]:
-        """Flags learners needing teacher intervention based on low mastery and overdue backlogs."""
-        heatmap = await self.get_heatmap(session, classroom_id)
+        """Flags learners needing teacher intervention based on low mastery, overdue backlogs, or active misconceptions."""
         now = datetime.datetime.now(datetime.UTC)
 
-        student_scores: dict[int, list[float]] = {s.id: [] for s in heatmap.students}
-        student_meta = {s.id: s.display_name for s in heatmap.students}
+        # 1. Load classroom students
+        students_stmt = (
+            select(User)
+            .where(User.classroom_id == classroom_id, User.role == UserRoleEnum.STUDENT)
+            .order_by(User.id)
+        )
+        students = (await session.execute(students_stmt)).scalars().all()
+        if not students:
+            return []
 
-        for cell in heatmap.cells:
-            student_scores[cell.student_id].append(cell.p_effective)
+        student_ids = [s.id for s in students]
 
-        # Check overdue concepts per student
-        student_ids = list(student_scores.keys())
+        # 2. Load masteries for these students
         masteries_stmt = select(Mastery).where(Mastery.user_id.in_(student_ids))
         masteries = (await session.execute(masteries_stmt)).scalars().all()
 
-        overdue_counts: dict[int, int] = {s_id: 0 for s_id in student_ids}
+        masteries_by_student: dict[int, list[Mastery]] = defaultdict(list)
         for m in masteries:
-            if m.next_due_at and now > m.next_due_at:
-                overdue_counts[m.user_id] = overdue_counts.get(m.user_id, 0) + 1
+            masteries_by_student[m.user_id].append(m)
 
-        # Check active misconceptions per student
+        # 3. Count distinct active misconceptions per student
         misc_stmt = (
             select(
                 DetectedMisconception.user_id,
-                func.count(DetectedMisconception.id).label("m_count"),
+                func.count(func.distinct(DetectedMisconception.misconception_id)).label("m_count"),
             )
             .where(
                 DetectedMisconception.user_id.in_(student_ids),
@@ -229,22 +225,33 @@ class TeacherService:
         misc_counts = dict((await session.execute(misc_stmt)).all())
 
         at_risk: list[AtRiskStudentItem] = []
-        for s_id, scores in student_scores.items():
-            if not scores:
-                continue
-            mean_m = sum(scores) / len(scores)
-            overdue = overdue_counts.get(s_id, 0)
-            m_count = misc_counts.get(s_id, 0)
+        for s in students:
+            s_masteries = masteries_by_student.get(s.id, [])
+            # Only compute mean across concepts the student has actually attempted
+            attempted_scores = [
+                compute_effective_mastery(m.p_mastery, m.next_due_at, now=now)
+                for m in s_masteries
+                if m.attempts > 0
+            ]
 
-            # Flag if average mastery below 45% or 3+ overdue concepts or 2+ misconceptions
-            if mean_m < 0.45 or overdue >= 3 or m_count >= 2:
+            mean_m = (
+                round(sum(attempted_scores) / len(attempted_scores), 4)
+                if attempted_scores
+                else 0.30
+            )
+
+            overdue_count = sum(1 for m in s_masteries if m.next_due_at and now > m.next_due_at)
+            distinct_misc_count = misc_counts.get(s.id, 0)
+
+            # Flag if average measured mastery below 45% or 3+ overdue reviews or 2+ distinct active misconceptions
+            if (attempted_scores and mean_m < 0.45) or overdue_count >= 3 or distinct_misc_count >= 2:
                 at_risk.append(
                     AtRiskStudentItem(
-                        student_id=s_id,
-                        display_name=student_meta[s_id],
-                        mean_mastery=round(mean_m, 4),
-                        overdue_count=overdue,
-                        active_misconceptions_count=m_count,
+                        student_id=s.id,
+                        display_name=s.display_name,
+                        mean_mastery=mean_m,
+                        overdue_count=overdue_count,
+                        active_misconceptions_count=distinct_misc_count,
                     )
                 )
 
@@ -272,21 +279,21 @@ class TeacherService:
         m_map = {m.concept_id: m for m in masteries}
 
         mastery_details: list[StudentMasteryDetail] = []
-        eff_scores: list[float] = []
+        attempted_scores: list[float] = []
 
         for c in concepts:
             m = m_map.get(c.id)
-            if m:
+            if m and m.attempts > 0:
                 p_eff = compute_effective_mastery(m.p_mastery, m.next_due_at, now=now)
                 p_mast = m.p_mastery
                 next_due = m.next_due_at
+                status = "mastered" if p_eff >= 0.80 else "learning"
+                attempted_scores.append(p_eff)
             else:
                 p_eff = c.p_l0
                 p_mast = c.p_l0
                 next_due = None
-
-            status = "mastered" if p_eff >= 0.80 else "learning" if m else "unlocked"
-            eff_scores.append(p_eff)
+                status = "untested"
 
             mastery_details.append(
                 StudentMasteryDetail(
@@ -299,7 +306,9 @@ class TeacherService:
                 )
             )
 
-        overall_mastery = sum(eff_scores) / len(eff_scores) if eff_scores else 0.0
+        overall_mastery = (
+            sum(attempted_scores) / len(attempted_scores) if attempted_scores else 0.0
+        )
 
         # Active misconceptions
         misc_stmt = (

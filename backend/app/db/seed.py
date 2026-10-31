@@ -26,6 +26,9 @@ from app.models.entities import (
     Question,
     QuestionKindEnum,
     QuestionSourceEnum,
+    Session,
+    SessionKindEnum,
+    SessionStatusEnum,
     User,
     UserRoleEnum,
 )
@@ -50,6 +53,9 @@ async def load_content_data() -> tuple[
 async def seed_database(reset_demo: bool = False) -> None:
     logger.info("starting_database_seed")
     concepts_data, misconceptions_data, questions_data = await load_content_data()
+
+    # Isolated deterministic random generator
+    rng = random.Random(42)
 
     # 1. Validate Prerequisite DAG
     all_node_ids = {c["id"] for c in concepts_data}
@@ -82,6 +88,7 @@ async def seed_database(reset_demo: bool = False) -> None:
                     )
                     session.add(concept)
                 else:
+                    concept.chapter = c_data["chapter"]
                     concept.name = c_data["name"]
                     concept.description = c_data["description"]
                     concept.lesson_md = c_data["lesson_md"]
@@ -118,6 +125,7 @@ async def seed_database(reset_demo: bool = False) -> None:
                         )
                     )
                 else:
+                    misc.concept_id = m_data["concept_id"]
                     misc.statement = m_data["statement"]
                     misc.correction = m_data["correction"]
 
@@ -141,6 +149,14 @@ async def seed_database(reset_demo: bool = False) -> None:
                             source=QuestionSourceEnum.SEED,
                         )
                     )
+                else:
+                    q.concept_id = q_data["concept_id"]
+                    q.stem = q_data["stem"]
+                    q.options = q_data["options"]
+                    q.correct_key = q_data["correct_key"]
+                    q.explanation = q_data["explanation"]
+                    q.difficulty_bucket = q_data.get("difficulty_bucket", 2)
+                    q.verified = q_data.get("verified", True)
 
             # 6. Seed Demo Classroom & Core Users
             classroom = await session.get(Classroom, 1)
@@ -171,6 +187,9 @@ async def seed_database(reset_demo: bool = False) -> None:
                     is_simulated=False,
                 )
                 session.add(ms_rao)
+
+            # Flush prerequisite records before querying for simulation
+            await session.flush()
 
             # 7. Seed 30 Simulated Students with Real Domain Math
             student_names = [
@@ -238,13 +257,31 @@ async def seed_database(reset_demo: bool = False) -> None:
                 else:
                     student = existing_student
 
-                # Determine ability profile: 5 high (85%), 18 average (65%), 7 struggling (40%)
+                # Determine ability profile: 5 high (88%), 18 average (65%), 7 struggling (38%)
                 if idx in (3, 4, 5, 6, 7):
                     target_accuracy = 0.88
                 elif idx in (26, 27, 28, 29, 30, 31, 32):
                     target_accuracy = 0.38
                 else:
                     target_accuracy = 0.65
+
+                # Ensure valid practice session exists for this student
+                stmt_s = select(Session).where(
+                    Session.user_id == student.id,
+                    Session.kind == SessionKindEnum.PRACTICE,
+                    Session.status == SessionStatusEnum.COMPLETED,
+                )
+                student_session = (await session.execute(stmt_s)).scalars().first()
+                if not student_session:
+                    student_session = Session(
+                        user_id=student.id,
+                        kind=SessionKindEnum.PRACTICE,
+                        status=SessionStatusEnum.COMPLETED,
+                        started_at=now - datetime.timedelta(days=14),
+                        ended_at=now - datetime.timedelta(days=1),
+                    )
+                    session.add(student_session)
+                    await session.flush()
 
                 # Seed attempts & mastery across concepts using real domain math
                 for concept in all_concepts_list:
@@ -263,7 +300,7 @@ async def seed_database(reset_demo: bool = False) -> None:
                         continue
 
                     # Simulate 1 to 4 attempts on this concept over the past 14 days
-                    num_attempts = random.randint(1, 4)
+                    num_attempts = rng.randint(1, 4)
                     p_prior = concept.p_l0
                     ease = 2.5
                     interval = 0
@@ -274,15 +311,15 @@ async def seed_database(reset_demo: bool = False) -> None:
                     if not c_questions:
                         continue
 
-                    for att_i in range(num_attempts):
-                        q = random.choice(c_questions)
-                        days_ago = random.randint(1, 14)
+                    for _ in range(num_attempts):
+                        q = rng.choice(c_questions)
+                        days_ago = rng.randint(1, 14)
                         attempt_time = now - datetime.timedelta(
-                            days=days_ago, hours=random.randint(1, 12)
+                            days=days_ago, hours=rng.randint(1, 12)
                         )
 
                         # Accuracy check with stochastic noise
-                        is_correct = random.random() < target_accuracy
+                        is_correct = rng.random() < target_accuracy
                         if is_correct:
                             correct_count += 1
 
@@ -305,26 +342,34 @@ async def seed_database(reset_demo: bool = False) -> None:
                         )
                         q.n_attempts += 1
 
+                        # Response time and answer selection
+                        resp_ms = rng.randint(8000, 45000)
+                        if is_correct:
+                            selected_key = q.correct_key
+                        else:
+                            wrong_keys = [opt["key"] for opt in q.options if opt["key"] != q.correct_key]
+                            selected_key = rng.choice(wrong_keys) if wrong_keys else "A"
+
                         # SM-2 update
                         ease, interval, reps, next_due = calculate_sm2_update(
                             current_ease=ease,
                             current_interval_days=interval,
                             current_repetitions=reps,
                             is_correct=is_correct,
-                            response_ms=random.randint(8000, 45000),
+                            response_ms=resp_ms,
                             now=attempt_time,
                         )
 
-                        # Record attempt
+                        # Record attempt with verified foreign key to student_session
                         attempt = Attempt(
                             client_attempt_id=uuid.uuid4(),
-                            session_id=1,
+                            session_id=student_session.id,
                             user_id=student.id,
                             question_id=q.id,
                             concept_id=concept.id,
-                            selected_key=q.correct_key if is_correct else "A",
+                            selected_key=selected_key,
                             is_correct=is_correct,
-                            response_ms=random.randint(8000, 45000),
+                            response_ms=resp_ms,
                             mastery_before=p_prior,
                             mastery_after=p_next,
                             created_at=attempt_time,
@@ -339,7 +384,7 @@ async def seed_database(reset_demo: bool = False) -> None:
                         p_mastery=p_prior,
                         attempts=num_attempts,
                         correct=correct_count,
-                        last_seen_at=now - datetime.timedelta(days=random.randint(1, 7)),
+                        last_seen_at=now - datetime.timedelta(days=rng.randint(1, 7)),
                         ease=ease,
                         interval_days=interval,
                         repetitions=reps,
@@ -349,8 +394,8 @@ async def seed_database(reset_demo: bool = False) -> None:
                     session.add(mastery_row)
 
                 # Add active misconceptions for struggling/average students
-                if target_accuracy < 0.70 and random.random() < 0.60:
-                    chosen_misc_id = random.choice(hotspot_misconceptions)
+                if target_accuracy < 0.70 and rng.random() < 0.60:
+                    chosen_misc_id = rng.choice(hotspot_misconceptions)
                     existing_dm = (
                         (
                             await session.execute(
@@ -370,7 +415,7 @@ async def seed_database(reset_demo: bool = False) -> None:
                             attempt_id=None,
                             source=MisconceptionSourceEnum.DISTRACTOR,
                             confidence=0.85,
-                            created_at=now - datetime.timedelta(days=random.randint(1, 5)),
+                            created_at=now - datetime.timedelta(days=rng.randint(1, 5)),
                         )
                         session.add(detected_misc)
 

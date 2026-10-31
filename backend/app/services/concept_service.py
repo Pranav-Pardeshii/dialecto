@@ -1,5 +1,4 @@
 import datetime
-import math
 from collections import defaultdict
 from typing import Any
 
@@ -7,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.errors import NotFoundError
 from app.domain.graph import calculate_concept_status
+from app.domain.sm2 import compute_effective_mastery
 from app.repositories.concept_repo import concept_repo
 from app.schemas.concept import (
     ConceptDetailResponse,
@@ -22,20 +22,8 @@ class ConceptService:
     def compute_effective_mastery(
         self, p_mastery: float, next_due_at: datetime.datetime | None
     ) -> float:
-        """Effective mastery with SM-2 decay:
-
-        p_effective = p_mastery * exp(-max(0, days_overdue) / 14)
-        """
-        if not next_due_at:
-            return round(p_mastery, 4)
-
-        now = datetime.datetime.now(datetime.UTC)
-        if now <= next_due_at:
-            return round(p_mastery, 4)
-
-        days_overdue = (now - next_due_at).total_seconds() / 86400.0
-        decay = math.exp(-days_overdue / 14.0)
-        return round(p_mastery * decay, 4)
+        """Delegates directly to canonical domain implementation."""
+        return compute_effective_mastery(p_mastery, next_due_at)
 
     async def get_concept_graph(
         self, session: AsyncSession, current_user: UserOut | None = None
@@ -59,7 +47,7 @@ class ConceptService:
         for c in concepts:
             m_data = user_mastery_map.get(c.id)
             if m_data:
-                eff = self.compute_effective_mastery(m_data["p_mastery"], m_data["next_due_at"])
+                eff = compute_effective_mastery(m_data["p_mastery"], m_data["next_due_at"])
             else:
                 eff = c.p_l0
             effective_masteries[c.id] = eff
@@ -72,9 +60,12 @@ class ConceptService:
                 attempts = m_data["attempts"] if m_data else 0
                 eff = effective_masteries[c.id]
 
-                # List of effective masteries of prerequisites
-                prereq_effs = [effective_masteries.get(p_id, 0.3) for p_id in prereq_map[c.id]]
-                status = calculate_concept_status(eff, attempts, prereq_effs)
+                # List of base masteries of prerequisites to prevent decay relock
+                prereq_masteries = [
+                    user_mastery_map.get(p_id, {}).get("p_mastery", 0.3)
+                    for p_id in prereq_map[c.id]
+                ]
+                status = calculate_concept_status(eff, attempts, prereq_masteries)
 
                 mastery_summary = ConceptMasterySummary(
                     p_effective=eff,

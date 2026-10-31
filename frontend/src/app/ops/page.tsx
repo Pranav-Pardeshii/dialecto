@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { api, LLMStatsResponse } from "@/lib/api/client";
+import { useEffect, useState, useCallback } from "react";
+import { api, ApiError, LLMStatsResponse } from "@/lib/api/client";
 import {
   Activity,
   CheckCircle2,
@@ -11,93 +11,40 @@ import {
   Gauge,
   Clock,
   ShieldCheck,
+  AlertCircle,
 } from "lucide-react";
 
 export default function OpsPage() {
   const [stats, setStats] = useState<LLMStatsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       setRefreshing(true);
+      setError(null);
       const res = await api.getLLMStats();
       setStats(res);
-    } catch {
-      // Mock fallback data for preview if backend offline
-      setStats({
-        primary_model: "Primary Evaluation Model",
-        fallback_models: ["Standard Backup Model", "High-Throughput Model"],
-        total_calls: 142,
-        fallback_rate: 1.4,
-        error_rate: 0.0,
-        p50_latency_ms: 380,
-        p95_latency_ms: 920,
-        models: [
-          {
-            model: "Primary Evaluation Model",
-            is_primary: true,
-            circuit_breaker: {
-              model: "Primary Evaluation Model",
-              state: "closed",
-              failure_count: 0,
-              seconds_until_reset: 0,
-            },
-            token_budget: {
-              capacity: 20000,
-              available: 18450,
-              pct_remaining: 92.3,
-            },
-            calls: 138,
-            errors: 0,
-            avg_latency_ms: 410,
-            tokens_consumed: 34120,
-          },
-          {
-            model: "Standard Backup Model",
-            is_primary: false,
-            circuit_breaker: {
-              model: "Standard Backup Model",
-              state: "closed",
-              failure_count: 0,
-              seconds_until_reset: 0,
-            },
-            token_budget: {
-              capacity: 20000,
-              available: 20000,
-              pct_remaining: 100.0,
-            },
-            calls: 4,
-            errors: 0,
-            avg_latency_ms: 320,
-            tokens_consumed: 890,
-          },
-        ],
-        recent_calls: [
-          {
-            purpose: "misconception_classifier",
-            model: "Primary Evaluation Model",
-            latency_ms: 395,
-            status: "ok",
-            fallback_used: false,
-            tokens: 340,
-            created_at: new Date().toISOString(),
-          },
-        ],
-      });
+    } catch (err: unknown) {
+      if (err instanceof ApiError) {
+        setError(err.message || "Failed to retrieve telemetry stats.");
+      } else {
+        setError("Unable to connect to the telemetry backend service. Please verify system connectivity.");
+      }
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchStats();
     const interval = setInterval(fetchStats, 10000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchStats]);
 
-  if (loading && !stats) {
+  if (loading && !stats && !error) {
     return (
       <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="h-7 w-48 bg-canvas-warm rounded animate-pulse mb-6" />
@@ -105,6 +52,33 @@ export default function OpsPage() {
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="h-24 bg-canvas-card rounded-xl border border-earth-sand/30 animate-pulse" />
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error && !stats) {
+    return (
+      <div className="max-w-4xl mx-auto py-12 px-4">
+        <div className="rounded-2xl border border-mastery-crimson/30 bg-surface p-8 shadow-subtle text-center space-y-4">
+          <div className="h-12 w-12 mx-auto rounded-full bg-mastery-crimsonLight flex items-center justify-center text-mastery-crimson">
+            <AlertCircle className="h-6 w-6" />
+          </div>
+          <h2 className="font-serif text-lg font-semibold text-ink-primary">
+            Telemetry Service Unavailable
+          </h2>
+          <p className="text-xs text-ink-secondary max-w-md mx-auto">
+            {error}
+          </p>
+          <div className="pt-2">
+            <button
+              onClick={fetchStats}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-ink-primary text-canvas text-xs font-semibold hover:bg-ink-primary/90 transition shadow-subtle"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              <span>Retry Connection</span>
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -269,7 +243,7 @@ export default function OpsPage() {
       {/* Recent Calls Stream */}
       <div>
         <h2 className="font-serif text-base font-semibold text-ink-primary mb-4">
-          Recent LLM Invocations
+          Recent AI Invocations
         </h2>
         <div className="bg-canvas-card rounded-xl border border-earth-sand/30 shadow-card overflow-hidden">
           {stats?.recent_calls && stats.recent_calls.length > 0 ? (
@@ -325,7 +299,7 @@ export default function OpsPage() {
             </div>
           ) : (
             <div className="p-8 text-center text-xs text-ink-muted">
-              No recent LLM invocations recorded in this session.
+              No recent AI invocations recorded in this session.
             </div>
           )}
         </div>
@@ -333,4 +307,3 @@ export default function OpsPage() {
     </div>
   );
 }
-

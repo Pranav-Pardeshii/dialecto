@@ -8,6 +8,7 @@ from groq import (
     APIConnectionError,
     APIError,
     AsyncGroq,
+    AuthenticationError,
     InternalServerError,
     RateLimitError,
 )
@@ -40,7 +41,7 @@ class LLMUnavailableError(AppError):
 
 
 class LLMRouter:
-    """Resilient router for Groq LLM calls with circuit breakers, token budgets, and graceful fallbacks."""
+    """Resilient router for Groq LLM calls with global request deadlines, circuit breakers, and bounded token budgets."""
 
     def __init__(self) -> None:
         self.settings = get_settings()
@@ -76,9 +77,10 @@ class LLMRouter:
         timeout: float | None = None,
         reasoning_effort: str | None = None,
     ) -> tuple[Any, AIFallbackMeta]:
-        """Routes a prompt completion through the resilient model chain."""
+        """Routes a prompt completion through the resilient model chain with a global deadline."""
         client: AsyncGroq = get_groq_client()
         timeout_s = timeout if timeout is not None else self.settings.LLM_TIMEOUT_S
+        global_deadline = time.monotonic() + timeout_s
         chain = [self.primary_model] + self.fallback_models
 
         # Estimate tokens (approx 4 chars per token + max_tokens reserve)
@@ -88,6 +90,11 @@ class LLMRouter:
         last_error_class: str | None = None
 
         for attempt_idx, model in enumerate(chain, start=1):
+            remaining_total_time = global_deadline - time.monotonic()
+            if remaining_total_time <= 0.5:
+                logger.warning("llm_global_deadline_exhausted", purpose=purpose, attempt=attempt_idx)
+                break
+
             fallback_used = model != self.primary_model
             breaker = self._get_breaker(model)
 
@@ -106,8 +113,9 @@ class LLMRouter:
                 )
                 continue
 
-            # 3. Call the model with timeout
+            # 3. Call model sharing global deadline
             start_time = time.monotonic()
+            step_timeout = min(timeout_s, remaining_total_time)
             response_kwargs: dict[str, Any] = {
                 "model": model,
                 "messages": messages,
@@ -120,7 +128,7 @@ class LLMRouter:
                 response_kwargs["reasoning_effort"] = reasoning_effort
 
             try:
-                async with asyncio.timeout(timeout_s):
+                async with asyncio.timeout(step_timeout):
                     response = await client.chat.completions.create(**response_kwargs)
 
                 latency_ms = int((time.monotonic() - start_time) * 1000)
@@ -136,7 +144,24 @@ class LLMRouter:
                         parsed_json = json.loads(raw_text)
                         parsed_result = schema.model_validate(parsed_json)
                     except (json.JSONDecodeError, ValidationError) as parse_err:
-                        # Attempt one repair retry on the same model
+                        repair_deadline_remaining = global_deadline - time.monotonic()
+                        if repair_deadline_remaining <= 1.0:
+                            recorder.record(
+                                {
+                                    "purpose": purpose,
+                                    "model": model,
+                                    "attempt_no": attempt_idx,
+                                    "fallback_used": fallback_used,
+                                    "latency_ms": latency_ms,
+                                    "prompt_tokens": p_tokens,
+                                    "completion_tokens": c_tokens,
+                                    "status": LLMCallStatusEnum.INVALID_JSON,
+                                    "error_class": parse_err.__class__.__name__,
+                                }
+                            )
+                            continue
+
+                        # Attempt one repair retry on same model sharing global deadline
                         logger.warning(
                             "llm_schema_validation_failed_attempting_repair",
                             model=model,
@@ -153,17 +178,37 @@ class LLMRouter:
                                 ),
                             },
                         ]
-                        async with asyncio.timeout(timeout_s):
-                            repair_resp = await client.chat.completions.create(
-                                model=model,
-                                messages=repair_messages,
-                                max_tokens=max_tokens,
-                                temperature=0.1,
-                                response_format={"type": "json_object"},
+                        try:
+                            async with asyncio.timeout(min(10.0, repair_deadline_remaining)):
+                                repair_resp = await client.chat.completions.create(
+                                    model=model,
+                                    messages=repair_messages,
+                                    max_tokens=max_tokens,
+                                    temperature=0.1,
+                                    response_format={"type": "json_object"},
+                                )
+                            r_p = repair_resp.usage.prompt_tokens if repair_resp.usage else estimated_tokens
+                            r_c = repair_resp.usage.completion_tokens if repair_resp.usage else 50
+                            self.budget_manager.consume(model, r_p + r_c)
+                            repair_text = repair_resp.choices[0].message.content or ""
+                            parsed_json = json.loads(repair_text)
+                            parsed_result = schema.model_validate(parsed_json)
+                        except (json.JSONDecodeError, ValidationError) as repair_err:
+                            recorder.record(
+                                {
+                                    "purpose": purpose,
+                                    "model": model,
+                                    "attempt_no": attempt_idx,
+                                    "fallback_used": fallback_used,
+                                    "latency_ms": int((time.monotonic() - start_time) * 1000),
+                                    "prompt_tokens": p_tokens,
+                                    "completion_tokens": c_tokens,
+                                    "status": LLMCallStatusEnum.INVALID_JSON,
+                                    "error_class": repair_err.__class__.__name__,
+                                }
                             )
-                        repair_text = repair_resp.choices[0].message.content or ""
-                        parsed_json = json.loads(repair_text)
-                        parsed_result = schema.model_validate(parsed_json)
+                            breaker.record_failure()
+                            continue
 
                 # Call succeeded and schema parsed
                 breaker.record_success()
@@ -186,6 +231,23 @@ class LLMRouter:
                     model=model,
                     fallback=fallback_used,
                 )
+
+            except AuthenticationError as auth_err:
+                logger.critical("llm_authentication_failed", error=str(auth_err))
+                recorder.record(
+                    {
+                        "purpose": purpose,
+                        "model": model,
+                        "attempt_no": attempt_idx,
+                        "fallback_used": fallback_used,
+                        "latency_ms": int((time.monotonic() - start_time) * 1000),
+                        "prompt_tokens": 0,
+                        "completion_tokens": 0,
+                        "status": LLMCallStatusEnum.ERROR,
+                        "error_class": "AuthenticationError",
+                    }
+                )
+                raise LLMUnavailableError(f"LLM Provider authentication failed: {auth_err}")
 
             except RateLimitError as rle:
                 latency_ms = int((time.monotonic() - start_time) * 1000)
@@ -224,7 +286,7 @@ class LLMRouter:
                         "error_class": "TimeoutError",
                     }
                 )
-                logger.warning("llm_call_timeout", model=model, timeout_s=timeout_s)
+                logger.warning("llm_call_timeout", model=model, timeout_s=step_timeout)
                 continue
 
             except (APIConnectionError, InternalServerError, APIError) as api_err:

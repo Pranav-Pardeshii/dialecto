@@ -4,23 +4,31 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { getActiveDemoUserId, setActiveDemoUserId } from "@/lib/api/client";
 import { GraduationCap, Users, Check } from "lucide-react";
 
 export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [activeUserId, setActiveUserId] = useState<number>(1);
+  const [hydrated, setHydrated] = useState(false);
   const [switcherOpen, setSwitcherOpen] = useState(false);
 
   useEffect(() => {
     setActiveUserId(getActiveDemoUserId());
+    setHydrated(true);
   }, []);
 
   const handleSelectUser = (id: number) => {
     setActiveDemoUserId(id);
     setActiveUserId(id);
     setSwitcherOpen(false);
+    queryClient.invalidateQueries();
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("storage"));
+    }
     if (id === 1) {
       router.push("/dashboard");
     } else {
@@ -100,16 +108,6 @@ export function Navbar() {
                 >
                   Review
                 </Link>
-                <Link
-                  href="/ops"
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${
-                    pathname.startsWith("/ops")
-                      ? "bg-subtle text-ink-primary font-semibold"
-                      : "text-ink-secondary hover:text-ink-primary hover:bg-subtle/50"
-                  }`}
-                >
-                  System Health
-                </Link>
               </>
             ) : (
               <>
@@ -143,13 +141,15 @@ export function Navbar() {
           <button
             onClick={() => setSwitcherOpen(!switcherOpen)}
             className="flex items-center gap-2 px-2.5 py-1.5 rounded-md border border-border-subtle bg-surface text-xs text-ink-primary hover:bg-subtle transition shadow-subtle"
+            aria-label="Switch User Role"
+            aria-expanded={switcherOpen}
           >
             <div className="h-2 w-2 rounded-full bg-mastery-emerald animate-pulse" />
             <span className="font-medium">
-              {isTeacher ? "Ms. Rao" : "Aarav"}
+              {hydrated ? (isTeacher ? "Ms. Rao" : "Aarav") : "Loading..."}
             </span>
             <span className="text-[11px] text-ink-muted">
-              ({isTeacher ? "Teacher" : "Student"})
+              {hydrated ? (isTeacher ? "(Teacher)" : "(Student)") : ""}
             </span>
           </button>
 

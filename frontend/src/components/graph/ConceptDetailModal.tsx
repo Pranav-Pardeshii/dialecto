@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api/client";
@@ -19,11 +20,34 @@ export function ConceptDetailModal({ conceptId, onClose }: ConceptDetailModalPro
     enabled: !!conceptId,
   });
 
+  // Listen for Escape key to close modal
+  useEffect(() => {
+    if (!conceptId) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [conceptId, onClose]);
+
   if (!conceptId) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-primary/20 backdrop-blur-sm animate-in fade-in duration-150">
-      <div className="relative w-full max-w-xl max-h-[85vh] flex flex-col rounded-2xl border border-border-subtle bg-surface shadow-flyout overflow-hidden">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={concept?.name || "Concept Information"}
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-primary/20 backdrop-blur-sm animate-in fade-in duration-150"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-xl max-h-[85vh] flex flex-col rounded-2xl border border-border-subtle bg-surface shadow-flyout overflow-hidden"
+      >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border-subtle px-6 py-4 bg-canvas/40">
           <div>
@@ -36,6 +60,7 @@ export function ConceptDetailModal({ conceptId, onClose }: ConceptDetailModalPro
           </div>
           <button
             onClick={onClose}
+            aria-label="Close dialog"
             className="rounded-lg p-1.5 text-ink-muted hover:text-ink-primary hover:bg-subtle transition"
           >
             <X className="h-5 w-5" />

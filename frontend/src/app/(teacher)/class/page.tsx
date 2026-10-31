@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   api,
+  ApiError,
   AtRiskStudentItem,
   CurriculumGapItem,
   MisconceptionPrevalenceItem,
@@ -17,7 +18,35 @@ import {
   X,
   ArrowRight,
   ShieldAlert,
+  AlertCircle,
+  RotateCcw,
 } from "lucide-react";
+
+function getConceptAbbr(id: string): string {
+  const customMap: Record<string, string> = {
+    "cc-plant-hormones": "plt-h",
+    "cc-animal-hormones": "anm-h",
+    "lp-photosynthesis": "photo",
+    "lp-nutrition": "nutr",
+    "lp-stomata": "stoma",
+    "lp-digestion": "digst",
+    "lp-respiration": "resp",
+    "lp-gas-exchange": "gas-x",
+    "lp-circulation": "circ",
+    "lp-vessels-blood": "vessl",
+    "lp-plant-transport": "plt-t",
+    "lp-excretion": "excr",
+    "cc-neuron": "nerve",
+    "cc-reflex": "reflx",
+    "cc-brain": "brain",
+    "he-variation": "var",
+    "he-genes-traits": "genes",
+    "he-monohybrid": "mono",
+    "he-dihybrid": "dihyb",
+    "he-sex-determination": "sex-d",
+  };
+  return customMap[id] || id.replace(/^(lp|cc|he)-/, "").slice(0, 5);
+}
 
 export default function ClassHeatmapPage() {
   const [activeTab, setActiveTab] = useState<"matrix" | "gaps" | "misconceptions" | "atrisk">("matrix");
@@ -26,11 +55,13 @@ export default function ClassHeatmapPage() {
   const [misconceptions, setMisconceptions] = useState<MisconceptionPrevalenceItem[]>([]);
   const [atRisk, setAtRisk] = useState<AtRiskStudentItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Student drill-down state
   const [selectedStudentId, setSelectedStudentId] = useState<number | null>(null);
   const [studentDetail, setStudentDetail] = useState<StudentDetailResponse | null>(null);
   const [loadingStudent, setLoadingStudent] = useState(false);
+  const [studentError, setStudentError] = useState<string | null>(null);
 
   // Hovered cell tooltip
   const [hoveredCell, setHoveredCell] = useState<{
@@ -41,94 +72,53 @@ export default function ClassHeatmapPage() {
     y: number;
   } | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const [hmData, gapsData, miscsData, riskData] = await Promise.all([
-          api.getTeacherHeatmap(1),
-          api.getTeacherGaps(1),
-          api.getTeacherMisconceptions(1),
-          api.getTeacherAtRisk(1),
-        ]);
-        setHeatmap(hmData);
-        setGaps(gapsData);
-        setMisconceptions(miscsData);
-        setAtRisk(riskData);
-      } catch {
-        // Fallback demo mock if backend database is offline
-        const mockConcepts = [
-          { id: "lp-photosynthesis", name: "Photosynthesis", chapter: "life-processes" },
-          { id: "lp-nutrition", name: "Nutrition Modes", chapter: "life-processes" },
-          { id: "lp-stomata", name: "Stomata & Gas Exchange", chapter: "life-processes" },
-          { id: "lp-respiration", name: "Cellular Respiration", chapter: "life-processes" },
-          { id: "lp-circulation", name: "Human Circulatory System", chapter: "life-processes" },
-          { id: "cr-reflex", name: "Reflex Arc", chapter: "control-coordination" },
-          { id: "cr-brain", name: "Human Brain", chapter: "control-coordination" },
-          { id: "hr-mendel", name: "Mendelian Inheritance", chapter: "heredity" },
-        ];
-        const mockStudents = Array.from({ length: 30 }, (_, i) => ({
-          id: i + 1,
-          display_name: i === 0 ? "Aarav" : `Student ${i + 1}`,
-        }));
-        const mockCells = [];
-        for (const s of mockStudents) {
-          for (const c of mockConcepts) {
-            mockCells.push({
-              student_id: s.id,
-              concept_id: c.id,
-              p_effective: s.id < 6 ? 0.85 : s.id > 23 ? 0.38 : 0.65,
-            });
-          }
-        }
-        setHeatmap({
-          classroom_id: 1,
-          classroom_name: "Class 10-A Biology",
-          concepts: mockConcepts,
-          students: mockStudents,
-          cells: mockCells,
-        });
-      } finally {
-        setLoading(false);
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const [hmData, gapsData, miscsData, riskData] = await Promise.all([
+        api.getTeacherHeatmap(1),
+        api.getTeacherGaps(1),
+        api.getTeacherMisconceptions(1),
+        api.getTeacherAtRisk(1),
+      ]);
+      setHeatmap(hmData);
+      setGaps(gapsData);
+      setMisconceptions(miscsData);
+      setAtRisk(riskData);
+    } catch (err: unknown) {
+      setHeatmap(null);
+      setGaps([]);
+      setMisconceptions([]);
+      setAtRisk([]);
+      if (err instanceof ApiError) {
+        setError(err.message || "Failed to load teacher analytics data.");
+      } else {
+        setError("Unable to connect to the teacher analytics service. Please verify server connectivity.");
       }
-    };
-
-    fetchData();
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleSelectStudent = async (studentId: number) => {
     setSelectedStudentId(studentId);
     setLoadingStudent(true);
+    setStudentError(null);
     try {
       const detail = await api.getTeacherStudentDetail(studentId, 1);
       setStudentDetail(detail);
-    } catch {
-      // Fallback detail
-      setStudentDetail({
-        student_id: studentId,
-        display_name: heatmap?.students.find((s) => s.id === studentId)?.display_name || `Student ${studentId}`,
-        overall_mastery: 0.62,
-        masteries: [
-          {
-            concept_id: "lp-photosynthesis",
-            concept_name: "Photosynthesis",
-            p_mastery: 0.70,
-            p_effective: 0.65,
-            status: "learning",
-            next_due_at: null,
-          },
-        ],
-        active_misconceptions: [
-          {
-            misconception_id: "mis-lp-photo-01",
-            statement: "Oxygen released during photosynthesis comes from carbon dioxide",
-            source: "distractor",
-            confidence: 0.85,
-            detected_at: new Date().toISOString(),
-          },
-        ],
-        recent_attempts: [],
-      });
+    } catch (err: unknown) {
+      setStudentDetail(null);
+      if (err instanceof ApiError) {
+        setStudentError(err.message || "Failed to load student breakdown.");
+      } else {
+        setStudentError("Network error while loading student profile.");
+      }
     } finally {
       setLoadingStudent(false);
     }
@@ -143,10 +133,38 @@ export default function ClassHeatmapPage() {
   }
 
   const getHeatmapColor = (p: number) => {
-    if (p >= 0.80) return "bg-mastery-emerald hover:ring-2 hover:ring-mastery-emeraldText";
-    if (p >= 0.50) return "bg-botanical-leaf/40 hover:ring-2 hover:ring-botanical-leaf";
-    return "bg-earth-sand/40 hover:ring-2 hover:ring-earth-amber";
+    if (p >= 0.80) return "bg-emerald-600 hover:ring-2 hover:ring-emerald-400 text-white font-bold";
+    if (p >= 0.50) return "bg-emerald-700/80 hover:ring-2 hover:ring-emerald-500 text-white font-semibold";
+    if (p >= 0.35) return "bg-amber-600/90 hover:ring-2 hover:ring-amber-400 text-white font-semibold";
+    return "bg-stone-300 dark:bg-stone-700 hover:ring-2 hover:ring-stone-400 text-stone-900 dark:text-stone-100 font-medium";
   };
+
+  if (error) {
+    return (
+      <div className="max-w-4xl mx-auto py-12 px-4">
+        <div className="rounded-2xl border border-mastery-crimson/30 bg-surface p-8 shadow-subtle text-center space-y-4">
+          <div className="h-12 w-12 mx-auto rounded-full bg-mastery-crimsonLight flex items-center justify-center text-mastery-crimson">
+            <AlertCircle className="h-6 w-6" />
+          </div>
+          <h2 className="font-serif text-lg font-semibold text-ink-primary">
+            Unable to Load Teacher Analytics
+          </h2>
+          <p className="text-xs text-ink-secondary max-w-md mx-auto">
+            {error}
+          </p>
+          <div className="pt-2">
+            <button
+              onClick={fetchData}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-ink-primary text-canvas text-xs font-semibold hover:bg-ink-primary/90 transition shadow-subtle"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              <span>Retry</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto px-2 sm:px-4 py-4">
@@ -170,7 +188,7 @@ export default function ClassHeatmapPage() {
         <div className="flex items-center gap-2">
           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-canvas-warm text-xs font-mono text-ink-primary border border-earth-sand/30">
             <Users className="h-3.5 w-3.5 text-mastery-emerald" />
-            <span>{heatmap?.students.length || 30} Students Tracked</span>
+            <span>{heatmap?.students.length ?? 0} Students Tracked</span>
           </span>
         </div>
       </div>
@@ -186,7 +204,9 @@ export default function ClassHeatmapPage() {
           }`}
         >
           <Grid className="h-3.5 w-3.5" />
-          <span>Class Matrix (30 × 20)</span>
+          <span>
+            Class Matrix ({heatmap ? `${heatmap.students.length} × ${heatmap.concepts.length}` : "Matrix"})
+          </span>
         </button>
 
         <button
@@ -242,15 +262,19 @@ export default function ClassHeatmapPage() {
             {/* Legend */}
             <div className="flex items-center gap-3 text-[11px] text-ink-secondary">
               <div className="flex items-center gap-1.5">
-                <div className="h-3 w-3 rounded bg-earth-sand/40 border border-earth-sand" />
-                <span>&lt; 50% (Needs Foundation)</span>
+                <div className="h-3 w-3 rounded bg-stone-300 dark:bg-stone-700 border border-stone-400" />
+                <span>&lt; 35% (Untested / Needs Prep)</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="h-3 w-3 rounded bg-botanical-leaf/40 border border-botanical-leaf/50" />
+                <div className="h-3 w-3 rounded bg-amber-600/90 border border-amber-600" />
+                <span>35 - 49% (Emerging)</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="h-3 w-3 rounded bg-emerald-700/80 border border-emerald-600" />
                 <span>50 - 79% (Learning)</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="h-3 w-3 rounded bg-mastery-emerald" />
+                <div className="h-3 w-3 rounded bg-emerald-600 border border-emerald-500" />
                 <span>80%+ (Mastered)</span>
               </div>
             </div>
@@ -274,8 +298,8 @@ export default function ClassHeatmapPage() {
                         className="pb-3 px-1 text-center font-mono text-[9px] text-ink-muted tracking-tight w-8 max-w-[36px]"
                         title={c.name}
                       >
-                        <div className="truncate w-8 text-center" title={c.name}>
-                          {c.id.split("-").slice(-1)[0].slice(0, 4)}
+                        <div className="truncate w-8 text-center" title={`${c.name} (${c.id})`}>
+                          {getConceptAbbr(c.id)}
                         </div>
                       </th>
                     ))}
@@ -308,11 +332,11 @@ export default function ClassHeatmapPage() {
                                 });
                               }}
                               onMouseLeave={() => setHoveredCell(null)}
-                              className={`h-6 w-7 rounded transition cursor-pointer flex items-center justify-center text-[9px] font-mono font-medium ${getHeatmapColor(
+                              className={`h-6 w-7 rounded transition cursor-pointer flex items-center justify-center text-[9px] font-mono ${getHeatmapColor(
                                 val
                               )}`}
                             >
-                              <span className="opacity-0 hover:opacity-100 text-canvas drop-shadow-sm font-bold">
+                              <span className="opacity-0 group-hover:opacity-100 hover:opacity-100 drop-shadow-sm font-bold">
                                 {pct}
                               </span>
                             </div>
@@ -481,7 +505,7 @@ export default function ClassHeatmapPage() {
               <div>
                 <span className="font-mono text-[10px] text-ink-muted uppercase">Student Diagnostic</span>
                 <h2 className="font-serif text-xl font-bold text-ink-primary">
-                  {studentDetail?.display_name || "Loading..."}
+                  {studentDetail?.display_name || "Student Profile"}
                 </h2>
               </div>
               <button
@@ -495,6 +519,10 @@ export default function ClassHeatmapPage() {
             {loadingStudent ? (
               <div className="flex-1 flex items-center justify-center text-xs text-ink-muted animate-pulse">
                 Fetching student profile...
+              </div>
+            ) : studentError ? (
+              <div className="p-4 rounded-lg bg-mastery-crimsonLight text-mastery-crimsonText text-xs">
+                {studentError}
               </div>
             ) : studentDetail ? (
               <div className="space-y-5">

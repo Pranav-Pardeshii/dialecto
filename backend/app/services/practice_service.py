@@ -1,18 +1,21 @@
 import datetime
+from collections import defaultdict
 from typing import Any
 
 import structlog
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.agents.misconception_classifier import classify_misconception
-from app.core.errors import NotFoundError
+from app.core.errors import AppError, ConflictError, ForbiddenError, NotFoundError
 from app.domain.bkt import bkt_update
 from app.domain.elo import calibrate_item_difficulty
 from app.domain.selector import select_next_practice_question
 from app.domain.sm2 import calculate_sm2_update, compute_effective_mastery
 from app.models.entities import (
     Attempt,
+    Concept,
     DetectedMisconception,
     Mastery,
     Misconception,
@@ -74,14 +77,13 @@ class PracticeService:
     ) -> PracticeNextResponse:
         practice_session = await self.get_or_create_practice_session(session, user_id)
         concepts = await concept_repo.list_all(session)
+        concepts_by_id = {c.id: c for c in concepts}
         prereqs = await concept_repo.list_all_prerequisites(session)
         user_masteries = await concept_repo.get_user_masteries(session, user_id)
         seen_questions = await question_repo.get_seen_question_ids(session, user_id)
 
         # Build prereq map
-        prereq_map: dict[str, list[str]] = {}
-        for c in concepts:
-            prereq_map[c.id] = []
+        prereq_map: dict[str, list[str]] = defaultdict(list)
         for dependent_id, prereq_id in prereqs:
             prereq_map[dependent_id].append(prereq_id)
 
@@ -94,46 +96,14 @@ class PracticeService:
         )
         active_miscs = set((await session.execute(active_misc_stmt)).scalars().all())
 
-        # Unlocked concepts pool
-        unlocked_pool: list[dict[str, Any]] = []
-        for c in concepts:
-            if req.mode == "concept" and req.concept_id and c.id != req.concept_id:
-                continue
+        # Map misconceptions to their concept_id
+        all_miscs_stmt = select(Misconception)
+        all_miscs = (await session.execute(all_miscs_stmt)).scalars().all()
+        misc_by_concept: dict[str, list[str]] = defaultdict(list)
+        for m in all_miscs:
+            misc_by_concept[m.concept_id].append(m.id)
 
-            m = user_masteries.get(c.id)
-            p_mast = m["p_mastery"] if m else c.p_l0
-            next_due = m["next_due_at"] if m else None
-            p_eff = compute_effective_mastery(p_mast, next_due, now=now)
-
-            # Check prerequisites
-            prereq_effs = [
-                compute_effective_mastery(
-                    user_masteries[p]["p_mastery"] if p in user_masteries else 0.3,
-                    user_masteries[p]["next_due_at"] if p in user_masteries else None,
-                    now=now,
-                )
-                for p in prereq_map[c.id]
-            ]
-            is_locked = any(pe < 0.60 for pe in prereq_effs)
-            if is_locked and req.mode != "concept":
-                continue
-
-            is_overdue = next_due is not None and now > next_due
-            has_active_misc = any(
-                m_id.startswith(f"m-{c.id}") or m_id in active_miscs for m_id in active_miscs
-            )
-
-            unlocked_pool.append(
-                {
-                    "id": c.id,
-                    "name": c.name,
-                    "p_effective": p_eff,
-                    "is_overdue": is_overdue,
-                    "has_active_misconception": has_active_misc,
-                }
-            )
-
-        # Load questions for unlocked concepts
+        # Load all verified questions grouped by concept
         all_questions = await question_repo.list_all_verified(session)
         questions_by_concept: dict[str, list[dict[str, Any]]] = {}
         for q in all_questions:
@@ -149,16 +119,96 @@ class PracticeService:
                 }
             )
 
-        chosen = select_next_practice_question(unlocked_pool, questions_by_concept, seen_questions)
-        if not chosen:
-            # Fallback to any verified question
-            if all_questions:
-                fallback_q = all_questions[0]
-                return PracticeNextResponse(
-                    session_id=practice_session.id,
-                    question=to_question_out(fallback_q),
-                    selection_reason="Exploring foundational concept questions.",
+        # Helper to check if concept is locked
+        def is_locked(concept_id: str) -> bool:
+            # If student has already practiced this concept, it is permanently unlocked
+            if concept_id in user_masteries and user_masteries[concept_id].get("attempts", 0) > 0:
+                return False
+            # Check prerequisites base mastery >= 0.60
+            for p_id in prereq_map.get(concept_id, []):
+                p_base = user_masteries.get(p_id, {}).get("p_mastery", 0.30)
+                if p_base < 0.60:
+                    return True
+            return False
+
+        # Specific concept mode validation
+        if req.mode == "concept":
+            if not req.concept_id or req.concept_id not in concepts_by_id:
+                raise NotFoundError(f"Concept '{req.concept_id}' not found.")
+            if is_locked(req.concept_id):
+                raise ForbiddenError(
+                    f"Concept '{req.concept_id}' is locked. Please master prerequisites first."
                 )
+
+            c_questions = questions_by_concept.get(req.concept_id, [])
+            if not c_questions:
+                raise NotFoundError(f"No questions available for concept '{req.concept_id}'.")
+
+            unseen = [q for q in c_questions if q["id"] not in seen_questions]
+            pool = unseen if unseen else c_questions
+            m_data = user_masteries.get(req.concept_id)
+            c_obj = concepts_by_id[req.concept_id]
+            p_eff = compute_effective_mastery(
+                m_data["p_mastery"] if m_data else c_obj.p_l0,
+                m_data["next_due_at"] if m_data else None,
+                now=now,
+            )
+            best_q = min(
+                pool,
+                key=lambda q: abs(q.get("difficulty_rating", 0.0) - (p_eff * 2.0 - 1.0)),
+            )
+            return PracticeNextResponse(
+                session_id=practice_session.id,
+                question=to_question_out(best_q["obj"]),
+                selection_reason=f"Practicing {c_obj.name}.",
+            )
+
+        # Unlocked concepts pool for adaptive and review modes
+        unlocked_pool: list[dict[str, Any]] = []
+        for c in concepts:
+            if is_locked(c.id):
+                continue
+
+            m_data = user_masteries.get(c.id)
+            p_mast = m_data["p_mastery"] if m_data else c.p_l0
+            next_due = m_data["next_due_at"] if m_data else None
+            p_eff = compute_effective_mastery(p_mast, next_due, now=now)
+
+            is_overdue = next_due is not None and now > next_due
+            # Active misconception check strictly scoped to this concept
+            has_active_misc = any(m_id in active_miscs for m_id in misc_by_concept.get(c.id, []))
+
+            unlocked_pool.append(
+                {
+                    "id": c.id,
+                    "name": c.name,
+                    "p_effective": p_eff,
+                    "is_overdue": is_overdue,
+                    "has_active_misconception": has_active_misc,
+                }
+            )
+
+        if not unlocked_pool:
+            raise NotFoundError("No unlocked concepts available for practice.")
+
+        # Review mode: filter to overdue or decaying concepts
+        if req.mode == "review":
+            review_pool = [c for c in unlocked_pool if c["is_overdue"] or c["p_effective"] < 0.75]
+            target_pool = review_pool if review_pool else unlocked_pool
+            chosen = select_next_practice_question(target_pool, questions_by_concept, seen_questions)
+        else:
+            chosen = select_next_practice_question(unlocked_pool, questions_by_concept, seen_questions)
+
+        if not chosen:
+            # Fallback to any unlocked question
+            for c_info in unlocked_pool:
+                cand = questions_by_concept.get(c_info["id"], [])
+                if cand:
+                    return PracticeNextResponse(
+                        session_id=practice_session.id,
+                        question=to_question_out(cand[0]["obj"]),
+                        selection_reason=f"Reinforcing {c_info['name']}.",
+                    )
             raise NotFoundError("No verified practice questions available.")
 
         chosen_concept_id, q_dict, reason = chosen
@@ -168,23 +218,89 @@ class PracticeService:
             selection_reason=reason,
         )
 
+    def _get_unlocked_concept_ids(
+        self,
+        concepts: list[Concept],
+        prereq_map: dict[str, list[str]],
+        mastery_map: dict[str, dict[str, Any]],
+    ) -> set[str]:
+        unlocked = set()
+        for c in concepts:
+            if c.id in mastery_map and mastery_map[c.id].get("attempts", 0) > 0:
+                unlocked.add(c.id)
+                continue
+            prereqs = prereq_map.get(c.id, [])
+            if not prereqs:
+                unlocked.add(c.id)
+            elif all(mastery_map.get(p, {}).get("p_mastery", 0.0) >= 0.60 for p in prereqs):
+                unlocked.add(c.id)
+        return unlocked
+
     async def submit_answer(
         self, session: AsyncSession, user_id: int, req: PracticeAnswerRequest
     ) -> PracticeAnswerResponse:
-        # 1. Idempotency check
+        # Validate response timing
+        if req.response_ms < 0 or req.response_ms > 600000:
+            raise AppError(
+                code="invalid_response_time",
+                message="Response time must be between 0 and 600,000 ms.",
+                status_code=422,
+            )
+
+        # Validate session ownership and type
+        prac_session = await session.get(Session, req.session_id)
+        if not prac_session:
+            raise NotFoundError(f"Practice session '{req.session_id}' not found.")
+        if prac_session.user_id != user_id:
+            raise ForbiddenError("Session does not belong to authenticated user.")
+        if prac_session.kind != SessionKindEnum.PRACTICE:
+            raise AppError(
+                code="invalid_session_kind",
+                message="Session is not an active practice session.",
+                status_code=400,
+            )
+
+        # Idempotency check before checking session active state
         existing_attempt = await question_repo.get_attempt_by_client_id(
             session, req.client_attempt_id
         )
         if existing_attempt:
-            # Return stored result
+            if existing_attempt.user_id != user_id:
+                raise ForbiddenError("Attempt belongs to another user.")
+            if existing_attempt.session_id != req.session_id:
+                raise AppError(
+                    code="session_mismatch",
+                    message="Client attempt ID belongs to another session.",
+                    status_code=409,
+                )
+
+            # Return complete stored result including any detected misconception
             q = await question_repo.get_by_id(session, existing_attempt.question_id)
             if not q:
-                raise NotFoundError("Question not found for stored attempt")
+                raise NotFoundError("Question not found for stored attempt.")
 
             m_stmt = select(Mastery).where(
                 Mastery.user_id == user_id, Mastery.concept_id == existing_attempt.concept_id
             )
             mastery_row = (await session.execute(m_stmt)).scalars().first()
+
+            dm_stmt = select(DetectedMisconception).where(
+                DetectedMisconception.attempt_id == existing_attempt.id
+            )
+            stored_dm = (await session.execute(dm_stmt)).scalars().first()
+            stored_misc_feedback: MisconceptionFeedback | None = None
+            if stored_dm:
+                misc_obj = await session.get(Misconception, stored_dm.misconception_id)
+                if misc_obj:
+                    stored_misc_feedback = MisconceptionFeedback(
+                        id=misc_obj.id,
+                        statement=misc_obj.statement,
+                        correction=misc_obj.correction,
+                        source="reasoning"
+                        if stored_dm.source == MisconceptionSourceEnum.LLM_REASONING
+                        else "distractor",
+                        confidence=stored_dm.confidence,
+                    )
 
             return PracticeAnswerResponse(
                 is_correct=existing_attempt.is_correct,
@@ -197,19 +313,33 @@ class PracticeService:
                     status="learning" if existing_attempt.mastery_after < 0.8 else "mastered",
                 ),
                 next_due_at=mastery_row.next_due_at if mastery_row else None,
-                misconception=None,
+                misconception=stored_misc_feedback,
                 ai=AIFallbackMeta(used=False),
                 newly_unlocked=[],
             )
 
-        # 2. Load question and concept
+        if prac_session.status != SessionStatusEnum.ACTIVE:
+            raise ConflictError("session_closed", "Practice session is already completed.")
+
+        # Load question and concept
         question = await question_repo.get_by_id(session, req.question_id)
         if not question:
-            raise NotFoundError(f"Question '{req.question_id}' not found")
+            raise NotFoundError(f"Question '{req.question_id}' not found.")
 
         concept = await concept_repo.get_by_id(session, question.concept_id)
         if not concept:
-            raise NotFoundError(f"Concept '{question.concept_id}' not found")
+            raise NotFoundError(f"Concept '{question.concept_id}' not found.")
+
+        # Validate selected key
+        valid_keys = [
+            opt.get("key") for opt in question.options if isinstance(opt, dict) and "key" in opt
+        ]
+        if req.selected_key not in valid_keys:
+            raise AppError(
+                code="invalid_selected_key",
+                message=f"Selected key '{req.selected_key}' is not among valid options: {valid_keys}",
+                status_code=422,
+            )
 
         # Evaluate correctness
         is_correct = req.selected_key.strip().upper() == question.correct_key.strip().upper()
@@ -220,15 +350,16 @@ class PracticeService:
         )
         distractor_misc_id = chosen_opt.get("misconception_id") if chosen_opt else None
 
+        # Load known misconceptions for this concept
+        misc_stmt = select(Misconception).where(Misconception.concept_id == concept.id)
+        concept_miscs = (await session.execute(misc_stmt)).scalars().all()
+        concept_misc_ids = {m.id for m in concept_miscs}
+
         # Misconception diagnosis via LLM Router if student provided reasoning and was wrong
-        # Rule: Call LLM before opening row lock transaction
         classification_result = None
         ai_meta = AIFallbackMeta(used=False, model=None, fallback=False)
 
         if not is_correct and req.reasoning and len(req.reasoning.strip()) >= 5:
-            # Load known misconceptions for this concept
-            misc_stmt = select(Misconception).where(Misconception.concept_id == concept.id)
-            concept_miscs = (await session.execute(misc_stmt)).scalars().all()
             misc_dicts = [
                 {"id": m.id, "statement": m.statement, "correction": m.correction}
                 for m in concept_miscs
@@ -247,7 +378,18 @@ class PracticeService:
             except Exception as exc:
                 logger.warning("misconception_classification_error", error=str(exc))
 
-        # 3. Lock mastery row with FOR UPDATE and persist learner updates
+        # Capture unlocked concepts before update for delta calculation
+        all_concepts = await concept_repo.list_all(session)
+        prereqs = await concept_repo.list_all_prerequisites(session)
+        prereq_map: dict[str, list[str]] = defaultdict(list)
+        for dependent_id, prereq_id in prereqs:
+            prereq_map[dependent_id].append(prereq_id)
+        user_masteries_before = await concept_repo.get_user_masteries(session, user_id)
+        unlocked_before = self._get_unlocked_concept_ids(
+            all_concepts, prereq_map, user_masteries_before
+        )
+
+        # Lock mastery row with FOR UPDATE and persist learner updates
         mastery_stmt = (
             select(Mastery)
             .where(Mastery.user_id == user_id, Mastery.concept_id == question.concept_id)
@@ -292,7 +434,7 @@ class PracticeService:
             now=now,
         )
 
-        # Update or create Mastery
+        # Update or create Mastery with concurrency handling
         if not mastery:
             mastery = Mastery(
                 user_id=user_id,
@@ -335,9 +477,25 @@ class PracticeService:
             created_at=now,
         )
         session.add(attempt)
-        await session.flush()
 
-        # Misconception resolution / recording
+        try:
+            await session.flush()
+        except IntegrityError:
+            # Handle concurrent first attempt write race condition
+            await session.rollback()
+            # Reload session and locked mastery
+            prac_session = await session.get(Session, req.session_id)
+            mastery = (await session.execute(mastery_stmt)).scalars().first()
+            if mastery:
+                mastery.p_mastery = p_next
+                mastery.attempts += 1
+                mastery.correct += 1 if is_correct else 0
+                mastery.last_seen_at = now
+                mastery.version += 1
+            session.add(attempt)
+            await session.flush()
+
+        # Misconception resolution and recording
         misconception_feedback: MisconceptionFeedback | None = None
         if not is_correct:
             active_misc_id = None
@@ -345,17 +503,18 @@ class PracticeService:
             confidence = 1.0
 
             if classification_result and classification_result.misconception_detected:
-                active_misc_id = classification_result.misconception_id or distractor_misc_id
-                misc_source = MisconceptionSourceEnum.LLM_REASONING
-                confidence = classification_result.confidence
-            elif distractor_misc_id:
+                candidate_id = classification_result.misconception_id or distractor_misc_id
+                if candidate_id in concept_misc_ids:
+                    active_misc_id = candidate_id
+                    misc_source = MisconceptionSourceEnum.LLM_REASONING
+                    confidence = classification_result.confidence
+            elif distractor_misc_id and distractor_misc_id in concept_misc_ids:
                 active_misc_id = distractor_misc_id
                 misc_source = MisconceptionSourceEnum.DISTRACTOR
                 confidence = 1.0
 
             if active_misc_id:
-                misc_stmt = select(Misconception).where(Misconception.id == active_misc_id)
-                misc_obj = (await session.execute(misc_stmt)).scalars().first()
+                misc_obj = await session.get(Misconception, active_misc_id)
                 if misc_obj:
                     detected = DetectedMisconception(
                         user_id=user_id,
@@ -379,17 +538,29 @@ class PracticeService:
                         else "distractor",
                         confidence=confidence,
                     )
-            elif classification_result and classification_result.student_gap_summary:
-                # Custom detected misconception from reasoning
-                misconception_feedback = MisconceptionFeedback(
-                    id="reasoning-gap",
-                    statement=classification_result.student_gap_summary,
-                    correction=classification_result.remedial_nudge,
-                    source="reasoning",
-                    confidence=classification_result.confidence,
-                )
+        else:
+            # Misconception resolution: if learner answers correctly, resolve active misconceptions for this concept
+            res_stmt = select(DetectedMisconception).where(
+                DetectedMisconception.user_id == user_id,
+                DetectedMisconception.resolved_at.is_(None),
+                DetectedMisconception.misconception_id.in_(concept_misc_ids),
+            )
+            to_resolve = (await session.execute(res_stmt)).scalars().all()
+            for dm in to_resolve:
+                dm.resolved_at = now
 
-        # Status & unlocks
+        # Compute newly unlocked concepts
+        user_masteries_after = dict(user_masteries_before)
+        user_masteries_after[concept.id] = {
+            "p_mastery": p_next,
+            "attempts": attempts_count + 1,
+            "next_due_at": next_due,
+        }
+        unlocked_after = self._get_unlocked_concept_ids(
+            all_concepts, prereq_map, user_masteries_after
+        )
+        newly_unlocked = [c_id for c_id in unlocked_after if c_id not in unlocked_before]
+
         status = "mastered" if p_next >= 0.80 else "learning"
 
         await session.commit()
@@ -407,7 +578,7 @@ class PracticeService:
             next_due_at=next_due,
             misconception=misconception_feedback,
             ai=ai_meta,
-            newly_unlocked=[],
+            newly_unlocked=newly_unlocked,
         )
 
 

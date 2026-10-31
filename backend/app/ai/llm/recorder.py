@@ -4,6 +4,8 @@ from collections import deque
 from typing import Any
 
 import structlog
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import AsyncSessionLocal
 from app.models.entities import LLMCall, LLMCallStatusEnum
@@ -29,8 +31,21 @@ class AsyncLLMRecorder:
                 # No running event loop yet (e.g. during script or unit test setup)
                 pass
 
+    async def flush(self) -> None:
+        """Drains any remaining items in queue to Postgres."""
+        batch: list[dict[str, Any]] = []
+        while not self.queue.empty():
+            try:
+                batch.append(self.queue.get_nowait())
+                self.queue.task_done()
+            except Exception:
+                break
+        if batch:
+            await self._persist_batch(batch)
+
     async def stop(self) -> None:
         self._running = False
+        await self.flush()
         if self._worker_task:
             self._worker_task.cancel()
             try:
@@ -90,7 +105,10 @@ class AsyncLLMRecorder:
                     for item in batch:
                         status_val = item.get("status", LLMCallStatusEnum.OK)
                         if isinstance(status_val, str):
-                            status_val = LLMCallStatusEnum(status_val)
+                            try:
+                                status_val = LLMCallStatusEnum(status_val)
+                            except ValueError:
+                                status_val = LLMCallStatusEnum.ERROR
 
                         db_call = LLMCall(
                             purpose=item["purpose"],
@@ -180,6 +198,71 @@ class AsyncLLMRecorder:
             "models": models_breakdown,
             "recent_calls": formatted_recent,
         }
+
+    async def get_db_stats(self, session: AsyncSession) -> dict[str, Any]:
+        """Calculates telemetry using persisted llm_calls table, falling back to ring buffer if empty."""
+        try:
+            stmt = select(LLMCall).order_by(LLMCall.created_at.desc()).limit(200)
+            db_calls = (await session.execute(stmt)).scalars().all()
+            if not db_calls:
+                return self.get_recent_stats()
+
+            total_calls = len(db_calls)
+            fallback_count = sum(1 for c in db_calls if c.fallback_used)
+            error_count = sum(1 for c in db_calls if c.status != LLMCallStatusEnum.OK)
+            latencies = sorted(int(c.latency_ms) for c in db_calls)
+            p50_idx = int(0.50 * (len(latencies) - 1))
+            p95_idx = int(0.95 * (len(latencies) - 1))
+
+            models_breakdown: dict[str, dict[str, Any]] = {}
+            for c in db_calls:
+                m = c.model
+                if m not in models_breakdown:
+                    models_breakdown[m] = {
+                        "calls": 0,
+                        "errors": 0,
+                        "prompt_tokens": 0,
+                        "completion_tokens": 0,
+                        "latencies": [],
+                    }
+                models_breakdown[m]["calls"] += 1
+                if c.status != LLMCallStatusEnum.OK:
+                    models_breakdown[m]["errors"] += 1
+                models_breakdown[m]["prompt_tokens"] += c.prompt_tokens
+                models_breakdown[m]["completion_tokens"] += c.completion_tokens
+                models_breakdown[m]["latencies"].append(c.latency_ms)
+
+            for m, stats in models_breakdown.items():
+                lats = sorted(stats.pop("latencies"))
+                stats["avg_latency_ms"] = round(sum(lats) / len(lats)) if lats else 0
+
+            formatted_recent = [
+                {
+                    "purpose": c.purpose,
+                    "model": c.model,
+                    "latency_ms": c.latency_ms,
+                    "status": str(c.status.value if hasattr(c.status, "value") else c.status),
+                    "fallback_used": c.fallback_used,
+                    "tokens": c.prompt_tokens + c.completion_tokens,
+                    "created_at": c.created_at.isoformat()
+                    if hasattr(c.created_at, "isoformat")
+                    else str(c.created_at),
+                }
+                for c in db_calls[:10]
+            ]
+
+            return {
+                "total_calls": total_calls,
+                "fallback_rate": round((fallback_count / total_calls) * 100, 1),
+                "error_rate": round((error_count / total_calls) * 100, 1),
+                "p50_latency_ms": latencies[p50_idx],
+                "p95_latency_ms": latencies[p95_idx],
+                "models": models_breakdown,
+                "recent_calls": formatted_recent,
+            }
+        except Exception as exc:
+            logger.warning("get_db_stats_fallback", error=str(exc))
+            return self.get_recent_stats()
 
 
 # Singleton recorder instance

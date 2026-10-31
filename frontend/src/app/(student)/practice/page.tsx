@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { api, PracticeNextResponse, PracticeAnswerResponse } from "@/lib/api/client";
+import { api, ApiError, PracticeNextResponse, PracticeAnswerResponse } from "@/lib/api/client";
 import { VoiceFriendlyTextarea } from "@/components/ui/VoiceFriendlyTextarea";
 import {
   ArrowLeft,
@@ -12,6 +12,8 @@ import {
   XCircle,
   AlertTriangle,
   HelpCircle,
+  RotateCcw,
+  AlertCircle,
 } from "lucide-react";
 
 export default function PracticePage() {
@@ -40,48 +42,45 @@ export default function PracticePage() {
 function PracticeContent() {
   const searchParams = useSearchParams();
   const conceptParam = searchParams.get("concept");
+  const modeParam = searchParams.get("mode");
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   const [sessionData, setSessionData] = useState<PracticeNextResponse | null>(null);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [reasoningText, setReasoningText] = useState("");
   const [feedback, setFeedback] = useState<PracticeAnswerResponse | null>(null);
   const [startTime, setStartTime] = useState<number>(Date.now());
+  const [clientAttemptId, setClientAttemptId] = useState<string>(() => crypto.randomUUID());
 
   const fetchNextQuestion = useCallback(async () => {
     setLoading(true);
+    setFetchError(null);
+    setSubmitError(null);
     setFeedback(null);
     setSelectedKey(null);
     setReasoningText("");
+
     try {
-      const mode = conceptParam ? "concept" : "adaptive";
+      const mode = modeParam === "review" ? "review" : conceptParam ? "concept" : "adaptive";
       const res = await api.getPracticeNext(mode, conceptParam || undefined);
       setSessionData(res);
+      setClientAttemptId(crypto.randomUUID());
       setStartTime(Date.now());
-    } catch {
-      // Fallback local question for demo resilience
-      setSessionData({
-        session_id: 1,
-        question: {
-          id: "q-lp-photosynthesis-01",
-          concept_id: "lp-photosynthesis",
-          stem: "During the photochemical reaction of photosynthesis, which molecule directly yields the released oxygen gas?",
-          options: [
-            { key: "A", text: "Carbon dioxide molecules during carbon fixation" },
-            { key: "B", text: "Water molecules split by absorbed light energy (photolysis)" },
-            { key: "C", text: "Glucose during carbohydrate polymer synthesis" },
-            { key: "D", text: "Chlorophyll pigment degradation products" },
-          ],
-          difficulty_bucket: 2,
-        },
-        selection_reason: "Targeting foundational mechanisms in Photosynthesis.",
-      });
-      setStartTime(Date.now());
+    } catch (err: unknown) {
+      setSessionData(null);
+      if (err instanceof ApiError) {
+        setFetchError(err.message || "Failed to load question from learning server.");
+      } else {
+        setFetchError("Unable to connect to the learning server. Please check your network connection.");
+      }
     } finally {
       setLoading(false);
     }
-  }, [conceptParam]);
+  }, [conceptParam, modeParam]);
 
   useEffect(() => {
     fetchNextQuestion();
@@ -91,8 +90,8 @@ function PracticeContent() {
     if (!selectedKey || !sessionData || submitting) return;
 
     setSubmitting(true);
+    setSubmitError(null);
     const responseMs = Date.now() - startTime;
-    const clientAttemptId = crypto.randomUUID();
 
     try {
       const res = await api.submitPracticeAnswer({
@@ -100,33 +99,16 @@ function PracticeContent() {
         session_id: sessionData.session_id,
         question_id: sessionData.question.id,
         selected_key: selectedKey,
-        reasoning: reasoningText.trim() || undefined,
+        reasoning: reasoningText.trim().slice(0, 600) || undefined,
         response_ms: responseMs,
       });
       setFeedback(res);
-    } catch {
-      // Offline fallback simulation
-      const isCorrect = selectedKey === "B";
-      setFeedback({
-        is_correct: isCorrect,
-        correct_key: "B",
-        explanation: "Oxygen gas released in photosynthesis comes entirely from the splitting of water molecules (2H2O -> 4H+ + O2), not from carbon dioxide.",
-        mastery: {
-          concept_id: sessionData.question.concept_id,
-          before: 0.30,
-          after: isCorrect ? 0.66 : 0.18,
-          status: isCorrect ? "learning" : "learning",
-        },
-        misconception: selectedKey === "A" ? {
-          id: "m-o2-from-co2",
-          statement: "The oxygen gas released during photosynthesis originates from carbon dioxide.",
-          correction: "Oxygen gas is released exclusively from the photolysis (splitting) of water molecules in the light reaction.",
-          source: "distractor",
-          confidence: 1.0,
-        } : null,
-        ai: { used: false, fallback: false },
-        newly_unlocked: isCorrect ? ["lp-stomata"] : [],
-      });
+    } catch (err: unknown) {
+      if (err instanceof ApiError) {
+        setSubmitError(err.message || "Failed to evaluate answer. You can retry submission.");
+      } else {
+        setSubmitError("Network error while submitting answer. Your input is preserved — click below to retry.");
+      }
     } finally {
       setSubmitting(false);
     }
@@ -137,6 +119,39 @@ function PracticeContent() {
       <div className="max-w-2xl mx-auto py-16 text-center space-y-4">
         <div className="inline-block h-8 w-8 animate-spin rounded-full border-2 border-mastery-emerald border-t-transparent" />
         <p className="text-xs font-mono text-ink-muted">Selecting calibrated question...</p>
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="max-w-2xl mx-auto py-12 px-4">
+        <div className="rounded-2xl border border-mastery-crimson/30 bg-surface p-8 shadow-subtle text-center space-y-4">
+          <div className="h-12 w-12 mx-auto rounded-full bg-mastery-crimsonLight flex items-center justify-center text-mastery-crimson">
+            <AlertCircle className="h-6 w-6" />
+          </div>
+          <h2 className="font-serif text-lg font-semibold text-ink-primary">
+            Unable to Load Practice Question
+          </h2>
+          <p className="text-xs text-ink-secondary max-w-md mx-auto">
+            {fetchError}
+          </p>
+          <div className="pt-2 flex items-center justify-center gap-3">
+            <Link
+              href="/dashboard"
+              className="px-4 py-2 rounded-lg border border-border-subtle bg-surface text-xs font-semibold text-ink-secondary hover:bg-subtle transition"
+            >
+              Back to Study Map
+            </Link>
+            <button
+              onClick={fetchNextQuestion}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-ink-primary text-canvas text-xs font-semibold hover:bg-ink-primary/90 transition shadow-subtle"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              <span>Retry</span>
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -176,6 +191,14 @@ function PracticeContent() {
               <span className="font-mono text-[10px] text-mastery-emerald">
                 Level {question.difficulty_bucket}
               </span>
+              {modeParam === "review" && (
+                <>
+                  <span className="text-border-subtle">•</span>
+                  <span className="font-mono text-[10px] text-earth-amberText bg-earth-amber/15 px-2 py-0.5 rounded font-semibold">
+                    Spaced Review
+                  </span>
+                </>
+              )}
             </div>
             <h1 className="font-serif text-lg sm:text-xl font-medium text-ink-primary leading-snug">
               {question.stem}
@@ -233,7 +256,7 @@ function PracticeContent() {
                   Explain your reasoning (dictate or type)
                 </span>
                 <span className="text-[11px] text-ink-muted">
-                  Helps identify underlying misconceptions
+                  Max 600 characters • Helps identify misconceptions
                 </span>
               </div>
               <VoiceFriendlyTextarea
@@ -241,8 +264,24 @@ function PracticeContent() {
                 onChange={setReasoningText}
                 onSubmit={handleSubmit}
                 minRows={4}
+                maxLength={600}
                 placeholder="Speak out loud or type why you chose this answer..."
               />
+            </div>
+          )}
+
+          {/* Inline Submission Error Alert */}
+          {submitError && (
+            <div className="rounded-xl border border-mastery-crimson/30 bg-mastery-crimsonLight p-4 flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-mastery-crimson shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <h4 className="text-xs font-semibold text-mastery-crimsonText">
+                  Submission Error
+                </h4>
+                <p className="text-xs text-ink-primary leading-relaxed">
+                  {submitError}
+                </p>
+              </div>
             </div>
           )}
 
@@ -339,7 +378,7 @@ function PracticeContent() {
                 onClick={handleSubmit}
                 className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-ink-primary text-canvas text-xs font-semibold hover:bg-ink-primary/90 disabled:opacity-40 transition shadow-subtle"
               >
-                <span>{submitting ? "Evaluating..." : "Submit Answer"}</span>
+                <span>{submitting ? "Evaluating..." : submitError ? "Retry Submission" : "Submit Answer"}</span>
                 <ArrowRight className="h-3.5 w-3.5" />
               </button>
             ) : (

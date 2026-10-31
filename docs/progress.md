@@ -101,10 +101,22 @@ Handoff memory across agent sessions.
   - Production builds verified and all contracts synchronized via `openapi-typescript`.
   - Resolved PostCSS configuration and Next.js CSS stylesheet asset serving (`postcss.config.js` standard CommonJS export, cleared stale `.next` cache, and verified all 7 frontend routes returning 200 OK with full Tailwind utility compilation).
 
+- **Comprehensive Bug-Fixing & Stabilization Pass Complete:**
+  - **Database Seeding (`app/db/seed.py`):** Explicit flush after prerequisite insertion (`autoflush=False` fix), deterministic isolated `Random(42)`, valid per-student practice sessions (zero orphan attempts), answer keys aligned with correctness, idempotent repeated execution.
+  - **Security & Authorization (`deps.py`, `teacher.py`, `ops.py`, `speech.py`):** `ALLOW_DEMO_AUTH` flag rejecting unauthenticated demo headers in production, `verify_classroom_access` multi-tenant scoping, authenticated speech transcription and ops endpoints, user/speech/teachback rate limiting.
+  - **Adaptive Practice & Concurrency (`practice_service.py`, `selector.py`):** Session verification (active, ownership, kind), answer key validation (422 for invalid keys), response timing validation (0 to 600,000ms), idempotent retry handling, `IntegrityError` concurrency safety, 2-pass concept selection preventing 12 consecutive repeats.
+  - **Diagnostic Assessment (`diagnostic_service.py`):** Idempotent retries on 15th question, prerequisite skip constraint (<0.30), unlocked recommendation guarantee, full 20-concept baseline with explicit `untested` status.
+  - **Teach-Back & AI Router (`teachback_service.py`, `router.py`, `recorder.py`):** Atomic post-LLM mastery row locking, session cleanup, cumulative evaluation across transcripts, shared global request deadline, DB-backed telemetry with ring-buffer fallback.
+  - **Question Bank (`questions.json`):** Corrected cross-concept misconceptions and distributed answer keys across choices (A: 23.8%, B: 28.6%, C: 23.8%, D: 23.8%).
+  - **Teacher Analytics & Reviews (`teacher_service.py`, `review_service.py`):** Distinct active misconception counts via SQL joins, canonical overdue condition (`now >= next_due_at`).
+  - **Frontend Fallback Elimination:** Removed all silent fabricated mocks from Practice, Diagnostic, Teach-Back, Review, Study Map, Teacher Heatmap, and System Health. All failures render authentic error states and retry buttons.
+  - **UI/UX & Voice Input:** Voice-friendly textarea with MediaRecorder auto-stop and track cleanup, accessible concept graph keyboard navigation (Tab/Enter/Space/Escape), opaque high-contrast heatmap cells, distinct concept abbreviations.
+  - **Build Verification:** 52/52 backend tests passing, `ruff` & `mypy` 0 errors across 68 files, `pnpm typecheck`, `pnpm lint`, and `pnpm build` (12/12 routes) passing.
+
 ---
 
 ## Complete
-All Milestones (M0 through M6) are completely implemented, verified, and committed to repository `https://github.com/Pranav-Pardeshii/dialecto`:
+All Milestones (M0 through M6) and the Stabilization Pass are completely implemented, verified, and committed:
 - **Adaptive Diagnostic & Practice Engine** with BKT Bayesian Knowledge Tracing, Elo item calibration, SM-2 spaced repetition decay, and optimal next-question selection.
 - **Resilient AI Layer** with in-process circuit breakers, token budget rate limiting, Groq multi-model fallback chain, and misconception classification from student reasoning.
 - **Teach-Back Mode with Pip** featuring autonomous comprehension levels (0 to 3), rubric key point evaluations, soft-evidence Bayesian updates, and voice dictation.

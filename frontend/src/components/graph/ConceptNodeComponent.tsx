@@ -38,8 +38,17 @@ export const ConceptNodeComponent = memo(function ConceptNodeComponent({
 
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-label={`Concept: ${data.name}. Chapter: ${chapterName}. Status: ${status}. Retention: ${pEff} percent.`}
       onClick={() => data.onSelect(data.id)}
-      className={`relative w-64 rounded-xl border p-4 transition-all duration-200 cursor-pointer shadow-subtle ${
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          data.onSelect(data.id);
+        }
+      }}
+      className={`relative w-64 rounded-xl border p-4 transition-all duration-200 cursor-pointer shadow-subtle focus:outline-none focus:ring-2 focus:ring-mastery-emerald ${
         isLocked
           ? "border-border-subtle bg-subtle/60 opacity-75 hover:opacity-100"
           : isMastered

@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState, useRef, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   api,
+  ApiError,
   TeachbackSessionStartResponse,
   TeachbackTurnResponse,
 } from "@/lib/api/client";
@@ -17,6 +18,9 @@ import {
   AlertCircle,
   BookOpen,
   Award,
+  RotateCcw,
+  AlertTriangle,
+  Lightbulb,
 } from "lucide-react";
 
 interface TurnMessage {
@@ -28,27 +32,6 @@ interface TurnMessage {
   missing?: string[];
   misconceptions?: { id: string; statement: string }[];
 }
-
-const FALLBACK_PIP_PROGRESSION = [
-  {
-    reply: "Oh, that makes sense! So chlorophyll absorbs sunlight to energize the reaction, but where does the oxygen gas actually originate from?",
-    level: 1,
-    covered: ["Absorption of light energy by chlorophyll"],
-    finished: false,
-  },
-  {
-    reply: "Aha! So light energy directly splits water molecules into hydrogen and oxygen (photolysis)? But where does carbon dioxide come in?",
-    level: 2,
-    covered: ["Splitting of water (photolysis) releasing oxygen gas"],
-    finished: false,
-  },
-  {
-    reply: "Now I see the full picture! Carbon dioxide is reduced to make carbohydrates like glucose. Thank you, I understand photosynthesis completely!",
-    level: 3,
-    covered: ["Reduction of carbon dioxide to carbohydrates"],
-    finished: true,
-  },
-];
 
 export default function TeachbackPage({
   params,
@@ -62,6 +45,9 @@ export default function TeachbackPage({
   const [session, setSession] = useState<TeachbackSessionStartResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [initError, setInitError] = useState<string | null>(null);
+  const [turnError, setTurnError] = useState<string | null>(null);
+
   const [inputText, setInputText] = useState("");
   const [messages, setMessages] = useState<TurnMessage[]>([]);
   const [currentLevel, setCurrentLevel] = useState<number>(0);
@@ -70,76 +56,107 @@ export default function TeachbackPage({
   const [finalResult, setFinalResult] = useState<TeachbackTurnResponse["result"] | null>(null);
   const [fallbackToast, setFallbackToast] = useState(false);
 
-  useEffect(() => {
-    let mounted = true;
-    const initSession = async () => {
-      try {
-        setLoading(true);
-        const startData = await api.startTeachback(conceptId);
-        if (!mounted) return;
-        setSession(startData);
-        setCurrentLevel(startData.pip.level);
-        setMessages([
-          {
-            role: "pip",
-            content: startData.pip.content,
-            level: startData.pip.level,
-          },
-        ]);
-      } catch {
-        // Fallback demo session if backend endpoint offline
-        if (!mounted) return;
-        setSession({
-          id: 1,
-          concept_id: conceptId,
-          concept_name: "Photosynthesis Mechanism",
-          turn_count: 0,
-          pip: {
-            content:
-              "Hi! Can you teach me how plants make food using sunlight? Where does the oxygen come from?",
-            level: 0,
-          },
-          rubric: {
-            key_points: [
-              "Absorption of light energy by chlorophyll",
-              "Splitting of water (photolysis) releasing oxygen gas",
-              "Reduction of carbon dioxide to carbohydrates",
-            ],
-          },
-          finished: false,
-        });
-        setMessages([
-          {
-            role: "pip",
-            content:
-              "Hi! Can you teach me how plants make food using sunlight? Where does the oxygen come from?",
-            level: 0,
-          },
-        ]);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Auto-scroll transcript on new messages or thinking states
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, submitting]);
+
+  const initSession = async () => {
+    setLoading(true);
+    setInitError(null);
+    setTurnError(null);
+
+    try {
+      // Check if we can resume an existing session from storage
+      const storageKey = `dialecto_teachback_${conceptId}`;
+      const savedSessionId = typeof window !== "undefined" ? sessionStorage.getItem(storageKey) : null;
+
+      if (savedSessionId) {
+        try {
+          const detail = await api.getTeachbackSession(Number(savedSessionId));
+          if (detail && detail.concept_id === conceptId) {
+            // Restore session
+            setCurrentLevel(detail.current_level);
+            setFinished(detail.finished);
+
+            const restoredMessages: TurnMessage[] = detail.turns.map((t) => ({
+              role: t.role === "learner" ? "learner" : "pip",
+              content: t.content,
+              level: t.level ?? undefined,
+            }));
+
+            setMessages(restoredMessages);
+
+            // Fetch start session info to populate rubric
+            const startData = await api.startTeachback(conceptId);
+            setSession({
+              ...startData,
+              id: detail.id,
+              turn_count: detail.turn_count,
+              finished: detail.finished,
+              pip: {
+                content: restoredMessages[restoredMessages.length - 1]?.content || startData.pip.content,
+                level: detail.current_level,
+              },
+            });
+            setLoading(false);
+            return;
+          }
+        } catch {
+          // If restoring failed, continue to start a fresh session
+          sessionStorage.removeItem(storageKey);
+        }
+      }
+
+      // Start fresh session
+      const startData = await api.startTeachback(conceptId);
+      setSession(startData);
+      setCurrentLevel(startData.pip.level);
+      setFinished(startData.finished);
+      setMessages([
+        {
+          role: "pip",
+          content: startData.pip.content,
+          level: startData.pip.level,
+        },
+      ]);
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem(storageKey, String(startData.id));
+      }
+    } catch (err: unknown) {
+      setSession(null);
+      if (err instanceof ApiError) {
+        setInitError(err.message || "Failed to initialize teach-back session.");
+      } else {
+        setInitError("Unable to connect to the learning server. Please check your connection.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     initSession();
-    return () => {
-      mounted = false;
-    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conceptId]);
 
   const handleSubmit = async () => {
     if (!inputText.trim() || !session || submitting || finished) return;
 
     const userText = inputText.trim();
-    setInputText("");
     setSubmitting(true);
+    setTurnError(null);
 
-    // Optimistically add learner turn to thread
-    setMessages((prev) => [...prev, { role: "learner", content: userText }]);
+    // Optimistically show user message
+    const tempLearnerMsg: TurnMessage = { role: "learner", content: userText };
+    setMessages((prev) => [...prev, tempLearnerMsg]);
 
     try {
       const turnResp = await api.submitTeachbackTurn(session.id, userText);
       setCurrentLevel(turnResp.pip.level);
+      setInputText(""); // Clear input only after successful submission
 
       if (turnResp.ai?.fallback) {
         setFallbackToast(true);
@@ -172,42 +189,17 @@ export default function TeachbackPage({
       if (turnResp.finished) {
         setFinished(true);
         setFinalResult(turnResp.result || null);
+        if (typeof window !== "undefined") {
+          sessionStorage.removeItem(`dialecto_teachback_${conceptId}`);
+        }
       }
-    } catch {
-      // Graceful progressive dialogue if offline
-      const nextIdx = Math.min(FALLBACK_PIP_PROGRESSION.length - 1, currentLevel);
-      const step = FALLBACK_PIP_PROGRESSION[nextIdx];
-      setCurrentLevel(step.level);
-      setCoveredPoints((prev) => {
-        const updated = new Set(prev);
-        step.covered.forEach((pt) => updated.add(pt));
-        return updated;
-      });
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "pip",
-          content: step.reply,
-          level: step.level,
-        },
-      ]);
-      if (step.finished) {
-        setFinished(true);
-        setFinalResult({
-          final_score: 0.90,
-          final_level: 3,
-          mastery: {
-            concept_id: conceptId,
-            before: 0.35,
-            after: 0.82,
-            status: "mastered",
-          },
-          strengths: [
-            "Clear explanation of chlorophyll light absorption",
-            "Accurate description of photolysis splitting water into oxygen",
-          ],
-          gaps: [],
-        });
+    } catch (err: unknown) {
+      // Revert optimistic user message on failure so state stays consistent
+      setMessages((prev) => prev.filter((m) => m !== tempLearnerMsg));
+      if (err instanceof ApiError) {
+        setTurnError(err.message || "Failed to evaluate explanation. You can retry.");
+      } else {
+        setTurnError("Network error while submitting explanation. Your input is preserved — click retry.");
       }
     } finally {
       setSubmitting(false);
@@ -221,6 +213,8 @@ export default function TeachbackPage({
     { label: "Level 3: Mastered!", color: "bg-mastery-emeraldLight text-mastery-emeraldText", mood: "Full comprehension!" },
   ];
 
+  const hasLearnerTurn = messages.some((m) => m.role === "learner");
+
   if (loading && !session) {
     return (
       <div className="max-w-5xl mx-auto px-4 py-8">
@@ -228,6 +222,39 @@ export default function TeachbackPage({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="h-96 bg-canvas-card rounded-xl border border-earth-sand/30 animate-pulse" />
           <div className="md:col-span-2 h-96 bg-canvas-card rounded-xl border border-earth-sand/30 animate-pulse" />
+        </div>
+      </div>
+    );
+  }
+
+  if (initError) {
+    return (
+      <div className="max-w-2xl mx-auto py-12 px-4">
+        <div className="rounded-2xl border border-mastery-crimson/30 bg-surface p-8 shadow-subtle text-center space-y-4">
+          <div className="h-12 w-12 mx-auto rounded-full bg-mastery-crimsonLight flex items-center justify-center text-mastery-crimson">
+            <AlertCircle className="h-6 w-6" />
+          </div>
+          <h2 className="font-serif text-lg font-semibold text-ink-primary">
+            Unable to Start Teach-Back Session
+          </h2>
+          <p className="text-xs text-ink-secondary max-w-md mx-auto">
+            {initError}
+          </p>
+          <div className="pt-2 flex items-center justify-center gap-3">
+            <Link
+              href="/dashboard"
+              className="px-4 py-2 rounded-lg border border-border-subtle bg-surface text-xs font-semibold text-ink-secondary hover:bg-subtle transition"
+            >
+              Back to Study Map
+            </Link>
+            <button
+              onClick={initSession}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-ink-primary text-canvas text-xs font-semibold hover:bg-ink-primary/90 transition shadow-subtle"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              <span>Retry</span>
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -253,12 +280,12 @@ export default function TeachbackPage({
           <span>Back to Study Map</span>
         </Link>
         <span className="font-mono text-[11px] text-ink-muted uppercase tracking-wider">
-          Teach-Back Arena
+          Teach-Back Arena • {session?.concept_name}
         </span>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column: Pip Persona & Rubric Checklist (4 cols) */}
+        {/* Left Column: Pip Persona & Rubric (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
           {/* Pip State Card */}
           <div className="bg-canvas-card rounded-xl border border-earth-sand/30 p-5 shadow-card">
@@ -268,7 +295,7 @@ export default function TeachbackPage({
               </div>
               <div>
                 <h2 className="font-serif text-base font-bold text-ink-primary">
-                  Pip (Student AI)
+                  Pip (Peer Learner)
                 </h2>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span
@@ -290,7 +317,7 @@ export default function TeachbackPage({
             {/* Level Stepper Bar */}
             <div className="space-y-1.5 pt-2 border-t border-earth-sand/20">
               <div className="flex justify-between text-[10px] font-mono text-ink-muted">
-                <span>Comprehension</span>
+                <span>Comprehension Level</span>
                 <span>{currentLevel} / 3</span>
               </div>
               <div className="grid grid-cols-4 gap-1 h-1.5">
@@ -310,42 +337,54 @@ export default function TeachbackPage({
             </div>
           </div>
 
-          {/* NCERT Rubric Checklist */}
+          {/* NCERT Concept Checklist */}
           <div className="bg-canvas-card rounded-xl border border-earth-sand/30 p-5 shadow-card">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-1.5">
                 <BookOpen className="h-4 w-4 text-mastery-emerald" />
                 <h3 className="font-serif text-xs font-bold text-ink-primary">
-                  NCERT Concept Rubric
+                  Curriculum Rubric
                 </h3>
               </div>
               <span className="font-mono text-[10px] text-ink-muted">
-                {coveredPoints.size} / {session?.rubric.key_points.length || 0}
+                {coveredPoints.size} / {session?.rubric.key_points.length || 0} Covered
               </span>
             </div>
 
-            <div className="space-y-2">
-              {session?.rubric.key_points.map((pt, idx) => {
-                const isCovered = coveredPoints.has(pt);
-                return (
-                  <div
-                    key={idx}
-                    className={`flex items-start gap-2.5 p-2.5 rounded-lg border text-xs transition ${
-                      isCovered
-                        ? "bg-mastery-emeraldLight/40 border-mastery-emerald/30 text-ink-primary font-medium"
-                        : "bg-canvas-warm/30 border-earth-sand/30 text-ink-muted"
-                    }`}
-                  >
-                    {isCovered ? (
-                      <CheckCircle2 className="h-4 w-4 text-mastery-emerald shrink-0 mt-0.5" />
-                    ) : (
-                      <div className="h-3.5 w-3.5 rounded-full border border-dashed border-earth-sand shrink-0 mt-0.5" />
-                    )}
-                    <span className="leading-snug">{pt}</span>
-                  </div>
-                );
-              })}
-            </div>
+            {!hasLearnerTurn ? (
+              <div className="rounded-lg bg-canvas-warm/40 border border-earth-sand/30 p-3 space-y-2">
+                <div className="flex items-center gap-2 text-xs font-semibold text-ink-primary">
+                  <Lightbulb className="h-4 w-4 text-mastery-amber" />
+                  <span>Your Mission</span>
+                </div>
+                <p className="text-xs text-ink-secondary leading-relaxed">
+                  Teach Pip about <strong>{session?.concept_name}</strong> in your own words. The key evaluation points will unlock and check off as you explain the core biological mechanisms.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {session?.rubric.key_points.map((pt, idx) => {
+                  const isCovered = coveredPoints.has(pt);
+                  return (
+                    <div
+                      key={idx}
+                      className={`flex items-start gap-2.5 p-2.5 rounded-lg border text-xs transition ${
+                        isCovered
+                          ? "bg-mastery-emeraldLight/40 border-mastery-emerald/30 text-ink-primary font-medium"
+                          : "bg-canvas-warm/30 border-earth-sand/30 text-ink-muted"
+                      }`}
+                    >
+                      {isCovered ? (
+                        <CheckCircle2 className="h-4 w-4 text-mastery-emerald shrink-0 mt-0.5" />
+                      ) : (
+                        <div className="h-3.5 w-3.5 rounded-full border border-dashed border-earth-sand shrink-0 mt-0.5" />
+                      )}
+                      <span className="leading-snug">{pt}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
 
@@ -392,6 +431,21 @@ export default function TeachbackPage({
                     )}
                   </div>
                 )}
+
+                {/* Detected Misconceptions on this turn */}
+                {msg.misconceptions && msg.misconceptions.length > 0 && (
+                  <div className="mt-2 max-w-[88%] rounded-lg border border-mastery-amber bg-mastery-amberLight p-3 text-xs space-y-1">
+                    <div className="flex items-center gap-1.5 font-semibold text-mastery-amberText">
+                      <AlertTriangle className="h-3.5 w-3.5" />
+                      <span>Note for Clarity</span>
+                    </div>
+                    {msg.misconceptions.map((misc) => (
+                      <p key={misc.id} className="text-ink-primary">
+                        &ldquo;{misc.statement}&rdquo;
+                      </p>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
 
@@ -402,12 +456,29 @@ export default function TeachbackPage({
                 </div>
               </div>
             )}
+
+            <div ref={messagesEndRef} />
           </div>
+
+          {/* Turn Submission Error Alert */}
+          {turnError && (
+            <div className="rounded-xl border border-mastery-crimson/30 bg-mastery-crimsonLight p-4 flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-mastery-crimson shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <h4 className="text-xs font-semibold text-mastery-crimsonText">
+                  Explanation Evaluation Failed
+                </h4>
+                <p className="text-xs text-ink-primary leading-relaxed">
+                  {turnError}
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Completion Celebration Card */}
           {finished && finalResult && (
-            <div className="bg-mastery-emeraldLight/50 border border-mastery-emerald/30 rounded-xl p-6 shadow-card">
-              <div className="flex items-center gap-3 mb-3">
+            <div className="bg-mastery-emeraldLight/50 border border-mastery-emerald/30 rounded-xl p-6 shadow-card space-y-4 animate-in fade-in duration-200">
+              <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-mastery-emerald text-canvas">
                   <Award className="h-5 w-5" />
                 </div>
@@ -416,13 +487,13 @@ export default function TeachbackPage({
                     Teach-Back Session Complete!
                   </h3>
                   <p className="text-xs text-ink-secondary">
-                    Pip reached Level {finalResult.final_level} with a score of{" "}
+                    Pip reached Level {finalResult.final_level} with a rubric mastery of{" "}
                     {Math.round(finalResult.final_score * 100)}%!
                   </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 my-4 p-3 bg-canvas-card rounded-lg border border-earth-sand/30 text-xs">
+              <div className="grid grid-cols-2 gap-3 p-3 bg-canvas-card rounded-lg border border-earth-sand/30 text-xs">
                 <div>
                   <span className="text-[10px] text-ink-muted uppercase block">Mastery Delta</span>
                   <span className="font-semibold text-mastery-emeraldText">
@@ -431,14 +502,41 @@ export default function TeachbackPage({
                   </span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-ink-muted uppercase block">Status</span>
+                  <span className="text-[10px] text-ink-muted uppercase block">Curriculum Status</span>
                   <span className="font-semibold capitalize text-ink-primary">
                     {finalResult.mastery.status}
                   </span>
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2">
+              {/* Strengths & Gaps Breakdown */}
+              {finalResult.strengths && finalResult.strengths.length > 0 && (
+                <div className="space-y-1 text-xs">
+                  <span className="font-semibold text-mastery-emeraldText block">
+                    Observed Explanatory Strengths:
+                  </span>
+                  <ul className="list-disc list-inside space-y-0.5 text-ink-secondary">
+                    {finalResult.strengths.map((str, i) => (
+                      <li key={i}>{str}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {finalResult.gaps && finalResult.gaps.length > 0 && (
+                <div className="space-y-1 text-xs">
+                  <span className="font-semibold text-mastery-amberText block">
+                    Areas for Next Review:
+                  </span>
+                  <ul className="list-disc list-inside space-y-0.5 text-ink-secondary">
+                    {finalResult.gaps.map((gap, i) => (
+                      <li key={i}>{gap}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-mastery-emerald/20">
                 <button
                   onClick={() => router.push("/dashboard")}
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-mastery-emerald text-canvas text-xs font-semibold hover:bg-mastery-emeraldText transition shadow-subtle"
@@ -459,7 +557,7 @@ export default function TeachbackPage({
                   <span className="font-medium">Teach Pip in Your Own Words</span>
                 </div>
                 <span className="text-[11px] text-ink-muted">
-                  Ctrl+Enter or Submit
+                  Ctrl+Enter or Send Explanation
                 </span>
               </div>
 
@@ -475,14 +573,14 @@ export default function TeachbackPage({
 
               <div className="flex items-center justify-between pt-1">
                 <div className="text-[11px] text-ink-muted">
-                  Explain clearly to unlock Level 3
+                  Explain clearly to level Pip up to Level 3
                 </div>
                 <button
                   onClick={handleSubmit}
                   disabled={!inputText.trim() || submitting}
                   className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-ink-primary text-canvas text-xs font-semibold hover:bg-ink-primary/90 disabled:opacity-40 transition shadow-subtle"
                 >
-                  <span>{submitting ? "Evaluating..." : "Send Explanation"}</span>
+                  <span>{submitting ? "Evaluating..." : turnError ? "Retry Explanation" : "Send Explanation"}</span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </button>
               </div>

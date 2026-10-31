@@ -5,10 +5,26 @@
     "kind": "mcq",
     "stem": "Which of the following organisms exhibits saprophytic nutrition?",
     "options": [
-      {"key": "A", "text": "Mushroom (fungi) breaking down dead organic matter", "misconception_id": null},
-      {"key": "B", "text": "Amoeba engulfing solid food particles with pseudopodia", "misconception_id": null},
-      {"key": "C", "text": "Cuscuta (dodder plant) deriving nutrition from a host", "misconception_id": null},
-      {"key": "D", "text": "Green algae synthesizing glucose in water", "misconception_id": null}
+      {
+        "key": "A",
+        "text": "Mushroom (fungi) breaking down dead organic matter",
+        "misconception_id": null
+      },
+      {
+        "key": "B",
+        "text": "Amoeba engulfing solid food particles with pseudopodia",
+        "misconception_id": null
+      },
+      {
+        "key": "C",
+        "text": "Cuscuta (dodder plant) deriving nutrition from a host",
+        "misconception_id": null
+      },
+      {
+        "key": "D",
+        "text": "Green algae synthesizing glucose in water",
+        "misconception_id": null
+      }
     ],
     "correct_key": "A",
     "explanation": "Saprophytic organisms like mushrooms and fungi secrete digestive enzymes onto decaying organic matter and absorb nutrients.",
@@ -24,12 +40,28 @@
     "kind": "mcq",
     "stem": "Where do green plants primarily obtain the raw organic food required for their metabolism?",
     "options": [
-      {"key": "A", "text": "Directly absorbed from fertile humus in soil through roots", "misconception_id": "m-plants-soil-food"},
-      {"key": "B", "text": "Synthesized by cells using CO2, water, and sunlight energy", "misconception_id": null},
-      {"key": "C", "text": "Derived from organic symbiotic mycorrhizal bacteria", "misconception_id": null},
-      {"key": "D", "text": "Absorbed from dissolved organic matter in rainwater", "misconception_id": null}
+      {
+        "key": "A",
+        "text": "Directly absorbed from fertile humus in soil through roots",
+        "misconception_id": "m-plants-soil-food"
+      },
+      {
+        "key": "B",
+        "text": "Derived from organic symbiotic mycorrhizal bacteria",
+        "misconception_id": null
+      },
+      {
+        "key": "C",
+        "text": "Synthesized by cells using CO2, water, and sunlight energy",
+        "misconception_id": null
+      },
+      {
+        "key": "D",
+        "text": "Absorbed from dissolved organic matter in rainwater",
+        "misconception_id": null
+      }
     ],
-    "correct_key": "B",
+    "correct_key": "C",
     "explanation": "Plants are autotrophs; soil supplies inorganic water and minerals, but food (glucose) is synthesized via photosynthesis.",
     "difficulty_bucket": 2,
     "difficulty_rating": 0.0,
@@ -43,12 +75,28 @@
     "kind": "mcq",
     "stem": "During the photochemical reaction of photosynthesis, which molecule directly yields the released oxygen gas?",
     "options": [
-      {"key": "A", "text": "Carbon dioxide molecules during reduction", "misconception_id": "m-o2-from-co2"},
-      {"key": "B", "text": "Water molecules split by absorbed light energy", "misconception_id": null},
-      {"key": "C", "text": "Glucose during its carbohydrate assembly", "misconception_id": null},
-      {"key": "D", "text": "Chlorophyll pigment degradation", "misconception_id": null}
+      {
+        "key": "A",
+        "text": "Carbon dioxide molecules during reduction",
+        "misconception_id": "m-o2-from-co2"
+      },
+      {
+        "key": "B",
+        "text": "Chlorophyll pigment degradation",
+        "misconception_id": null
+      },
+      {
+        "key": "C",
+        "text": "Glucose during its carbohydrate assembly",
+        "misconception_id": null
+      },
+      {
+        "key": "D",
+        "text": "Water molecules split by absorbed light energy",
+        "misconception_id": null
+      }
     ],
-    "correct_key": "B",
+    "correct_key": "D",
     "explanation": "Oxygen released in photosynthesis comes from the photolysis of water molecules (2H2O -> 4H+ + O2), not from carbon dioxide.",
     "difficulty_bucket": 2,
     "difficulty_rating": 0.0,
@@ -62,12 +110,28 @@
     "kind": "mcq",
     "stem": "What physical mechanism directly causes a stomatal pore to open?",
     "options": [
-      {"key": "A", "text": "Atmospheric water vapour being absorbed into the pore", "misconception_id": "m-stomata-absorb-water"},
-      {"key": "B", "text": "Water flowing into guard cells causing them to swell and curve", "misconception_id": null},
-      {"key": "C", "text": "Loss of water from guard cells causing them to shrink", "misconception_id": null},
-      {"key": "D", "text": "Evaporative drying of the epidermal cuticle", "misconception_id": null}
+      {
+        "key": "A",
+        "text": "Water flowing into guard cells causing them to swell and curve",
+        "misconception_id": null
+      },
+      {
+        "key": "B",
+        "text": "Atmospheric water vapour being absorbed into the pore",
+        "misconception_id": "m-stomata-absorb-water"
+      },
+      {
+        "key": "C",
+        "text": "Loss of water from guard cells causing them to shrink",
+        "misconception_id": null
+      },
+      {
+        "key": "D",
+        "text": "Evaporative drying of the epidermal cuticle",
+        "misconception_id": null
+      }
     ],
-    "correct_key": "B",
+    "correct_key": "A",
     "explanation": "Guard cells swell when water enters them via osmosis, causing their curved outer walls to expand and pull the inner pore open.",
     "difficulty_bucket": 2,
     "difficulty_rating": 0.0,
@@ -81,12 +145,28 @@
     "kind": "mcq",
     "stem": "What is the primary physiological function of bile juice secreted by the liver?",
     "options": [
-      {"key": "A", "text": "Providing specialized lipase enzymes to chemically digest proteins", "misconception_id": "m-bile-enzymes"},
-      {"key": "B", "text": "Emulsifying large fat globules into small micelles and making chime alkaline", "misconception_id": null},
-      {"key": "C", "text": "Synthesizing hydrochloric acid to sterilize stomach chime", "misconception_id": null},
-      {"key": "D", "text": "Absorbing glucose through the gastric wall", "misconception_id": "m-digestion-stomach-only"}
+      {
+        "key": "A",
+        "text": "Providing specialized lipase enzymes to chemically digest proteins",
+        "misconception_id": "m-bile-enzymes"
+      },
+      {
+        "key": "B",
+        "text": "Absorbing glucose through the gastric wall",
+        "misconception_id": "m-digestion-stomach-only"
+      },
+      {
+        "key": "C",
+        "text": "Synthesizing hydrochloric acid to sterilize stomach chime",
+        "misconception_id": null
+      },
+      {
+        "key": "D",
+        "text": "Emulsifying large fat globules into small micelles and making chime alkaline",
+        "misconception_id": null
+      }
     ],
-    "correct_key": "B",
+    "correct_key": "D",
     "explanation": "Bile contains no enzymes; its bile salts emulsify fats and its alkaline nature neutralizes acidic gastric juice.",
     "difficulty_bucket": 2,
     "difficulty_rating": 0.0,
@@ -100,10 +180,26 @@
     "kind": "mcq",
     "stem": "Which statement accurately describes cellular respiration in plants?",
     "options": [
-      {"key": "A", "text": "Plants only photosynthesize and do not undergo cellular respiration", "misconception_id": "m-plants-dont-respire"},
-      {"key": "B", "text": "Respiration is identical to the physical act of inhalation", "misconception_id": "m-resp-is-breathing"},
-      {"key": "C", "text": "Plants respire aerobically day and night to produce ATP for metabolic processes", "misconception_id": null},
-      {"key": "D", "text": "Plants only respire during midday when temperatures peak", "misconception_id": null}
+      {
+        "key": "A",
+        "text": "Plants only photosynthesize and do not undergo cellular respiration",
+        "misconception_id": "m-plants-dont-respire"
+      },
+      {
+        "key": "B",
+        "text": "Respiration is identical to the physical act of inhalation",
+        "misconception_id": "m-resp-is-breathing"
+      },
+      {
+        "key": "C",
+        "text": "Plants respire aerobically day and night to produce ATP for metabolic processes",
+        "misconception_id": null
+      },
+      {
+        "key": "D",
+        "text": "Plants only respire during midday when temperatures peak",
+        "misconception_id": null
+      }
     ],
     "correct_key": "C",
     "explanation": "Plants require continuous cellular energy (ATP) and respire all the time, day and night, in their mitochondria.",
@@ -119,10 +215,26 @@
     "kind": "mcq",
     "stem": "How is atmospheric air drawn into the human lungs during inhalation?",
     "options": [
-      {"key": "A", "text": "Lung tissue contracts by itself to actively suction air inward", "misconception_id": "m-lungs-contract"},
-      {"key": "B", "text": "The diaphragm flattens and rib cage expands, reducing thoracic pressure", "misconception_id": null},
-      {"key": "C", "text": "Blood pressure in capillaries forces alveoli to expand", "misconception_id": null},
-      {"key": "D", "text": "The epiglottis pumps air into the trachea", "misconception_id": null}
+      {
+        "key": "A",
+        "text": "Lung tissue contracts by itself to actively suction air inward",
+        "misconception_id": "m-lungs-contract"
+      },
+      {
+        "key": "B",
+        "text": "The diaphragm flattens and rib cage expands, reducing thoracic pressure",
+        "misconception_id": null
+      },
+      {
+        "key": "C",
+        "text": "Blood pressure in capillaries forces alveoli to expand",
+        "misconception_id": null
+      },
+      {
+        "key": "D",
+        "text": "The epiglottis pumps air into the trachea",
+        "misconception_id": null
+      }
     ],
     "correct_key": "B",
     "explanation": "Lungs are elastic but lack muscle to pump; the contraction and flattening of the diaphragm increases chest volume, lowering pressure so air flows in.",
@@ -138,12 +250,28 @@
     "kind": "mcq",
     "stem": "Which human blood vessel carries deoxygenated blood away from the heart toward the respiratory organs?",
     "options": [
-      {"key": "A", "text": "Aorta", "misconception_id": null},
-      {"key": "B", "text": "Pulmonary artery", "misconception_id": null},
-      {"key": "C", "text": "Pulmonary vein", "misconception_id": "m-arteries-oxygenated"},
-      {"key": "D", "text": "Superior vena cava", "misconception_id": null}
+      {
+        "key": "A",
+        "text": "Aorta",
+        "misconception_id": null
+      },
+      {
+        "key": "B",
+        "text": "Superior vena cava",
+        "misconception_id": null
+      },
+      {
+        "key": "C",
+        "text": "Pulmonary vein",
+        "misconception_id": "m-arteries-oxygenated"
+      },
+      {
+        "key": "D",
+        "text": "Pulmonary artery",
+        "misconception_id": null
+      }
     ],
-    "correct_key": "B",
+    "correct_key": "D",
     "explanation": "The pulmonary artery is the exception among arteries: it pumps deoxygenated blood from the right ventricle to the lungs.",
     "difficulty_bucket": 2,
     "difficulty_rating": 0.0,
@@ -157,12 +285,28 @@
     "kind": "mcq",
     "stem": "Why do systemic arteries possess thicker, more muscular walls than corresponding systemic veins?",
     "options": [
-      {"key": "A", "text": "Veins need to expand wider to generate high pressure", "misconception_id": "m-veins-thicker"},
-      {"key": "B", "text": "Arteries must withstand high, pulsing blood pressure directly from ventricles", "misconception_id": null},
-      {"key": "C", "text": "Arteries have internal semilunar valves lining their walls", "misconception_id": null},
-      {"key": "D", "text": "Veins must filter red blood cells before returning to the heart", "misconception_id": null}
+      {
+        "key": "A",
+        "text": "Arteries must withstand high, pulsing blood pressure directly from ventricles",
+        "misconception_id": null
+      },
+      {
+        "key": "B",
+        "text": "Veins need to expand wider to generate high pressure",
+        "misconception_id": "m-veins-thicker"
+      },
+      {
+        "key": "C",
+        "text": "Arteries have internal semilunar valves lining their walls",
+        "misconception_id": null
+      },
+      {
+        "key": "D",
+        "text": "Veins must filter red blood cells before returning to the heart",
+        "misconception_id": null
+      }
     ],
-    "correct_key": "B",
+    "correct_key": "A",
     "explanation": "Blood emerges from the heart under high pressure; thick elastic muscular walls prevent arterial rupture.",
     "difficulty_bucket": 2,
     "difficulty_rating": 0.0,
@@ -176,10 +320,26 @@
     "kind": "mcq",
     "stem": "In tall vascular plants, which tissue and mechanism is primarily responsible for the upward transport of water and dissolved minerals?",
     "options": [
-      {"key": "A", "text": "Phloem translocation driven by active ATP pump", "misconception_id": "m-phloem-water"},
-      {"key": "B", "text": "Xylem vessels driven by transpiration pull", "misconception_id": null},
-      {"key": "C", "text": "Phloem sieve tubes driven by gravitational flow", "misconception_id": null},
-      {"key": "D", "text": "Guard cells absorbing rainwater directly into leaves", "misconception_id": "m-stomata-absorb-water"}
+      {
+        "key": "A",
+        "text": "Phloem translocation driven by active ATP pump",
+        "misconception_id": "m-phloem-water"
+      },
+      {
+        "key": "B",
+        "text": "Xylem vessels driven by transpiration pull",
+        "misconception_id": null
+      },
+      {
+        "key": "C",
+        "text": "Phloem sieve tubes driven by gravitational flow",
+        "misconception_id": null
+      },
+      {
+        "key": "D",
+        "text": "Guard cells absorbing rainwater directly into leaves",
+        "misconception_id": null
+      }
     ],
     "correct_key": "B",
     "explanation": "Xylem conducts water and minerals; transpiration of water vapour from leaves creates a continuous negative suction pull.",
@@ -195,12 +355,28 @@
     "kind": "mcq",
     "stem": "During the formation of urine in human nephrons, what happens to essential substances like glucose and amino acids in the filtrate?",
     "options": [
-      {"key": "A", "text": "They pass directly into the bladder because all filtrate is waste", "misconception_id": "m-no-reabsorption"},
-      {"key": "B", "text": "They are selectively reabsorbed across the tubular epithelium back into blood", "misconception_id": null},
-      {"key": "C", "text": "They are converted directly into urea by nephron cells", "misconception_id": null},
-      {"key": "D", "text": "They are destroyed by bile in the renal pelvis", "misconception_id": null}
+      {
+        "key": "A",
+        "text": "They pass directly into the bladder because all filtrate is waste",
+        "misconception_id": "m-no-reabsorption"
+      },
+      {
+        "key": "B",
+        "text": "They are converted directly into urea by nephron cells",
+        "misconception_id": null
+      },
+      {
+        "key": "C",
+        "text": "They are selectively reabsorbed across the tubular epithelium back into blood",
+        "misconception_id": null
+      },
+      {
+        "key": "D",
+        "text": "They are destroyed by bile in the renal pelvis",
+        "misconception_id": null
+      }
     ],
-    "correct_key": "B",
+    "correct_key": "C",
     "explanation": "Useful nutrients like glucose and amino acids are actively reabsorbed by peritubular capillaries along the renal tubule.",
     "difficulty_bucket": 2,
     "difficulty_rating": 0.0,
@@ -214,10 +390,26 @@
     "kind": "mcq",
     "stem": "What is the correct, unidirectional sequence of electrical nerve impulse propagation through a single neuron?",
     "options": [
-      {"key": "A", "text": "Axon terminal -> Axon -> Cyton -> Dendrite", "misconception_id": "m-impulse-direction"},
-      {"key": "B", "text": "Dendrite -> Cell body (cyton) -> Axon -> Axon terminal", "misconception_id": null},
-      {"key": "C", "text": "Cell body -> Dendrite -> Axon terminal -> Axon", "misconception_id": null},
-      {"key": "D", "text": "Axon -> Dendrite -> Synapse -> Cell body", "misconception_id": null}
+      {
+        "key": "A",
+        "text": "Axon terminal -> Axon -> Cyton -> Dendrite",
+        "misconception_id": "m-impulse-direction"
+      },
+      {
+        "key": "B",
+        "text": "Dendrite -> Cell body (cyton) -> Axon -> Axon terminal",
+        "misconception_id": null
+      },
+      {
+        "key": "C",
+        "text": "Cell body -> Dendrite -> Axon terminal -> Axon",
+        "misconception_id": null
+      },
+      {
+        "key": "D",
+        "text": "Axon -> Dendrite -> Synapse -> Cell body",
+        "misconception_id": null
+      }
     ],
     "correct_key": "B",
     "explanation": "Dendrites detect stimulus and initiate the impulse, which travels through cyton, down the axon, and to the axon terminal.",
@@ -233,12 +425,28 @@
     "kind": "mcq",
     "stem": "Why does pulling your hand away from a hot surface occur before you consciously experience the sensation of pain?",
     "options": [
-      {"key": "A", "text": "The cerebrum makes a conscious decision faster than nerves can signal pain", "misconception_id": "m-reflex-brain"},
-      {"key": "B", "text": "The reflex arc is completed in the spinal cord before the brain processes perception", "misconception_id": null},
-      {"key": "C", "text": "Muscles can detect thermal pain directly without sensory neurons", "misconception_id": null},
-      {"key": "D", "text": "Endocrine adrenaline moves faster than nerve impulses", "misconception_id": "m-hormone-via-nerves"}
+      {
+        "key": "A",
+        "text": "The cerebrum makes a conscious decision faster than nerves can signal pain",
+        "misconception_id": "m-reflex-brain"
+      },
+      {
+        "key": "B",
+        "text": "Endocrine adrenaline moves faster than nerve impulses",
+        "misconception_id": null
+      },
+      {
+        "key": "C",
+        "text": "Muscles can detect thermal pain directly without sensory neurons",
+        "misconception_id": null
+      },
+      {
+        "key": "D",
+        "text": "The reflex arc is completed in the spinal cord before the brain processes perception",
+        "misconception_id": null
+      }
     ],
-    "correct_key": "B",
+    "correct_key": "D",
     "explanation": "Reflex arcs pass directly through relay neurons in the spinal cord to evoke an immediate motor response; signal reaches the brain afterward.",
     "difficulty_bucket": 2,
     "difficulty_rating": 0.0,
@@ -252,10 +460,26 @@
     "kind": "mcq",
     "stem": "Which part of the human brain is specifically responsible for maintaining physical equilibrium, posture, and coordination of voluntary movements?",
     "options": [
-      {"key": "A", "text": "Cerebellum in the hindbrain", "misconception_id": null},
-      {"key": "B", "text": "Cerebrum in the forebrain", "misconception_id": "m-cerebellum-thinks"},
-      {"key": "C", "text": "Medulla oblongata", "misconception_id": null},
-      {"key": "D", "text": "Hypothalamus", "misconception_id": null}
+      {
+        "key": "A",
+        "text": "Cerebellum in the hindbrain",
+        "misconception_id": null
+      },
+      {
+        "key": "B",
+        "text": "Cerebrum in the forebrain",
+        "misconception_id": "m-cerebellum-thinks"
+      },
+      {
+        "key": "C",
+        "text": "Medulla oblongata",
+        "misconception_id": null
+      },
+      {
+        "key": "D",
+        "text": "Hypothalamus",
+        "misconception_id": null
+      }
     ],
     "correct_key": "A",
     "explanation": "The cerebellum coordinates motor balance, equilibrium, and precision of voluntary muscle movement. The cerebrum handles conscious thought.",
@@ -271,12 +495,28 @@
     "kind": "mcq",
     "stem": "During positive phototropism in a growing plant shoot, how does the hormone auxin cause the shoot to bend towards unidirectional light?",
     "options": [
-      {"key": "A", "text": "Auxin concentrates on the illuminated side, speeding up growth toward light", "misconception_id": "m-auxin-lit-side"},
-      {"key": "B", "text": "Auxin diffuses to the shaded side, stimulating faster elongation of shaded cells", "misconception_id": null},
-      {"key": "C", "text": "Auxin destroys cells on the shaded side causing the stem to collapse inward", "misconception_id": null},
-      {"key": "D", "text": "Abscisic acid causes rapid division only on the illuminated tip", "misconception_id": null}
+      {
+        "key": "A",
+        "text": "Auxin concentrates on the illuminated side, speeding up growth toward light",
+        "misconception_id": "m-auxin-lit-side"
+      },
+      {
+        "key": "B",
+        "text": "Auxin destroys cells on the shaded side causing the stem to collapse inward",
+        "misconception_id": null
+      },
+      {
+        "key": "C",
+        "text": "Auxin diffuses to the shaded side, stimulating faster elongation of shaded cells",
+        "misconception_id": null
+      },
+      {
+        "key": "D",
+        "text": "Abscisic acid causes rapid division only on the illuminated tip",
+        "misconception_id": null
+      }
     ],
-    "correct_key": "B",
+    "correct_key": "C",
     "explanation": "Auxin diffuses away from light towards the shaded flank. Increased auxin concentration stimulates greater cell elongation there, bending the stem toward light.",
     "difficulty_bucket": 3,
     "difficulty_rating": 1.0,
@@ -290,10 +530,26 @@
     "kind": "mcq",
     "stem": "Which hormone is synthesized by the pancreas to prevent blood glucose concentrations from rising abnormally high?",
     "options": [
-      {"key": "A", "text": "Thyroxine", "misconception_id": null},
-      {"key": "B", "text": "Adrenaline", "misconception_id": null},
-      {"key": "C", "text": "Insulin", "misconception_id": null},
-      {"key": "D", "text": "Glucagon", "misconception_id": "m-insulin-raises"}
+      {
+        "key": "A",
+        "text": "Thyroxine",
+        "misconception_id": null
+      },
+      {
+        "key": "B",
+        "text": "Adrenaline",
+        "misconception_id": null
+      },
+      {
+        "key": "C",
+        "text": "Insulin",
+        "misconception_id": null
+      },
+      {
+        "key": "D",
+        "text": "Glucagon",
+        "misconception_id": "m-insulin-raises"
+      }
     ],
     "correct_key": "C",
     "explanation": "Insulin is secreted by beta cells of the pancreas; it lowers blood sugar by facilitating cellular glucose uptake and glycogen storage.",
@@ -309,10 +565,26 @@
     "kind": "mcq",
     "stem": "What is the primary evolutionary significance of genetic variation within a biological population?",
     "options": [
-      {"key": "A", "text": "Organisms consciously alter their traits whenever they need to survive", "misconception_id": "m-variation-need"},
-      {"key": "B", "text": "Pre-existing variants may survive unpredictable environmental fluctuations", "misconception_id": null},
-      {"key": "C", "text": "Variation guarantees that all offspring are exact genetic clones", "misconception_id": null},
-      {"key": "D", "text": "Variation prevents cell division from taking place in gametes", "misconception_id": null}
+      {
+        "key": "A",
+        "text": "Organisms consciously alter their traits whenever they need to survive",
+        "misconception_id": "m-variation-need"
+      },
+      {
+        "key": "B",
+        "text": "Pre-existing variants may survive unpredictable environmental fluctuations",
+        "misconception_id": null
+      },
+      {
+        "key": "C",
+        "text": "Variation guarantees that all offspring are exact genetic clones",
+        "misconception_id": null
+      },
+      {
+        "key": "D",
+        "text": "Variation prevents cell division from taking place in gametes",
+        "misconception_id": null
+      }
     ],
     "correct_key": "B",
     "explanation": "Variations arise by chance during DNA copying. If the habitat undergoes extreme changes (e.g., temperature rise), pre-adapted variants survive.",
@@ -328,10 +600,26 @@
     "kind": "mcq",
     "stem": "Why are acquired somatic modifications (e.g. surgically pierced ears or bodybuilder muscles) NOT inherited by subsequent generations?",
     "options": [
-      {"key": "A", "text": "They do not alter the nucleotide DNA sequence of reproductive germ cells (gametes)", "misconception_id": null},
-      {"key": "B", "text": "All somatic changes are automatically passed on through blood circulation", "misconception_id": "m-acquired-inherited"},
-      {"key": "C", "text": "Mendelian genes only exist in bodily skin cells", "misconception_id": null},
-      {"key": "D", "text": "Only maternal bodily adaptations can be passed to children", "misconception_id": null}
+      {
+        "key": "A",
+        "text": "They do not alter the nucleotide DNA sequence of reproductive germ cells (gametes)",
+        "misconception_id": null
+      },
+      {
+        "key": "B",
+        "text": "All somatic changes are automatically passed on through blood circulation",
+        "misconception_id": "m-acquired-inherited"
+      },
+      {
+        "key": "C",
+        "text": "Mendelian genes only exist in bodily skin cells",
+        "misconception_id": null
+      },
+      {
+        "key": "D",
+        "text": "Only maternal bodily adaptations can be passed to children",
+        "misconception_id": null
+      }
     ],
     "correct_key": "A",
     "explanation": "Inheritance requires changes in germ cell DNA (sperm or egg). Changes to somatic tissues do not affect germline genetics.",
@@ -347,10 +635,26 @@
     "kind": "mcq",
     "stem": "When Mendel self-pollinated heterozygous tall F1 pea plants (Tt), what phenotypic ratio appeared in the resulting F2 generation?",
     "options": [
-      {"key": "A", "text": "100% tall plants because the dwarf trait was permanently destroyed in F1", "misconception_id": "m-recessive-lost"},
-      {"key": "B", "text": "3 Tall : 1 Dwarf", "misconception_id": null},
-      {"key": "C", "text": "1 Tall : 2 Medium : 1 Dwarf", "misconception_id": null},
-      {"key": "D", "text": "9 Tall : 3 Dwarf : 3 Intermediate : 1 Wrinkled", "misconception_id": null}
+      {
+        "key": "A",
+        "text": "100% tall plants because the dwarf trait was permanently destroyed in F1",
+        "misconception_id": "m-recessive-lost"
+      },
+      {
+        "key": "B",
+        "text": "3 Tall : 1 Dwarf",
+        "misconception_id": null
+      },
+      {
+        "key": "C",
+        "text": "1 Tall : 2 Medium : 1 Dwarf",
+        "misconception_id": null
+      },
+      {
+        "key": "D",
+        "text": "9 Tall : 3 Dwarf : 3 Intermediate : 1 Wrinkled",
+        "misconception_id": null
+      }
     ],
     "correct_key": "B",
     "explanation": "The phenotypic ratio of Mendel's monohybrid F2 generation is 3 dominant (tall) : 1 recessive (dwarf), with a 1 TT : 2 Tt : 1 tt genotypic ratio.",
@@ -366,12 +670,28 @@
     "kind": "mcq",
     "stem": "In a dihybrid cross between homozygous round yellow (RRYY) and wrinkled green (rryy) pea plants, what phenotypic ratio occurs in F2?",
     "options": [
-      {"key": "A", "text": "3 Round Yellow : 1 Wrinkled Green", "misconception_id": null},
-      {"key": "B", "text": "9 Round Yellow : 3 Round Green : 3 Wrinkled Yellow : 1 Wrinkled Green", "misconception_id": null},
-      {"key": "C", "text": "Round and yellow traits can never separate because they entered together", "misconception_id": "m-traits-stay-together"},
-      {"key": "D", "text": "1 : 1 : 1 : 1 equal combination", "misconception_id": null}
+      {
+        "key": "A",
+        "text": "3 Round Yellow : 1 Wrinkled Green",
+        "misconception_id": null
+      },
+      {
+        "key": "B",
+        "text": "1 : 1 : 1 : 1 equal combination",
+        "misconception_id": null
+      },
+      {
+        "key": "C",
+        "text": "Round and yellow traits can never separate because they entered together",
+        "misconception_id": "m-traits-stay-together"
+      },
+      {
+        "key": "D",
+        "text": "9 Round Yellow : 3 Round Green : 3 Wrinkled Yellow : 1 Wrinkled Green",
+        "misconception_id": null
+      }
     ],
-    "correct_key": "B",
+    "correct_key": "D",
     "explanation": "Independent assortment yields the classic 9:3:3:1 phenotypic ratio in F2, producing new non-parental recombinations (round green, wrinkled yellow).",
     "difficulty_bucket": 3,
     "difficulty_rating": 1.0,
@@ -385,10 +705,26 @@
     "kind": "mcq",
     "stem": "In human beings, which parental gamete genetically determines whether the zygote develops into a boy or a girl?",
     "options": [
-      {"key": "A", "text": "The mother's ovum because it provides mitochondrial DNA", "misconception_id": "m-mother-decides-sex"},
-      {"key": "B", "text": "The father's sperm, which carries either an X or a Y chromosome", "misconception_id": null},
-      {"key": "C", "text": "The ambient temperature of the womb during embryonic implantation", "misconception_id": null},
-      {"key": "D", "text": "The autosomes contributed equally by both parents", "misconception_id": null}
+      {
+        "key": "A",
+        "text": "The mother's ovum because it provides mitochondrial DNA",
+        "misconception_id": "m-mother-decides-sex"
+      },
+      {
+        "key": "B",
+        "text": "The father's sperm, which carries either an X or a Y chromosome",
+        "misconception_id": null
+      },
+      {
+        "key": "C",
+        "text": "The ambient temperature of the womb during embryonic implantation",
+        "misconception_id": null
+      },
+      {
+        "key": "D",
+        "text": "The autosomes contributed equally by both parents",
+        "misconception_id": null
+      }
     ],
     "correct_key": "B",
     "explanation": "Females produce only X gametes. Males produce 50% X and 50% Y sperm. Fertilization by Y sperm results in a boy (XY); X sperm yields a girl (XX).",
@@ -399,4 +735,3 @@
     "source": "seed"
   }
 ]
-

@@ -21,5 +21,5 @@ async def list_users(
 async def get_me(
     current_user: UserOut = Depends(get_current_user),
 ) -> UserOut:
-    """Return the currently authenticated demo identity from X-Demo-User-Id."""
+    """Return the currently authenticated identity."""
     return current_user

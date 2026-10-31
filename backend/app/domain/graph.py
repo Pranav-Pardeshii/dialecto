@@ -45,7 +45,7 @@ def calculate_concept_status(
 ) -> str:
     """Calculates mastery status per docs/architecture.md:
 
-    - locked: any prerequisite has effective mastery < 0.60
+    - locked: any prerequisite has mastery < 0.60
     - unlocked: prerequisites met, but 0 attempts recorded
     - learning: has attempts, but effective mastery < 0.80
     - mastered: effective mastery >= 0.80

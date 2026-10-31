@@ -9,9 +9,21 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        canvas: "#FAF9F5",
+        canvas: {
+          DEFAULT: "#FAF9F5",
+          warm: "#F4F2EB",
+          card: "#FFFFFF",
+        },
         surface: "#FFFFFF",
         subtle: "#F3F2EC",
+        earth: {
+          sand: "#E5E3D8",
+          amber: "#D97706",
+          amberText: "#92400E",
+        },
+        botanical: {
+          leaf: "#2E7D32",
+        },
         border: {
           subtle: "#E5E3D8",
           DEFAULT: "#E5E3D8",
@@ -48,6 +60,7 @@ const config: Config = {
       },
       boxShadow: {
         subtle: "0 1px 3px rgba(25, 26, 21, 0.04)",
+        card: "0 1px 3px rgba(25, 26, 21, 0.05), 0 1px 2px rgba(25, 26, 21, 0.03)",
         flyout: "0 4px 16px rgba(25, 26, 21, 0.08)",
       },
     },
@@ -56,4 +69,3 @@ const config: Config = {
 };
 
 export default config;
-

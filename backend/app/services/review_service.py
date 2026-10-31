@@ -14,7 +14,7 @@ class ReviewService:
         session: AsyncSession,
         user_id: int,
     ) -> list[ReviewDueItem]:
-        """Calculates concepts due for spaced repetition review based on SM-2 decay and schedules."""
+        """Calculates concepts due for spaced repetition review based on canonical next_due_at timestamp."""
         now = datetime.datetime.now(datetime.UTC)
 
         concepts_stmt = select(Concept).order_by(Concept.position)
@@ -28,16 +28,15 @@ class ReviewService:
 
         for m in masteries:
             c = concept_map.get(m.concept_id)
-            if not c:
+            if not c or m.attempts == 0:
                 continue
 
-            p_eff = compute_effective_mastery(m.p_mastery, m.next_due_at, now=now)
-            days_overdue = 0
-            if m.next_due_at and now > m.next_due_at:
-                days_overdue = (now - m.next_due_at).days
+            # Canonical condition: an item is due if current time is at or past next_due_at
+            if m.next_due_at and now >= m.next_due_at:
+                p_eff = compute_effective_mastery(m.p_mastery, m.next_due_at, now=now)
+                seconds_overdue = (now - m.next_due_at).total_seconds()
+                days_overdue = max(0, int(seconds_overdue // 86400))
 
-            # Include if overdue or if effective mastery has decayed below 75%
-            if days_overdue > 0 or p_eff < 0.75:
                 due_items.append(
                     ReviewDueItem(
                         concept_id=c.id,
@@ -49,10 +48,8 @@ class ReviewService:
                     )
                 )
 
-        # Order by overdue urgency first, then lowest effective mastery
-        due_items.sort(
-            key=lambda x: (x.days_overdue > 0, x.days_overdue, -x.p_effective), reverse=True
-        )
+        # Order by most overdue days descending, then lowest effective mastery
+        due_items.sort(key=lambda x: (x.days_overdue, -x.p_effective), reverse=True)
         return due_items
 
 

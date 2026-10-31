@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
+const isStandalone = process.env.STANDALONE === "true" || process.platform !== "win32";
+
 const nextConfig: NextConfig = {
+  ...(isStandalone ? { output: "standalone" } : {}),
   reactStrictMode: true,
   async rewrites() {
     const backendUrl = process.env.BACKEND_URL || "http://localhost:8000";
@@ -22,4 +25,3 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
-

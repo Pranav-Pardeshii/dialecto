@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -26,6 +26,9 @@ class Settings(BaseSettings):
                 v = v.replace("postgres://", "postgresql+asyncpg://", 1)
             elif v.startswith("postgresql://") and not v.startswith("postgresql+asyncpg://"):
                 v = v.replace("postgresql://", "postgresql+asyncpg://", 1)
+            # asyncpg requires ssl=... instead of sslmode=...
+            if "sslmode=" in v:
+                v = v.replace("sslmode=", "ssl=")
         return v
 
     # Groq AI
@@ -39,8 +42,16 @@ class Settings(BaseSettings):
     TOKEN_BUDGET_PER_MINUTE: int = 20000
 
     # Security & CORS
+    ALLOW_DEMO_AUTH: bool = False
     CORS_ORIGINS: str = "http://localhost:3000"
     BACKEND_URL: str = "http://localhost:8000"
+
+    @model_validator(mode="after")
+    def validate_production_env(self) -> "Settings":
+        if self.ENV == "production":
+            if not self.GROQ_API_KEY or self.GROQ_API_KEY == "mock-key":
+                raise ValueError("GROQ_API_KEY must be configured with a valid key in production environment.")
+        return self
 
     @property
     def fallback_models_list(self) -> list[str]:

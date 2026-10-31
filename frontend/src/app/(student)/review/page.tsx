@@ -1,56 +1,46 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { api, ReviewDueItem } from "@/lib/api/client";
+import { api, ApiError, ReviewDueItem } from "@/lib/api/client";
 import {
   Clock,
-  RotateCcw,
   ArrowRight,
   CheckCircle2,
   Sparkles,
   BookOpen,
+  AlertCircle,
+  RotateCcw,
 } from "lucide-react";
 
 export default function ReviewPage() {
   const router = useRouter();
   const [reviews, setReviews] = useState<ReviewDueItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchReviews = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await api.getDueReviews();
+      setReviews(data);
+    } catch (err: unknown) {
+      setReviews([]);
+      if (err instanceof ApiError) {
+        setError(err.message || "Failed to load due reviews.");
+      } else {
+        setError("Unable to connect to the learning server. Please check your connection.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        setLoading(true);
-        const data = await api.getDueReviews();
-        setReviews(data);
-      } catch {
-        // Fallback demo data if offline
-        setReviews([
-          {
-            concept_id: "lp-photosynthesis",
-            name: "Photosynthesis",
-            chapter: "life-processes",
-            p_effective: 0.54,
-            days_overdue: 3,
-            next_due_at: new Date(Date.now() - 3 * 86400000).toISOString(),
-          },
-          {
-            concept_id: "cr-reflex",
-            name: "Reflex Actions",
-            chapter: "control-coordination",
-            p_effective: 0.49,
-            days_overdue: 1,
-            next_due_at: new Date(Date.now() - 1 * 86400000).toISOString(),
-          },
-        ]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchReviews();
-  }, []);
+  }, [fetchReviews]);
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -85,6 +75,33 @@ export default function ReviewPage() {
           {[1, 2, 3].map((i) => (
             <div key={i} className="h-20 bg-canvas-card rounded-xl border border-earth-sand/30 animate-pulse" />
           ))}
+        </div>
+      ) : error ? (
+        <div className="rounded-2xl border border-mastery-crimson/30 bg-surface p-8 shadow-subtle text-center space-y-4">
+          <div className="h-12 w-12 mx-auto rounded-full bg-mastery-crimsonLight flex items-center justify-center text-mastery-crimson">
+            <AlertCircle className="h-6 w-6" />
+          </div>
+          <h3 className="font-serif text-base font-semibold text-ink-primary">
+            Unable to Load Due Reviews
+          </h3>
+          <p className="text-xs text-ink-secondary max-w-sm mx-auto">
+            {error}
+          </p>
+          <div className="pt-2 flex items-center justify-center gap-3">
+            <Link
+              href="/dashboard"
+              className="px-4 py-2 rounded-lg border border-border-subtle bg-surface text-xs font-semibold text-ink-secondary hover:bg-subtle transition"
+            >
+              Back to Study Map
+            </Link>
+            <button
+              onClick={fetchReviews}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-ink-primary text-canvas text-xs font-semibold hover:bg-ink-primary/90 transition shadow-subtle"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              <span>Retry</span>
+            </button>
+          </div>
         </div>
       ) : reviews.length === 0 ? (
         <div className="bg-canvas-card rounded-xl border border-earth-sand/30 p-12 text-center shadow-card">
@@ -132,28 +149,17 @@ export default function ReviewPage() {
                   <div className="flex items-center gap-3 text-xs text-ink-muted">
                     <span className="capitalize">{item.chapter.replace("-", " ")}</span>
                     <span>•</span>
-                    <span>Effective Mastery: {pct}%</span>
+                    <span>Effective Retention: {pct}%</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="hidden sm:block w-24 text-right">
-                    <div className="h-1.5 w-full bg-canvas-warm rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-mastery-emerald rounded-full"
-                        style={{ width: `${pct}%` }}
-                      />
-                    </div>
-                  </div>
-
                   <button
-                    onClick={() =>
-                      router.push(`/practice?concept=${item.concept_id}&mode=review`)
-                    }
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-earth-sand/50 bg-canvas-card text-xs font-medium text-ink-primary hover:bg-canvas-warm transition shadow-subtle"
+                    onClick={() => router.push(`/practice?concept=${item.concept_id}&mode=review`)}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-border-subtle bg-surface text-xs font-semibold text-ink-primary hover:bg-subtle transition shadow-subtle"
                   >
-                    <RotateCcw className="h-3 w-3 text-mastery-emerald" />
-                    <span>Review</span>
+                    <span>Practice Now</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
                   </button>
                 </div>
               </div>

@@ -1,62 +1,40 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { api, ConceptEdge, ConceptNode } from "@/lib/api/client";
+import { api, getActiveDemoUserId } from "@/lib/api/client";
 import { ConceptGraphView } from "@/components/graph/ConceptGraphView";
-import { ArrowRight, RefreshCw } from "lucide-react";
-
-// Robust fallback data for instantaneous demo stability
-const FALLBACK_NODES: ConceptNode[] = [
-  { id: "lp-nutrition", name: "Modes of Nutrition", chapter: "life-processes", position: 1, mastery: { p_effective: 0.65, status: "learning" } },
-  { id: "lp-photosynthesis", name: "Photosynthesis", chapter: "life-processes", position: 2, mastery: { p_effective: 0.42, status: "learning" } },
-  { id: "lp-stomata", name: "Stomata & Gas Exchange", chapter: "life-processes", position: 3, mastery: { p_effective: 0.30, status: "unlocked" } },
-  { id: "lp-digestion", name: "Human Alimentary Canal", chapter: "life-processes", position: 4, mastery: { p_effective: 0.82, status: "mastered" } },
-  { id: "lp-respiration", name: "Cellular Respiration", chapter: "life-processes", position: 5, mastery: { p_effective: 0.70, status: "learning" } },
-  { id: "lp-gas-exchange", name: "Breathing & Alveoli", chapter: "life-processes", position: 6, mastery: { p_effective: 0.30, status: "unlocked" } },
-  { id: "lp-circulation", name: "Heart & Double Circulation", chapter: "life-processes", position: 7, mastery: { p_effective: 0.30, status: "unlocked" } },
-  { id: "lp-vessels-blood", name: "Blood Vessels & Lymph", chapter: "life-processes", position: 8, mastery: { p_effective: 0.25, status: "locked" } },
-  { id: "lp-plant-transport", name: "Vascular Transport in Plants", chapter: "life-processes", position: 9, mastery: { p_effective: 0.30, status: "unlocked" } },
-  { id: "lp-excretion", name: "Excretion & Nephron", chapter: "life-processes", position: 10, mastery: { p_effective: 0.25, status: "locked" } },
-  { id: "cc-neuron", name: "Neuron & Nerve Impulse", chapter: "control-coordination", position: 11, mastery: { p_effective: 0.75, status: "learning" } },
-  { id: "cc-reflex", name: "Reflex Action & Arc", chapter: "control-coordination", position: 12, mastery: { p_effective: 0.30, status: "unlocked" } },
-  { id: "cc-brain", name: "Human Brain Structure", chapter: "control-coordination", position: 13, mastery: { p_effective: 0.30, status: "unlocked" } },
-  { id: "cc-plant-hormones", name: "Plant Hormones & Tropisms", chapter: "control-coordination", position: 14, mastery: { p_effective: 0.85, status: "mastered" } },
-  { id: "cc-animal-hormones", name: "Endocrine Hormones", chapter: "control-coordination", position: 15, mastery: { p_effective: 0.35, status: "unlocked" } },
-  { id: "he-variation", name: "Variation & Evolution", chapter: "heredity", position: 16, mastery: { p_effective: 0.60, status: "learning" } },
-  { id: "he-genes-traits", name: "Genes & Inheritance", chapter: "heredity", position: 17, mastery: { p_effective: 0.30, status: "unlocked" } },
-  { id: "he-monohybrid", name: "Mendel Monohybrid Cross", chapter: "heredity", position: 18, mastery: { p_effective: 0.25, status: "locked" } },
-  { id: "he-dihybrid", name: "Dihybrid Cross", chapter: "heredity", position: 19, mastery: { p_effective: 0.20, status: "locked" } },
-  { id: "he-sex-determination", name: "Sex Determination", chapter: "heredity", position: 20, mastery: { p_effective: 0.25, status: "locked" } },
-];
-
-const FALLBACK_EDGES: ConceptEdge[] = [
-  { from: "lp-nutrition", to: "lp-photosynthesis" },
-  { from: "lp-nutrition", to: "lp-digestion" },
-  { from: "lp-nutrition", to: "lp-respiration" },
-  { from: "lp-photosynthesis", to: "lp-stomata" },
-  { from: "lp-stomata", to: "lp-plant-transport" },
-  { from: "lp-respiration", to: "lp-gas-exchange" },
-  { from: "lp-gas-exchange", to: "lp-circulation" },
-  { from: "lp-circulation", to: "lp-vessels-blood" },
-  { from: "lp-circulation", to: "lp-excretion" },
-  { from: "cc-neuron", to: "cc-reflex" },
-  { from: "cc-neuron", to: "cc-brain" },
-  { from: "he-variation", to: "he-genes-traits" },
-  { from: "he-genes-traits", to: "he-monohybrid" },
-  { from: "he-genes-traits", to: "he-sex-determination" },
-  { from: "he-monohybrid", to: "he-dihybrid" },
-];
+import { ArrowRight, RefreshCw, AlertCircle, RotateCcw } from "lucide-react";
 
 export default function StudentDashboardPage() {
-  const { data, isLoading, refetch } = useQuery({
-    queryKey: ["concept-graph"],
-    queryFn: () => api.getConceptGraph(),
-    retry: 1,
+  const [userId, setUserId] = useState<number | null>(null);
+
+  useEffect(() => {
+    setUserId(getActiveDemoUserId());
+    const handleStorage = () => setUserId(getActiveDemoUserId());
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
+  const { data: me } = useQuery({
+    queryKey: ["user-me", userId],
+    queryFn: () => api.getMe(),
+    enabled: userId !== null,
   });
 
-  const nodes = data?.nodes && data.nodes.length > 0 ? data.nodes : FALLBACK_NODES;
-  const edges = data?.edges && data.edges.length > 0 ? data.edges : FALLBACK_EDGES;
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["concept-graph", userId],
+    queryFn: () => api.getConceptGraph(),
+    enabled: userId !== null,
+    retry: 1,
+  });
 
   return (
     <div className="space-y-6">
@@ -67,10 +45,10 @@ export default function StudentDashboardPage() {
             Study Map
           </span>
           <h1 className="font-serif text-2xl font-normal text-ink-primary mt-1">
-            Welcome, Aarav
+            {me?.display_name ? `Welcome, ${me.display_name}` : "Curriculum Study Map"}
           </h1>
           <p className="text-xs sm:text-sm text-ink-secondary mt-1 max-w-xl">
-            Interactive curriculum prerequisite tree across 20 Class 10 Biology concepts. Click any concept node to read notes, launch practice, or explain to Pip.
+            Interactive prerequisite knowledge graph across 20 Class 10 Biology concepts. Click any concept node to read notes, launch practice, or explain to Pip.
           </p>
         </div>
 
@@ -99,6 +77,7 @@ export default function StudentDashboardPage() {
           </div>
           <button
             onClick={() => refetch()}
+            disabled={isLoading}
             className="inline-flex items-center gap-1 text-[11px] font-mono text-ink-muted hover:text-ink-primary transition"
           >
             <RefreshCw className={`h-3 w-3 ${isLoading ? "animate-spin" : ""}`} />
@@ -106,7 +85,37 @@ export default function StudentDashboardPage() {
           </button>
         </div>
 
-        <ConceptGraphView nodes={nodes} edges={edges} />
+        {isLoading ? (
+          <div className="w-full h-[680px] rounded-2xl border border-border-subtle bg-surface/50 flex flex-col items-center justify-center space-y-3">
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-2 border-mastery-emerald border-t-transparent" />
+            <p className="text-xs font-mono text-ink-muted">Loading curriculum knowledge graph...</p>
+          </div>
+        ) : isError ? (
+          <div className="w-full h-[400px] rounded-2xl border border-mastery-crimson/30 bg-surface flex flex-col items-center justify-center p-8 text-center space-y-4">
+            <div className="h-12 w-12 rounded-full bg-mastery-crimsonLight flex items-center justify-center text-mastery-crimson">
+              <AlertCircle className="h-6 w-6" />
+            </div>
+            <h3 className="font-serif text-lg font-semibold text-ink-primary">
+              Unable to Load Concept Graph
+            </h3>
+            <p className="text-xs text-ink-secondary max-w-md">
+              {error instanceof Error ? error.message : "Failed to connect to the learning server. Please verify your connection."}
+            </p>
+            <button
+              onClick={() => refetch()}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-ink-primary text-canvas text-xs font-semibold hover:bg-ink-primary/90 transition shadow-subtle"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              <span>Retry</span>
+            </button>
+          </div>
+        ) : data && data.nodes && data.nodes.length > 0 ? (
+          <ConceptGraphView nodes={data.nodes} edges={data.edges} />
+        ) : (
+          <div className="w-full h-[300px] rounded-2xl border border-border-subtle bg-surface flex items-center justify-center text-xs text-ink-muted">
+            No concepts available.
+          </div>
+        )}
       </div>
     </div>
   );
