@@ -168,6 +168,12 @@ Handoff memory across agent sessions.
     - Pins rotate and scale synchronously with the specimen, support hover enlargement, pointer cursor, Drei `<Html>` contextual label tooltips, and active emerald pulse rings upon selection.
     - Added direct mesh raycast pointer and click event listeners to procedural Three.js geometries in `EpithelialModel` and `MuscleModel` (microvilli, tight junction toruses/tubes, sarcolemma capsule, myofibril bundles, and nuclei).
     - Attached `onPointerMissed` canvas handler to gracefully clear selection to an empty exploration state when clicking open viewport space.
+    - **Real GLB Mesh Picking & Coordinate Anchor Fix:**
+      - Wired `onPointerDown` and `onClick` with a 6px drag threshold to distinguish camera rotation from clicks directly on the biological 3D mesh (`primitive object={clonedScene}`).
+      - Transformed raycast intersection surface points into mesh-local coordinates (`mesh.worldToLocal(event.point.clone())`) to accurately resolve biological organelle structures.
+      - Fixed marker coordinate misalignment: anchored precision anatomical pins INSIDE the `<Center>` group within `AssetCellModel` so they inherit the exact transformations, centering, rotation, and scaling of the model.
+      - Removed all disconnected/floating markers outside the specimen bounds.
+      - Added automated regression test `test_glb_geometry_integrity_and_bounds` verifying all 5 production GLBs, mesh primitives, and physical bounding box containment.
   - **Removed Interface Clutter & UI Noise:**
     - Completely removed `WisprCommandInput` and the `Voice Command Interpreter` section from `/lab`.
     - Removed redundant bottom organelle quick-selector chip bars under the canvas.

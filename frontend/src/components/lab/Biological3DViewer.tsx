@@ -1,7 +1,7 @@
 "use client";
 
 import React, { Suspense, useMemo, useRef, useState, Component, type ErrorInfo, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
 import {
   Center,
   ContactShadows,
@@ -123,27 +123,47 @@ function CellMaterial({
 interface OrganelleHotspotPinProps {
   organelle: OrganelleItem;
   isSelected: boolean;
+  radius: number;
   onSelect: (id: string) => void;
 }
 
-function OrganelleHotspotPin({ organelle, isSelected, onSelect }: OrganelleHotspotPinProps) {
+function OrganelleHotspotPin({
+  organelle,
+  isSelected,
+  radius,
+  onSelect,
+}: OrganelleHotspotPinProps) {
   const [hovered, setHovered] = useState(false);
   const position = organelle.position3D ?? [0, 0, 0];
+  const pointerDownPos = useRef<{ x: number; y: number } | null>(null);
+
+  const currentRadius = isSelected ? radius * 1.3 : hovered ? radius * 1.15 : radius;
 
   return (
     <group position={position}>
-      {/* Outer Glow Halo Ring when selected */}
+      {/* Active Emerald Ring when selected */}
       {isSelected && (
         <mesh rotation={[Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[0.075, 0.098, 32]} />
+          <ringGeometry args={[radius * 1.6, radius * 2.1, 32]} />
           <meshBasicMaterial color="#16a34a" transparent opacity={0.85} side={2} />
         </mesh>
       )}
 
-      {/* Main 3D Marker Sphere */}
+      {/* Anatomical Marker Pin */}
       <mesh
+        onPointerDown={(e) => {
+          e.stopPropagation();
+          pointerDownPos.current = { x: e.clientX, y: e.clientY };
+        }}
         onClick={(e) => {
           e.stopPropagation();
+          if (pointerDownPos.current) {
+            const dist = Math.hypot(
+              e.clientX - pointerDownPos.current.x,
+              e.clientY - pointerDownPos.current.y
+            );
+            if (dist > 6) return;
+          }
           onSelect(organelle.id);
         }}
         onPointerOver={(e) => {
@@ -156,30 +176,22 @@ function OrganelleHotspotPin({ organelle, isSelected, onSelect }: OrganelleHotsp
           document.body.style.cursor = "auto";
         }}
       >
-        <sphereGeometry args={[isSelected ? 0.065 : hovered ? 0.056 : 0.044, 24, 24]} />
+        <sphereGeometry args={[currentRadius, 20, 20]} />
         <meshStandardMaterial
-          color={isSelected ? "#15803d" : organelle.color}
-          emissive={isSelected ? "#22c55e" : hovered ? organelle.color : "#191a15"}
-          emissiveIntensity={isSelected ? 0.8 : hovered ? 0.45 : 0.15}
-          roughness={0.25}
-          metalness={0.15}
+          color={organelle.color}
+          emissive={isSelected ? "#22c55e" : hovered ? organelle.color : "#111111"}
+          emissiveIntensity={isSelected ? 0.75 : hovered ? 0.4 : 0.12}
+          roughness={0.3}
+          metalness={0.2}
         />
       </mesh>
 
-      {/* Pulsing Core for selected */}
-      {isSelected && (
-        <mesh>
-          <sphereGeometry args={[0.03, 16, 16]} />
-          <meshBasicMaterial color="#ffffff" />
-        </mesh>
-      )}
-
-      {/* Tooltip / Label */}
+      {/* Label Tooltip */}
       {(hovered || isSelected) && (
         <Html
-          position={[0, 0.14, 0]}
+          position={[0, radius * 2.8, 0]}
           center
-          distanceFactor={5.5}
+          distanceFactor={6}
           style={{ pointerEvents: "none" }}
         >
           <div
@@ -197,7 +209,7 @@ function OrganelleHotspotPin({ organelle, isSelected, onSelect }: OrganelleHotsp
               <span className="font-semibold text-xs tracking-tight">{organelle.name}</span>
               {isSelected && (
                 <span className="px-1 py-0.2 rounded text-[9px] font-bold uppercase bg-emerald-600 text-white tracking-wider ml-1">
-                  Active
+                  Selected
                 </span>
               )}
             </div>
@@ -239,13 +251,27 @@ function CurveTube({
     return new TubeGeometry(curve, 80, radius, 12, false);
   }, [points, radius]);
 
+  const pointerDownPos = useRef<{ x: number; y: number } | null>(null);
+
   return (
     <mesh
       geometry={geometry}
       castShadow
       receiveShadow
+      onPointerDown={(e) => {
+        if (onClick) {
+          pointerDownPos.current = { x: e.clientX, y: e.clientY };
+        }
+      }}
       onClick={(e) => {
         if (onClick) {
+          if (pointerDownPos.current) {
+            const dist = Math.hypot(
+              e.clientX - pointerDownPos.current.x,
+              e.clientY - pointerDownPos.current.y
+            );
+            if (dist > 6) return;
+          }
           e.stopPropagation();
           onClick();
         }
@@ -280,11 +306,14 @@ type CommonModelProps = {
 function AssetCellModel({
   cell,
   asset,
+  activeOrganelle,
+  onSelectOrganelle,
   viewMode,
   crossSection,
 }: CommonModelProps & {
   cell: CellItem;
   asset: CellModelAsset;
+  onSelectOrganelle?: (id: string) => void;
 }) {
   const { scene } = useGLTF(asset.url, true, true);
   const clonedScene = useMemo(() => {
@@ -299,6 +328,23 @@ function AssetCellModel({
 
       mesh.castShadow = true;
       mesh.receiveShadow = true;
+
+      // Diagnostic logging in development
+      if (process.env.NODE_ENV !== "production") {
+        mesh.geometry?.computeBoundingBox();
+        console.groupCollapsed(`[3D Specimen Mesh] ${cell.name}: ${mesh.name || "mesh"}`);
+        console.log("Type:", mesh.type);
+        console.log("Geometry Bounds:", mesh.geometry?.boundingBox);
+        console.log(
+          "Material:",
+          Array.isArray(mesh.material)
+            ? mesh.material.map((m) => m.name)
+            : mesh.material?.name
+        );
+        console.log("UserData:", mesh.userData);
+        console.groupEnd();
+      }
+
       if (asset.materialMode === "native") {
         mesh.material = createNativeAssetMaterial({
           original: mesh.material,
@@ -331,6 +377,54 @@ function AssetCellModel({
     return clone;
   }, [cell, scene, viewMode, crossSection, asset]);
 
+  // Pointer position tracker to distinguish clean clicks from OrbitControls drag/orbit
+  const pointerDownPos = useRef<{ x: number; y: number } | null>(null);
+
+  const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
+    pointerDownPos.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const handleMeshClick = (e: ThreeEvent<MouseEvent>) => {
+    if (pointerDownPos.current) {
+      const dist = Math.hypot(
+        e.clientX - pointerDownPos.current.x,
+        e.clientY - pointerDownPos.current.y
+      );
+      if (dist > 6) {
+        // Drag gesture to rotate/orbit model - ignore to prevent misclicks
+        return;
+      }
+    }
+
+    e.stopPropagation();
+
+    // The clicked mesh
+    const mesh = e.object as Mesh;
+    // Transform raycast world hit point to mesh-local coordinates
+    const localPoint = mesh.worldToLocal(e.point.clone());
+
+    // Resolve closest biological organelle based on model-local coordinates
+    let closestId: string | null = null;
+    let minDistance = Infinity;
+
+    for (const organelle of cell.organelles) {
+      if (!organelle.position3D) continue;
+      const [ox, oy, oz] = organelle.position3D;
+      const dist = Math.hypot(localPoint.x - ox, localPoint.y - oy, localPoint.z - oz);
+      if (dist < minDistance) {
+        minDistance = dist;
+        closestId = organelle.id;
+      }
+    }
+
+    if (closestId) {
+      onSelectOrganelle?.(closestId);
+    }
+  };
+
+  // Pin radius scaled inversely to asset.scale so visual pin size is always ~0.04 world units
+  const pinRadius = 0.04 / (asset.scale || 1.0);
+
   return (
     <group
       position={asset.position ?? [0, 0, 0]}
@@ -338,7 +432,31 @@ function AssetCellModel({
       scale={[asset.scale, asset.scale, asset.scale]}
     >
       <Center>
-        <primitive object={clonedScene} />
+        <primitive
+          object={clonedScene}
+          onPointerDown={handlePointerDown}
+          onClick={handleMeshClick}
+          onPointerOver={() => {
+            document.body.style.cursor = "pointer";
+          }}
+          onPointerOut={() => {
+            document.body.style.cursor = "auto";
+          }}
+        />
+
+        {/* Hotspots anchored in the EXACT same transformed & centered model space */}
+        {cell.organelles.map((organelle) => {
+          if (!organelle.position3D) return null;
+          return (
+            <OrganelleHotspotPin
+              key={organelle.id}
+              organelle={organelle}
+              isSelected={activeOrganelle === organelle.id}
+              radius={pinRadius}
+              onSelect={(id) => onSelectOrganelle?.(id)}
+            />
+          );
+        })}
       </Center>
     </group>
   );
@@ -450,11 +568,30 @@ function Nucleus({
 }
 
 function EpithelialModel({
+  cell,
   activeOrganelle,
   viewMode,
   crossSection,
   onSelectOrganelle,
-}: CommonModelProps & { onSelectOrganelle?: (id: string) => void }) {
+}: CommonModelProps & { cell: CellItem; onSelectOrganelle?: (id: string) => void }) {
+  const pointerDownPos = useRef<{ x: number; y: number } | null>(null);
+
+  const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
+    pointerDownPos.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const handleClickPart = (id: string, e: ThreeEvent<MouseEvent>) => {
+    if (pointerDownPos.current) {
+      const dist = Math.hypot(
+        e.clientX - pointerDownPos.current.x,
+        e.clientY - pointerDownPos.current.y
+      );
+      if (dist > 6) return;
+    }
+    e.stopPropagation();
+    onSelectOrganelle?.(id);
+  };
+
   const microvilliRows = 6;
   const microvilliCols = 6;
   const microvilli: Array<{ position: [number, number, number]; height: number }> = [];
@@ -471,7 +608,13 @@ function EpithelialModel({
 
   return (
     <group rotation={[0.08, -0.22, 0]} scale={[1.08, 1.08, 1.08]}>
-      <mesh position={[0, 0, 0]} castShadow receiveShadow>
+      <mesh
+        position={[0, 0, 0]}
+        castShadow
+        receiveShadow
+        onPointerDown={handlePointerDown}
+        onClick={(e) => handleClickPart("microvilli", e)}
+      >
         <cylinderGeometry args={[0.78, 0.88, 2.6, 32, 1, false]} />
         <CellMaterial
           id="membrane"
@@ -498,10 +641,8 @@ function EpithelialModel({
           key={`villus-${index}`}
           position={villus.position}
           castShadow
-          onClick={(e) => {
-            e.stopPropagation();
-            onSelectOrganelle?.("microvilli");
-          }}
+          onPointerDown={handlePointerDown}
+          onClick={(e) => handleClickPart("microvilli", e)}
           onPointerOver={(e) => {
             e.stopPropagation();
             document.body.style.cursor = "pointer";
@@ -523,10 +664,8 @@ function EpithelialModel({
         position={[0, 1.34, 0]}
         castShadow
         receiveShadow
-        onClick={(e) => {
-          e.stopPropagation();
-          onSelectOrganelle?.("microvilli");
-        }}
+        onPointerDown={handlePointerDown}
+        onClick={(e) => handleClickPart("microvilli", e)}
         onPointerOver={(e) => {
           e.stopPropagation();
           document.body.style.cursor = "pointer";
@@ -557,10 +696,8 @@ function EpithelialModel({
           key={`junction-${index}`}
           position={[x, 0.95, 0]}
           castShadow
-          onClick={(e) => {
-            e.stopPropagation();
-            onSelectOrganelle?.("junctions");
-          }}
+          onPointerDown={handlePointerDown}
+          onClick={(e) => handleClickPart("junctions", e)}
           onPointerOver={(e) => {
             e.stopPropagation();
             document.body.style.cursor = "pointer";
@@ -623,16 +760,49 @@ function EpithelialModel({
         viewMode={viewMode}
         crossSection={crossSection}
       />
+
+      {/* Anatomical Pins inside model local space */}
+      {cell.organelles.map((organelle) => {
+        if (!organelle.position3D) return null;
+        return (
+          <OrganelleHotspotPin
+            key={organelle.id}
+            organelle={organelle}
+            isSelected={activeOrganelle === organelle.id}
+            radius={0.04}
+            onSelect={(id) => onSelectOrganelle?.(id)}
+          />
+        );
+      })}
     </group>
   );
 }
 
 function MuscleModel({
+  cell,
   activeOrganelle,
   viewMode,
   crossSection,
   onSelectOrganelle,
-}: CommonModelProps & { onSelectOrganelle?: (id: string) => void }) {
+}: CommonModelProps & { cell: CellItem; onSelectOrganelle?: (id: string) => void }) {
+  const pointerDownPos = useRef<{ x: number; y: number } | null>(null);
+
+  const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
+    pointerDownPos.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const handleClickPart = (id: string, e: ThreeEvent<MouseEvent>) => {
+    if (pointerDownPos.current) {
+      const dist = Math.hypot(
+        e.clientX - pointerDownPos.current.x,
+        e.clientY - pointerDownPos.current.y
+      );
+      if (dist > 6) return;
+    }
+    e.stopPropagation();
+    onSelectOrganelle?.(id);
+  };
+
   const fiberLength = 4.4;
   const sarcomere = 0.36;
   const sarcomereCount = Math.floor(fiberLength / sarcomere);
@@ -652,10 +822,8 @@ function MuscleModel({
         rotation={[0, 0, Math.PI / 2]}
         castShadow
         receiveShadow
-        onClick={(e) => {
-          e.stopPropagation();
-          onSelectOrganelle?.("sarcolemma");
-        }}
+        onPointerDown={handlePointerDown}
+        onClick={(e) => handleClickPart("sarcolemma", e)}
         onPointerOver={(e) => {
           e.stopPropagation();
           document.body.style.cursor = "pointer";
@@ -681,10 +849,8 @@ function MuscleModel({
               <group
                 key={`s-${sIndex}`}
                 position={[x, 0, 0]}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onSelectOrganelle?.("myofibril");
-                }}
+                onPointerDown={handlePointerDown}
+                onClick={(e) => handleClickPart("myofibril", e)}
                 onPointerOver={(e) => {
                   e.stopPropagation();
                   document.body.style.cursor = "pointer";
@@ -749,10 +915,8 @@ function MuscleModel({
           position={position as [number, number, number]}
           rotation={[0, 0, Math.PI / 2]}
           castShadow
-          onClick={(e) => {
-            e.stopPropagation();
-            onSelectOrganelle?.("mitochondria");
-          }}
+          onPointerDown={handlePointerDown}
+          onClick={(e) => handleClickPart("mitochondria", e)}
           onPointerOver={(e) => {
             e.stopPropagation();
             document.body.style.cursor = "pointer";
@@ -786,6 +950,20 @@ function MuscleModel({
           onClick={() => onSelectOrganelle?.("sarcolemma")}
         />
       ))}
+
+      {/* Anatomical Pins inside model local space */}
+      {cell.organelles.map((organelle) => {
+        if (!organelle.position3D) return null;
+        return (
+          <OrganelleHotspotPin
+            key={organelle.id}
+            organelle={organelle}
+            isSelected={activeOrganelle === organelle.id}
+            radius={0.04}
+            onSelect={(id) => onSelectOrganelle?.(id)}
+          />
+        );
+      })}
     </group>
   );
 }
@@ -818,30 +996,30 @@ function CellModelContainer({
   return (
     <group ref={group} position={[0, 0, 0]}>
       {cell.modelAsset ? (
-        <AssetCellModel cell={cell} asset={cell.modelAsset} {...common} />
+        <AssetCellModel
+          cell={cell}
+          asset={cell.modelAsset}
+          onSelectOrganelle={onSelectOrganelle}
+          {...common}
+        />
       ) : (
         <>
           {cell.modelKind === "epithelial" && (
-            <EpithelialModel {...common} onSelectOrganelle={onSelectOrganelle} />
+            <EpithelialModel
+              cell={cell}
+              onSelectOrganelle={onSelectOrganelle}
+              {...common}
+            />
           )}
           {cell.modelKind === "muscle" && (
-            <MuscleModel {...common} onSelectOrganelle={onSelectOrganelle} />
+            <MuscleModel
+              cell={cell}
+              onSelectOrganelle={onSelectOrganelle}
+              {...common}
+            />
           )}
         </>
       )}
-
-      {/* Render 3D Anatomical Hotspot Pins */}
-      {cell.organelles.map((organelle) => {
-        if (!organelle.position3D) return null;
-        return (
-          <OrganelleHotspotPin
-            key={organelle.id}
-            organelle={organelle}
-            isSelected={activeOrganelle === organelle.id}
-            onSelect={(id) => onSelectOrganelle?.(id)}
-          />
-        );
-      })}
     </group>
   );
 }

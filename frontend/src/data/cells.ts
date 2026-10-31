@@ -109,7 +109,7 @@ export const cells: CellItem[] = [
         name: "Nucleus",
         subtitle: "The control center",
         color: "#7047a8",
-        position3D: [0.45, 0.25, 0.28],
+        position3D: [0.088, 0.166, -0.172],
         attributes: [
           { label: "Size", value: "5 to 10 µm in diameter" },
           { label: "Location", value: "Usually peripheral in plants" },
@@ -124,7 +124,7 @@ export const cells: CellItem[] = [
         name: "Chloroplast",
         subtitle: "The light harvester",
         color: "#5fa842",
-        position3D: [-0.65, 0.35, 0.22],
+        position3D: [0.133, -0.066, 0.025],
         attributes: [
           { label: "Role", value: "Photosynthesis" },
           { label: "Pigment", value: "Chlorophyll" },
@@ -139,7 +139,7 @@ export const cells: CellItem[] = [
         name: "Vacuole",
         subtitle: "The pressure reservoir",
         color: "#62bdd2",
-        position3D: [-0.15, -0.05, 0.15],
+        position3D: [0.117, 0.027, 0.023],
         attributes: [
           { label: "Volume", value: "Large central space" },
           { label: "Content", value: "Water and solutes" },
@@ -154,7 +154,7 @@ export const cells: CellItem[] = [
         name: "Cell Wall",
         subtitle: "The rigid frame",
         color: "#7aa647",
-        position3D: [-1.15, 0.05, 0.0],
+        position3D: [-0.28, 0.05, 0.0],
         attributes: [
           { label: "Material", value: "Cellulose rich" },
           { label: "Position", value: "Outer boundary" },
@@ -208,7 +208,7 @@ export const cells: CellItem[] = [
         name: "Lysosome",
         subtitle: "The cleanup vesicle",
         color: "#8b54b7",
-        position3D: [-0.45, -0.22, 0.22],
+        position3D: [-0.15, -0.12, 0.12],
         attributes: [
           { label: "Size", value: "About 1 µm" },
           { label: "Content", value: "Digestive enzymes" },
@@ -223,7 +223,7 @@ export const cells: CellItem[] = [
         name: "Lobed Nucleus",
         subtitle: "Flexible genome vault",
         color: "#6f35a1",
-        position3D: [0.0, 0.15, 0.25],
+        position3D: [0.0, 0.08, 0.05],
         attributes: [
           { label: "Shape", value: "Often lobed" },
           { label: "Location", value: "Central" },
@@ -238,7 +238,7 @@ export const cells: CellItem[] = [
         name: "Granules",
         subtitle: "The chemical packets",
         color: "#c06696",
-        position3D: [0.38, -0.15, 0.2],
+        position3D: [0.16, -0.1, 0.1],
         attributes: [
           { label: "Content", value: "Proteins and enzymes" },
           { label: "Use", value: "Defense" },
@@ -292,7 +292,7 @@ export const cells: CellItem[] = [
         name: "Axon",
         subtitle: "The signal highway",
         color: "#6b7dc6",
-        position3D: [0.72, 0.0, 0.0],
+        position3D: [0.18, -0.15, 0.01],
         attributes: [
           { label: "Length", value: "µm to over 1 metre" },
           { label: "Insulation", value: "Myelin sheath" },
@@ -307,7 +307,7 @@ export const cells: CellItem[] = [
         name: "Soma",
         subtitle: "The cell body",
         color: "#7c52b7",
-        position3D: [-0.32, 0.02, 0.06],
+        position3D: [0.005, 0.061, 0.015],
         attributes: [
           { label: "Contains", value: "Nucleus" },
           { label: "Role", value: "Metabolic hub" },
@@ -322,7 +322,7 @@ export const cells: CellItem[] = [
         name: "Dendrites",
         subtitle: "The receiving branches",
         color: "#7d9bcf",
-        position3D: [-0.85, 0.42, 0.02],
+        position3D: [-0.12, 0.22, 0.01],
         attributes: [
           { label: "Shape", value: "Branched" },
           { label: "Role", value: "Input" },
@@ -450,7 +450,7 @@ export const cells: CellItem[] = [
         name: "Nucleoid",
         subtitle: "The naked genome",
         color: "#7a43ad",
-        position3D: [0.0, 0.04, 0.2],
+        position3D: [89.7, 199.6, 184.5],
         attributes: [
           { label: "Size", value: "About 1 µm region" },
           { label: "Membrane", value: "None" },
@@ -465,7 +465,7 @@ export const cells: CellItem[] = [
         name: "Cell Wall",
         subtitle: "The protective shell",
         color: "#55aa89",
-        position3D: [-0.88, 0.02, 0.12],
+        position3D: [-600.0, 200.0, 180.0],
         attributes: [
           { label: "Material", value: "Peptidoglycan" },
           { label: "Role", value: "Shape and defense" },
@@ -480,7 +480,7 @@ export const cells: CellItem[] = [
         name: "Flagellum",
         subtitle: "The swimming tail",
         color: "#b87438",
-        position3D: [1.25, -0.2, 0.0],
+        position3D: [650.0, 500.0, 180.0],
         attributes: [
           { label: "Role", value: "Movement" },
           { label: "Shape", value: "Helical filament" },
@@ -534,7 +534,7 @@ export const cells: CellItem[] = [
         name: "Mitochondrion",
         subtitle: "The energy converter",
         color: "#cf6f42",
-        position3D: [-0.55, 0.3, 0.18],
+        position3D: [10.0, 20.0, 22.0],
         attributes: [
           { label: "Length", value: "1 to 10 µm" },
           { label: "Membrane", value: "Double" },
@@ -549,7 +549,7 @@ export const cells: CellItem[] = [
         name: "Nucleus",
         subtitle: "The command room",
         color: "#7a49b0",
-        position3D: [0.1, 0.08, 0.22],
+        position3D: [29.5, 9.8, 25.8],
         attributes: [
           { label: "Shape", value: "Rounded" },
           { label: "Membrane", value: "Double" },
@@ -564,7 +564,7 @@ export const cells: CellItem[] = [
         name: "Golgi Apparatus",
         subtitle: "The packaging stack",
         color: "#d49057",
-        position3D: [-0.2, -0.4, 0.22],
+        position3D: [42.0, -10.0, 24.0],
         attributes: [
           { label: "Shape", value: "Flattened stacks" },
           { label: "Role", value: "Modify and sort" },
