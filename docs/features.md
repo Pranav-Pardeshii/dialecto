@@ -38,3 +38,4 @@ Priorities:
 - **M4:** F-08 (Teach-Back with Pip), F-09 (Wispr Flow dictation UX).
 - **M5:** F-07 (Teacher dashboard heatmap & gaps), F-11 (Review queue).
 - **M6 & M7:** F-12 (Whisper mic fallback), F-14 (At-risk drill-down), hardening, end-to-end polish.
+

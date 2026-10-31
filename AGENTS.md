@@ -70,6 +70,7 @@ Stop and ask when a requirement is ambiguous, a doc contradicts another doc, a l
 - **Dictation-friendly input (Wispr Flow):** the teach-back and reasoning inputs are plain `<textarea>` elements. No contenteditable, no rich-text editors, no input masking. `autoFocus`; at least 8 rows; word counter; `Ctrl/Cmd+Enter` submits; plain `Enter` inserts a newline; do not intercept other key events or re-render the field in a way that drops the cursor.
 - Every screen needs loading (skeleton), empty, and error states. Responsive layout. Mastery colors must also show the percentage (color is never the only signal). Visible focus rings.
 - Show AI fallback honestly: a small toast such as "Tutor is busy, using backup model".
+- **Strict UI Cleanliness & Framework Secrecy:** NEVER mention backend frameworks, internal architecture, or third-party tools in any user-facing UI code or copy (e.g. absolutely no "FastAPI-powered", "identity validation", "Wispr Flow", "Groq", etc. anywhere in UI text, labels, footers, tooltips, or watermarks). Keep all user-facing copy natural, clean, minimal, beautiful, and focused entirely on the user experience (e.g. "Speak or type your explanation here...").
 
 ## 7. Content rules (biology correctness)
 

@@ -14,3 +14,7 @@ Record decisions in this file: Date, Decision, Reason.
 
 - **Decision:** Place root-level copies of `AGENTS.md` and `README.md` at project root in addition to `docs/`.
 - **Reason:** Matches the repository layout prescribed in `docs/README.md` and `MASTER_PROMPT.md` section 5/6.
+
+- **Decision:** Strictly ban mentions of backend frameworks, internal architecture, and third-party tools in any user-facing UI code or copy (e.g. no "FastAPI", "identity validation", "Wispr Flow", "Groq").
+- **Reason:** Preserves a clean, minimal, beautiful, and distraction-free user experience focused purely on learning without leaking implementation details.
+

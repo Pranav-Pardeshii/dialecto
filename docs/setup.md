@@ -104,3 +104,4 @@ Wispr Flow provides frictionless, system-wide speech-to-text with exceptional pu
 1. Import `frontend/` directory into Vercel.
 2. Set `BACKEND_URL` environment variable to your deployed backend URL.
 3. Deploy; Vercel automatically runs `pnpm build` and routes `/api/*` to the backend.
+

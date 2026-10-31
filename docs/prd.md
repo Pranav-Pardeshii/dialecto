@@ -105,3 +105,4 @@ Dialecto solves this by pairing:
   *Mitigation:* Single repair retry with schema guidance, followed by fallback model.
 - **Risk:** Design drift or generic look.  
   *Mitigation:* Taste Skill tokens codified in `docs/design.md` and approved by developer prior to building UI.
+

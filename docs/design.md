@@ -84,7 +84,7 @@ Powered by CSS transitions and Motion (Framer Motion). Honor `prefers-reduced-mo
 
 ---
 
-## 6. Dictation-First Input Component (`WisprFlowTextarea`)
+## 6. Dictation-First Input Component (`VoiceFriendlyTextarea`)
 
 Per standing rules in `AGENTS.md`:
 - Plain native `<textarea>` element — **no** rich text editors, contenteditable, or input masking.
@@ -94,9 +94,9 @@ Per standing rules in `AGENTS.md`:
 - Keyboard ergonomics:
   - `Ctrl + Enter` (or `Cmd + Enter`) submits the response.
   - Standard `Enter` creates a normal newline.
-  - Zero key interception that could hijack cursor position during Wispr Flow system-wide dictation.
-- Subtle helper label: *"Press your Wispr Flow hotkey to speak your explanation naturally."*
-- Groq Whisper mic button positioned cleanly as a secondary fallback.
+  - Zero key interception that could hijack cursor position during system-wide dictation.
+- Subtle, clean helper label: *"Speak out loud or type your explanation here..."* (strictly no third-party branding or framework mentions in the UI).
+- In-app microphone button positioned cleanly as a secondary voice input option.
 
 ---
 
@@ -145,8 +145,10 @@ Per standing rules in `AGENTS.md`:
 
 ---
 
-## 9. Microcopy & Voice Tone
+## 9. Microcopy, Voice Tone & Strict UI Privacy
 
 - **Voice:** Calm, intellectually respectful, precise, and encouraging. Never snarky, never juvenile.
 - **Pip's Voice:** Deliberately inquisitive, polite, asks genuine follow-up questions based on the judge's missing concepts without sounding like a generic corporate bot.
 - **Scientific Precision:** Terms match NCERT Class 10 Biology conventions verbatim (*alveoli*, *salivary amylase*, *emulsification*, *synapse*, *tropism*, *monohybrid*).
+- **Strict Framework & Tool Privacy:** Absolutely NO user-facing UI text, component labels, footers, tooltips, or error toasts may mention backend frameworks, internal architectural details, or third-party product names (such as "FastAPI", "identity validation", "Wispr Flow", "Groq", etc.). Keep the interface clean, minimal, distraction-free, and 100% focused on student and teacher learning experiences.
+
