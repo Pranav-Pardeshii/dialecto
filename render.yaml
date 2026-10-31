@@ -13,7 +13,7 @@ services:
     region: oregon
     plan: free
     buildCommand: "curl -LsSf https://astral.sh/uv/install.sh | sh && export UV_PYTHON_DOWNLOADS=auto && $HOME/.local/bin/uv python install 3.12 && $HOME/.local/bin/uv sync --no-dev --python 3.12"
-    startCommand: "$HOME/.local/bin/uv run alembic upgrade head && $HOME/.local/bin/uv run python -m app.db.seed && $HOME/.local/bin/uv run uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    startCommand: "bash scripts/start.sh"
     healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION
