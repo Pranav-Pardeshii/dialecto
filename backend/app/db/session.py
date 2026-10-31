@@ -7,8 +7,13 @@ from app.core.config import get_settings
 settings = get_settings()
 
 connect_args = {}
-# Disable asyncpg statement cache if using Neon pooled endpoint or if requested
-if "6543" in settings.DATABASE_URL or "ssl=require" in settings.DATABASE_URL:
+# Disable asyncpg statement cache if using pooled endpoint or cloud provider (Neon, Render, Supabase)
+if (
+    "6543" in settings.DATABASE_URL
+    or "ssl" in settings.DATABASE_URL
+    or "render.com" in settings.DATABASE_URL
+    or "dpg-" in settings.DATABASE_URL
+):
     connect_args["statement_cache_size"] = 0
 
 engine = create_async_engine(

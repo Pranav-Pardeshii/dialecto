@@ -1,0 +1,34 @@
+databases:
+  - name: dialecto-db
+    databaseName: dialecto
+    user: dialecto_user
+    plan: free
+    region: oregon
+
+services:
+  - type: web
+    name: dialecto-backend
+    runtime: python
+    rootDir: backend
+    region: oregon
+    plan: free
+    buildCommand: "curl -LsSf https://astral.sh/uv/install.sh | sh && $HOME/.local/bin/uv sync --no-dev"
+    startCommand: "$HOME/.local/bin/uv run alembic upgrade head && $HOME/.local/bin/uv run python -m app.db.seed && $HOME/.local/bin/uv run uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: dialecto-db
+          property: connectionString
+      - key: GROQ_API_KEY
+        sync: false
+      - key: LLM_PRIMARY_MODEL
+        value: openai/gpt-oss-120b
+      - key: LLM_FALLBACK_MODELS
+        value: qwen/qwen3.8-27b,openai/gpt-oss-20b
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: ENV
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
