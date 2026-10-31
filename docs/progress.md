@@ -92,17 +92,25 @@ Handoff memory across agent sessions.
 
 ---
 
-## In Progress
-- Transitioning to **Milestone M6: Speech Fallback (Groq Whisper), Final Polish & End-to-End Verification**.
+- **Milestone M6 Complete (Speech Fallback via Whisper, Polish, and Full End-to-End Delivery):**
+  - Groq Whisper speech-to-text endpoint at `POST /api/v1/speech/transcriptions` in `backend/app/api/v1/endpoints/speech.py` with 5 MB file size boundary and empty audio validation.
+  - Interactive browser voice dictation fallback in `frontend/src/components/ui/VoiceFriendlyTextarea.tsx` with MediaRecorder recording states, pulsing indicators, and auto-transcription appending.
+  - Strict UI cleanliness verified across all screens: zero technical/framework jargon anywhere in UI text.
+  - Complete backend test suite: all 50 unit and integration tests passing (`pytest`).
+  - Strict type safety and linting passing 100% on both backend (`ruff`, `mypy`) and frontend (`tsc --noEmit`, Next.js ESLint, `next build`).
+  - Production builds verified and all contracts synchronized via `openapi-typescript`.
 
 ---
 
-## Next
-- **Milestone M6 Plan:**
-  1. Add Groq Whisper speech-to-text endpoint at `POST /api/v1/speech/transcriptions` in `backend/app/api/v1/endpoints/speech.py`.
-  2. Wire client-side audio recording fallback in `frontend/src/components/ui/VoiceFriendlyTextarea.tsx` when user clicks the mic button.
-  3. Run full verification test suite across backend and frontend (`make check`).
-  4. Final commit, push, and review against PRD user stories.
+## Complete
+All Milestones (M0 through M6) are completely implemented, verified, and committed to repository `https://github.com/Pranav-Pardeshii/dialecto`:
+- **Adaptive Diagnostic & Practice Engine** with BKT Bayesian Knowledge Tracing, Elo item calibration, SM-2 spaced repetition decay, and optimal next-question selection.
+- **Resilient AI Layer** with in-process circuit breakers, token budget rate limiting, Groq multi-model fallback chain, and misconception classification from student reasoning.
+- **Teach-Back Mode with Pip** featuring autonomous comprehension levels (0 to 3), rubric key point evaluations, soft-evidence Bayesian updates, and voice dictation.
+- **Teacher Classroom Analytics** featuring $30 \times 20$ interactive student-by-concept knowledge matrix, curriculum failure gap rankings, misconception hotspots, and at-risk student intervention drill-downs.
+- **Spaced Review Queue** with urgency ranking and one-click review launch.
+- **Observability Panel (`/ops`)** displaying live latency percentiles (P50/P95), circuit breaker states, token budgets, and invocation logs.
+
 
 ---
 

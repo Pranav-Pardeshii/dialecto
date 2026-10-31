@@ -444,6 +444,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/speech/transcriptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Transcribe Audio
+         * @description Transcribe spoken learner audio using Whisper speech-to-text model.
+         */
+        post: operations["transcribe_audio_api_v1_speech_transcriptions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/ops/llm-stats": {
         parameters: {
             query?: never;
@@ -504,6 +524,11 @@ export interface components {
             overdue_count: number;
             /** Active Misconceptions Count */
             active_misconceptions_count: number;
+        };
+        /** Body_transcribe_audio_api_v1_speech_transcriptions_post */
+        Body_transcribe_audio_api_v1_speech_transcriptions_post: {
+            /** Audio */
+            audio: string;
         };
         /** ConceptDetailResponse */
         ConceptDetailResponse: {
@@ -1127,6 +1152,11 @@ export interface components {
             students: components["schemas"]["HeatmapStudentOut"][];
             /** Cells */
             cells: components["schemas"]["HeatmapCellOut"][];
+        };
+        /** TranscriptionResponse */
+        TranscriptionResponse: {
+            /** Text */
+            text: string;
         };
         /** UserOut */
         UserOut: {
@@ -1857,6 +1887,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["StudentDetailResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    transcribe_audio_api_v1_speech_transcriptions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_transcribe_audio_api_v1_speech_transcriptions_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TranscriptionResponse"];
                 };
             };
             /** @description Validation Error */

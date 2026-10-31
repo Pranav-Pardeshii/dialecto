@@ -1202,6 +1202,48 @@
         }
       }
     },
+    "/api/v1/speech/transcriptions": {
+      "post": {
+        "tags": [
+          "Speech Recognition"
+        ],
+        "summary": "Transcribe Audio",
+        "description": "Transcribe spoken learner audio using Whisper speech-to-text model.",
+        "operationId": "transcribe_audio_api_v1_speech_transcriptions_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_transcribe_audio_api_v1_speech_transcriptions_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranscriptionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/ops/llm-stats": {
       "get": {
         "tags": [
@@ -1316,6 +1358,20 @@
           "active_misconceptions_count"
         ],
         "title": "AtRiskStudentItem"
+      },
+      "Body_transcribe_audio_api_v1_speech_transcriptions_post": {
+        "properties": {
+          "audio": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "Audio"
+          }
+        },
+        "type": "object",
+        "required": [
+          "audio"
+        ],
+        "title": "Body_transcribe_audio_api_v1_speech_transcriptions_post"
       },
       "ConceptDetailResponse": {
         "properties": {
@@ -3050,6 +3106,20 @@
           "cells"
         ],
         "title": "TeacherHeatmapResponse"
+      },
+      "TranscriptionResponse": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "TranscriptionResponse"
       },
       "UserOut": {
         "properties": {
